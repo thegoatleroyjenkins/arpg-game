@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
@@ -13,6 +13,14 @@ height = 1.7
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 radius = 0.35
 mid_height = 1.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_npc"]
+radius = 0.33
+height = 1.65
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_npc"]
+radius = 0.33
+mid_height = 0.95
 
 [node name="OpenWorld3D" type="Node3D"]
 
@@ -43,6 +51,22 @@ position = Vector3(0, 6, 8)
 
 [node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
 current = true
+
+[node name="NpcGnome" type="CharacterBody3D" parent="." groups=["npcs"]]
+position = Vector3(30, 2, 26)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NpcGnome"]
+position = Vector3(0, 0.82, 0)
+shape = SubResource("CapsuleShape3D_npc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NpcGnome"]
+position = Vector3(0, 0.82, 0)
+mesh = SubResource("CapsuleMesh_npc")
+
+[node name="NameLabel" type="Label3D" parent="NpcGnome"]
+position = Vector3(0, 2.05, 0)
+billboard = 1
+text = "Gnome"
 
 [node name="WorldStreamer" type="Node" parent="."]
 script = ExtResource("4_world_streamer")
