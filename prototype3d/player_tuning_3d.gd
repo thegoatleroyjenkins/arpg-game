@@ -15,6 +15,10 @@ class_name PlayerTuning3D
 @export var ground_deceleration: float = 48.0
 @export_range(0.0, 1.0, 0.01) var air_control: float = 0.5
 
+@export_group("Facing")
+@export var turn_speed_degrees_per_second: float = 720.0
+@export var min_turn_speed_threshold: float = 0.1
+
 @export_group("Stamina")
 @export var max_stamina: float = 100.0
 @export var sprint_stamina_per_second: float = 28.0

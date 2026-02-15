@@ -99,11 +99,12 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Face movement direction
+	# Face movement direction with data-driven turn speed smoothing.
 	var horizontal_vel := Vector3(velocity.x, 0.0, velocity.z)
-	if horizontal_vel.length() > 0.1:
+	if horizontal_vel.length() > tuning.min_turn_speed_threshold:
 		look_target = global_position + horizontal_vel.normalized()
-		look_at(look_target, Vector3.UP)
+		var desired_yaw := atan2(-horizontal_vel.x, -horizontal_vel.z)
+		rotation.y = lerp_angle(rotation.y, desired_yaw, deg_to_rad(tuning.turn_speed_degrees_per_second) * delta)
 
 	# Follow camera smoothly
 	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, tuning.camera_distance)
