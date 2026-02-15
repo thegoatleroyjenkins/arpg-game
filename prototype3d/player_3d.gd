@@ -478,6 +478,7 @@ func _resolve_camera_pivot_target() -> Vector3:
 	ray_query.exclude = [self]
 	ray_query.collide_with_areas = false
 	ray_query.collide_with_bodies = true
+	ray_query.collision_mask = max(1, tuning.camera_collision_mask)
 	var hit := get_world_3d().direct_space_state.intersect_ray(ray_query)
 	if hit.is_empty():
 		return desired_pivot_position

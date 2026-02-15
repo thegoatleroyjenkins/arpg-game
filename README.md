@@ -52,6 +52,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Sprint Exhaustion Gate (3D prototype)** — Data-driven stamina thresholds now gate sprint re-engage after exhaustion, preventing rapid on/off sprint jitter at near-zero stamina
 - **Velocity Look-Ahead Camera (3D prototype)** — Data-driven camera look-ahead shifts focus toward movement direction based on speed, improving forward readability during traversal and combat repositioning
 - **Camera Collision Avoidance (3D prototype)** — Data-driven camera raycast + collision padding now prevent hard clipping through level geometry, preserving player readability in tight spaces while keeping camera behavior modular and tunable
+- **Camera Collision Layer Mask (3D prototype)** — Data-driven camera collision mask now controls which physics layers can push the camera, preventing jitter from non-blocking gameplay props while preserving modular tuning
 - **Dash Charges (3D prototype)** — Data-driven multi-charge dash model (max charges + recharge time) adds tactical mobility pacing without hardcoding ability logic
 - **Dash Charge Recharge HUD (3D prototype)** — Modular HUD now surfaces next-charge refill timing, improving dash resource planning in high-pressure movement chains
 - **Charge-Bypass Dash Chaining (3D prototype)** — Data-driven toggle now allows available dash charges to bypass cooldown gating, enabling cleaner back-to-back reposition bursts while depleted charges still recover on timer
@@ -193,6 +194,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D camera collision layer mask tuning so camera occlusion checks can ignore non-blocking physics layers (like gameplay props/pickups), reducing unwanted camera jitter while preserving level readability
 - ✅ Added data-driven stamina pickup anti-waste collect threshold (minimum missing-stamina ratio) so near-full players do not accidentally consume orbs, preserving intentional resource routing
 - ✅ Added data-driven 3D stamina pickup respawn telegraph tuning (toggle + telegraph duration + pulse speed + alpha range) so depleted stamina orbs visibly pulse before becoming collectible again, improving pickup timing readability during movement-heavy combat routing
 - ✅ Added data-driven stamina pickup spawn-recovery drift correction (return speed + snap distance) so uncollected orbs slide back toward their spawn anchors when magnet pull conditions fail, preserving pickup location readability
