@@ -8,6 +8,9 @@ extends Area3D
 @export_group("Magnet")
 @export var magnet_radius: float = 4.0
 @export var magnet_speed: float = 10.0
+@export_range(0.0, 1.0, 0.01) var magnet_min_speed_ratio: float = 0.35
+@export_range(0.5, 3.0, 0.05) var magnet_speed_curve_power: float = 1.4
+@export var magnet_auto_collect_radius: float = 0.75
 @export_range(0.0, 1.0, 0.01) var magnet_missing_stamina_ratio: float = 0.2
 
 @onready var mesh: Node3D = $MeshInstance3D
@@ -31,6 +34,9 @@ func _process(delta: float) -> void:
 		_update_magnet_motion(delta)
 
 func _on_body_entered(body: Node) -> void:
+	_try_collect(body)
+
+func _try_collect(body: Node) -> void:
 	if not _active:
 		return
 	if not body.has_method("restore_stamina"):
@@ -39,8 +45,11 @@ func _on_body_entered(body: Node) -> void:
 	if restored <= 0.0:
 		return
 	_deactivate()
-	await get_tree().create_timer(max(0.1, respawn_time)).timeout
-	_activate()
+	_begin_respawn_timer()
+
+func _begin_respawn_timer() -> void:
+	var timer := get_tree().create_timer(max(0.1, respawn_time))
+	timer.timeout.connect(_activate, CONNECT_ONE_SHOT)
 
 func _deactivate() -> void:
 	_active = false
@@ -75,8 +84,14 @@ func _update_magnet_motion(delta: float) -> void:
 		return
 	if not _target_needs_stamina(player):
 		return
+	if distance <= max(0.05, magnet_auto_collect_radius):
+		_try_collect(player)
+		return
 	var direction: Vector3 = to_player / distance
-	global_position += direction * magnet_speed * delta
+	var magnet_progress: float = clamp(1.0 - (distance / magnet_radius), 0.0, 1.0)
+	var speed_curve: float = pow(magnet_progress, max(0.5, magnet_speed_curve_power))
+	var speed_scale: float = lerpf(clamp(magnet_min_speed_ratio, 0.0, 1.0), 1.0, speed_curve)
+	global_position += direction * magnet_speed * speed_scale * delta
 
 func _get_magnet_target() -> Node3D:
 	var players: Array[Node] = get_tree().get_nodes_in_group("player_3d")
