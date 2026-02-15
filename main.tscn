@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=4 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://player_scene" path="res://player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://ui/minimap.gd" id="3_minimap"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -48,3 +49,22 @@ offset_bottom = 115.0
 horizontal_alignment = 2
 vertical_alignment = 1
 text = "Controls\nWASD / Arrows: Move\nClick or Space: Attack\nWalk over loot: Auto-pickup"
+
+[node name="MinimapPanel" type="Panel" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -230.0
+offset_top = 145.0
+offset_right = -10.0
+offset_bottom = 365.0
+self_modulate = Color(1, 1, 1, 0.88)
+
+[node name="MiniMap" type="Control" parent="UI/MinimapPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 210.0
+offset_bottom = 210.0
+script = ExtResource("3_minimap")
+player_path = NodePath("../../Player")

@@ -4,6 +4,7 @@ extends Node2D
 @onready var camera = $Camera2D
 @onready var ui = $UI
 @onready var stats_label = $UI/StatsPanel/StatsLabel
+@onready var minimap = $UI/MinimapPanel/MiniMap
 
 var world_size = Vector2(2000, 2000)
 var enemies_remaining: int = 0
@@ -21,6 +22,9 @@ func _ready():
 	camera.limit_right = world_size.x
 	camera.limit_bottom = world_size.y
 	
+	if minimap:
+		minimap.world_size = world_size
+
 	# Generate world
 	_generate_floor()
 	_generate_enemies(20)  # More enemies for variety

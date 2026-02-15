@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://item.gd" id="1_item"]
 
-[node name="Item" type="Area2D"]
+[node name="Item" type="Area2D" groups=["pickups"]]
 script = ExtResource("1_item")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
