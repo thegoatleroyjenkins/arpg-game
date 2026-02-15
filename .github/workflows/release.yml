@@ -69,12 +69,25 @@ jobs:
           TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
           mkdir -p "$TEMPLATES_DIR"
 
-          curl -fsSL -o /tmp/godot_templates.tpz \
-            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          TEMPLATE_URL="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+
+          if command -v curl >/dev/null 2>&1; then
+            curl -fsSL -o /tmp/godot_templates.tpz "$TEMPLATE_URL"
+          elif command -v wget >/dev/null 2>&1; then
+            wget -q -O /tmp/godot_templates.tpz "$TEMPLATE_URL"
+          elif command -v python3 >/dev/null 2>&1; then
+            python3 - <<PY
+import urllib.request
+urllib.request.urlretrieve("$TEMPLATE_URL", "/tmp/godot_templates.tpz")
+PY
+          else
+            echo "No downloader available (curl/wget/python3 missing)."
+            exit 1
+          fi
 
           unzip -o -q /tmp/godot_templates.tpz -d "$TEMPLATES_DIR"
 
-          # Godot may look either in .../4.2.1.stable/templates/* or directly in .../4.2.1.stable/*
+          # Godot may look either in .../<version>/templates/* or directly in .../<version>/*
           if [ -d "$TEMPLATES_DIR/templates" ]; then
             cp -f "$TEMPLATES_DIR"/templates/* "$TEMPLATES_DIR"/
           fi
