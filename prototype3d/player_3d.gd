@@ -329,7 +329,7 @@ func _resolve_move_direction(input_vec: Vector2) -> Vector3:
 		var remapped_strength: float = clamp((input_strength - deadzone) / max(0.001, 1.0 - deadzone), 0.0, 1.0)
 		input_vec = input_vec.normalized() * remapped_strength
 	if not tuning.movement_relative_to_camera or not is_instance_valid(camera):
-		return Vector3(input_vec.x, 0.0, input_vec.y)
+		return Vector3(input_vec.x, 0.0, -input_vec.y)
 
 	var camera_forward := -camera.global_transform.basis.z
 	camera_forward.y = 0.0
@@ -343,7 +343,7 @@ func _resolve_move_direction(input_vec: Vector2) -> Vector3:
 		camera_right = Vector3.RIGHT
 	camera_right = camera_right.normalized()
 
-	var direction := (camera_right * input_vec.x) + (camera_forward * input_vec.y)
+	var direction := (camera_right * input_vec.x) - (camera_forward * input_vec.y)
 	if direction.length() > 1.0:
 		direction = direction.normalized()
 	return direction
