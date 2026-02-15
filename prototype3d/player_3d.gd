@@ -10,6 +10,7 @@ const ACTION_JUMP := "jump"
 signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
+signal air_jumps_changed(current: int, max_value: int)
 
 var look_target: Vector3
 var target_camera_distance: float = 0.0
@@ -38,6 +39,7 @@ func _ready() -> void:
 	_emit_stamina_changed()
 	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
+	_emit_air_jumps_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -63,7 +65,10 @@ func _physics_process(delta: float) -> void:
 	# Gravity + coyote time for forgiving jumps after stepping off ledges.
 	if was_on_floor:
 		coyote_time_left = tuning.coyote_time
-		air_jumps_left = max(0, tuning.max_air_jumps)
+		var reset_air_jumps := max(0, tuning.max_air_jumps)
+		if air_jumps_left != reset_air_jumps:
+			air_jumps_left = reset_air_jumps
+			_emit_air_jumps_changed()
 	else:
 		coyote_time_left = max(0.0, coyote_time_left - delta)
 		var gravity_scale := 1.0
@@ -83,6 +88,7 @@ func _physics_process(delta: float) -> void:
 			coyote_time_left = 0.0
 		elif can_air_jump:
 			air_jumps_left -= 1
+			_emit_air_jumps_changed()
 
 	# Movement input
 	var input_vec := Vector2(
@@ -279,3 +285,6 @@ func _emit_dash_charges_changed() -> void:
 
 func _emit_dash_cooldown_changed() -> void:
 	dash_cooldown_changed.emit(_next_dash_ready_remaining(), _next_dash_ready_max())
+
+func _emit_air_jumps_changed() -> void:
+	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))
