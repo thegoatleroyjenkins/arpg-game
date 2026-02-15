@@ -7,6 +7,8 @@ class_name PlayerTuning3D
 @export var gravity: float = 12.0
 @export var coyote_time: float = 0.12
 @export var jump_buffer_time: float = 0.12
+@export var jump_release_gravity_multiplier: float = 2.2
+@export var max_fall_speed: float = 18.0
 
 @export_group("Movement Feel")
 @export var ground_acceleration: float = 40.0

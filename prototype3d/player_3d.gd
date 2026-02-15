@@ -42,7 +42,12 @@ func _physics_process(delta: float) -> void:
 		coyote_time_left = tuning.coyote_time
 	else:
 		coyote_time_left = max(0.0, coyote_time_left - delta)
-		velocity.y -= tuning.gravity * delta
+		var gravity_scale := 1.0
+		# Variable jump height: releasing jump early makes ascent fall off faster.
+		if velocity.y > 0.0 and not Input.is_action_pressed("ui_accept"):
+			gravity_scale = tuning.jump_release_gravity_multiplier
+		velocity.y -= tuning.gravity * gravity_scale * delta
+		velocity.y = max(velocity.y, -tuning.max_fall_speed)
 
 	if jump_buffer_left > 0.0 and coyote_time_left > 0.0:
 		velocity.y = tuning.jump_velocity
