@@ -27,6 +27,9 @@ func _ready():
 	_generate_items(10)
 	_generate_equipment(5)
 	
+	if player.has_signal("stats_changed"):
+		player.stats_changed.connect(update_stats)
+	
 	update_stats()
 
 func _process(_delta):
@@ -243,24 +246,33 @@ func update_stats():
 	var armor_name = "None"
 	var accessory_name = "None"
 	
+	var weapon_damage = 0
+	var armor_defense = 0
+	var accessory_health = 0
+	
 	if player.weapon:
 		weapon_name = player.weapon.item_name
+		weapon_damage = player.weapon.damage_bonus
 	if player.armor:
 		armor_name = player.armor.item_name
+		armor_defense = player.armor.defense_bonus
 	if player.accessory:
 		accessory_name = player.accessory.item_name
+		accessory_health = player.accessory.health_bonus
 	
-	stats_label.text = "Level: %d\nXP: %d/%d\nHealth: %d/%d\nEnemies: %d\n\nEquipment:\n- Weapon: %s (+%d dmg)\n- Armor: %s (+%d def)\n- Accessory: %s (+%d hp)" % [
+	stats_label.text = "Level: %d\nXP: %d/%d\nHealth: %d/%d\nDamage: %d\nDefense: %d\nEnemies: %d\n\nEquipment:\n- Weapon: %s (+%d dmg)\n- Armor: %s (+%d def)\n- Accessory: %s (+%d hp)" % [
 		player.level,
 		player.xp,
 		player.xp_to_next_level,
 		player.current_health,
 		player.total_max_health,
+		player.total_damage,
+		player.defense_bonus,
 		enemies_remaining,
 		weapon_name,
-		player.damage_bonus,
+		weapon_damage,
 		armor_name,
-		player.defense_bonus,
+		armor_defense,
 		accessory_name,
-		player.health_bonus
+		accessory_health
 	]

@@ -32,6 +32,8 @@ var total_damage: int:
 @onready var attack_area = $AttackArea
 @onready var health_bar = $HealthBar
 
+signal stats_changed
+
 var xp_to_next_level: int:
 	get:
 		return level * 100
@@ -39,6 +41,7 @@ var xp_to_next_level: int:
 func _ready():
 	current_health = max_health
 	_update_health_bar()
+	emit_signal("stats_changed")
 
 func _physics_process(delta):
 	# Handle attack cooldown
@@ -88,6 +91,7 @@ func take_damage(amount: int):
 	var actual_damage = max(1, amount - defense_bonus)
 	current_health -= actual_damage
 	_update_health_bar()
+	emit_signal("stats_changed")
 	
 	# Flash red
 	var tween = create_tween()
@@ -103,6 +107,7 @@ func _update_health_bar():
 
 func gain_xp(amount: int):
 	xp += amount
+	emit_signal("stats_changed")
 	if xp >= xp_to_next_level:
 		level_up()
 
@@ -117,12 +122,14 @@ func level_up():
 	var tween = create_tween()
 	sprite.modulate = Color.GOLD
 	tween.tween_property(sprite, "modulate", Color.WHITE, 0.5)
+	emit_signal("stats_changed")
 
 func die():
 	# Simple respawn
 	current_health = total_max_health
 	position = Vector2(100, 100)
 	_update_health_bar()
+	emit_signal("stats_changed")
 
 func equip_item(new_equipment: Equipment):
 	var slot_name = ""
@@ -180,3 +187,4 @@ func _apply_bonuses():
 	# Clamp health if current exceeds new max
 	current_health = min(current_health, total_max_health)
 	_update_health_bar()
+	emit_signal("stats_changed")

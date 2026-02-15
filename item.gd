@@ -20,7 +20,9 @@ func _on_body_entered(body):
 func apply_effect(player):
 	match item_type:
 		"health_potion":
-			player.current_health = min(player.current_health + value, player.max_health)
+			player.current_health = min(player.current_health + value, player.total_max_health)
 			player._update_health_bar()
+			if player.has_signal("stats_changed"):
+				player.emit_signal("stats_changed")
 		"xp_orb":
 			player.gain_xp(value)
