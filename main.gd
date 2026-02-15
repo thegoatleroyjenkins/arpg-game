@@ -5,9 +5,12 @@ extends Node2D
 @onready var ui = $UI
 @onready var stats_label = $UI/StatsPanel/StatsLabel
 @onready var minimap = $UI/MinimapPanel/MiniMap
+@onready var objective_label = $UI/ObjectivePanel/ObjectiveLabel
+@onready var objective_progress = $UI/ObjectivePanel/ObjectiveProgress
 
 var world_size = Vector2(2000, 2000)
 var enemies_remaining: int = 0
+var total_enemies: int = 0
 
 # Loot drop chances
 var loot_chance_common: float = 0.4
@@ -51,6 +54,7 @@ func _generate_floor():
 
 func _generate_enemies(count):
 	enemies_remaining = count
+	total_enemies = count
 	
 	for i in range(count):
 		var enemy = preload("res://enemy.tscn").instantiate()
@@ -280,7 +284,7 @@ func update_stats():
 	if health_ratio < 0.3:
 		health_color = "#FF6B6B"
 	
-	stats_label.text = "[b][color=#F6E27A]Level %d[/color][/b]\n[color=#A9D6FF]XP:[/color] %d/%d\n[color=%s]Health:[/color] %d/%d\n[color=#FFB26B]Damage:[/color] %d    [color=#8BD3FF]Defense:[/color] %d\n[b]Objective:[/b] Defeat [color=#FF8FA3]%d[/color] enemies\n\n[b][color=#DCC7FF]Equipment[/color][/b]\n• Weapon: %s (+%d dmg)\n• Armor: %s (+%d def)\n• Accessory: %s (+%d hp)" % [
+	stats_label.text = "[b][color=#F6E27A]Level %d[/color][/b]\n[color=#A9D6FF]XP:[/color] %d/%d\n[color=%s]Health:[/color] %d/%d\n[color=#FFB26B]Damage:[/color] %d    [color=#8BD3FF]Defense:[/color] %d\n\n[b][color=#DCC7FF]Equipment[/color][/b]\n• Weapon: %s (+%d dmg)\n• Armor: %s (+%d def)\n• Accessory: %s (+%d hp)" % [
 		player.level,
 		player.xp,
 		player.xp_to_next_level,
@@ -289,7 +293,6 @@ func update_stats():
 		player.total_max_health,
 		player.total_damage,
 		player.defense_bonus,
-		enemies_remaining,
 		weapon_name,
 		weapon_damage,
 		armor_name,
@@ -297,3 +300,9 @@ func update_stats():
 		accessory_name,
 		accessory_health
 	]
+
+	if objective_label and objective_progress:
+		var defeated = max(total_enemies - enemies_remaining, 0)
+		objective_label.text = "Objective: Defeat enemies (%d/%d)" % [defeated, total_enemies]
+		objective_progress.max_value = max(total_enemies, 1)
+		objective_progress.value = defeated

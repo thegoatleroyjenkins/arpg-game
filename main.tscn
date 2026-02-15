@@ -31,6 +31,29 @@ fit_content = true
 scroll_active = false
 text = "[b]Level 1[/b]\nXP: 0/100\nHealth: 100/100"
 
+[node name="ObjectivePanel" type="Panel" parent="UI"]
+offset_left = 10.0
+offset_top = 265.0
+offset_right = 350.0
+offset_bottom = 330.0
+self_modulate = Color(1, 1, 1, 0.88)
+
+[node name="ObjectiveLabel" type="Label" parent="UI/ObjectivePanel"]
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 330.0
+offset_bottom = 28.0
+text = "Objective: Defeat enemies (0/20)"
+
+[node name="ObjectiveProgress" type="ProgressBar" parent="UI/ObjectivePanel"]
+offset_left = 10.0
+offset_top = 34.0
+offset_right = 330.0
+offset_bottom = 56.0
+max_value = 20.0
+value = 0.0
+show_percentage = false
+
 [node name="ControlsPanel" type="Panel" parent="UI"]
 anchors_preset = 1
 anchor_left = 1.0
@@ -48,7 +71,7 @@ offset_right = 250.0
 offset_bottom = 115.0
 horizontal_alignment = 2
 vertical_alignment = 1
-text = "Controls\nWASD / Arrows: Move\nClick or Space: Attack\nWalk over loot: Auto-pickup"
+text = "[Controls]\nWASD / Arrows: Move\nClick or Space: Attack\nWalk over loot: Auto-pickup"
 
 [node name="MinimapPanel" type="Panel" parent="UI"]
 anchors_preset = 1
@@ -57,7 +80,7 @@ anchor_right = 1.0
 offset_left = -230.0
 offset_top = 145.0
 offset_right = -10.0
-offset_bottom = 365.0
+offset_bottom = 385.0
 self_modulate = Color(1, 1, 1, 0.88)
 
 [node name="MiniMap" type="Control" parent="UI/MinimapPanel"]
@@ -68,3 +91,11 @@ offset_right = 210.0
 offset_bottom = 210.0
 script = ExtResource("3_minimap")
 player_path = NodePath("../../Player")
+
+[node name="MinimapLegend" type="Label" parent="UI/MinimapPanel"]
+offset_left = 10.0
+offset_top = 216.0
+offset_right = 210.0
+offset_bottom = 236.0
+horizontal_alignment = 1
+text = "Green: You   Red: Enemies   Blue: Loot"
