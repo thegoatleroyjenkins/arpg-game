@@ -37,6 +37,8 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 
 Get the latest **Windows build** from [Releases](../../releases).
 
+- Every push to `master` now auto-builds and publishes a GitHub Release artifact (`arpg-windows.zip`).
+
 ## Controls
 
 | Key | Action |
