@@ -24,6 +24,7 @@ var buffered_dash_direction: Vector3 = Vector3.ZERO
 var stamina: float = 0.0
 var stamina_regen_delay_left: float = 0.0
 var sprint_blend: float = 0.0
+var sprint_exhausted: bool = false
 var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
 var air_jumps_left: int = 0
@@ -145,9 +146,15 @@ func _physics_process(delta: float) -> void:
 		var is_moving := move_dir.length() > 0.01
 		var is_trying_to_sprint := Input.is_action_pressed("sprint") and is_moving
 		var is_sprinting := false
-		if is_trying_to_sprint and _can_pay_stamina(tuning.sprint_stamina_per_second * delta):
+		var sprint_exhaust_threshold := max(0.0, tuning.sprint_exhaustion_threshold)
+		var sprint_resume_threshold := max(sprint_exhaust_threshold, tuning.sprint_resume_threshold)
+		if sprint_exhausted and stamina >= sprint_resume_threshold:
+			sprint_exhausted = false
+		if is_trying_to_sprint and not sprint_exhausted and _can_pay_stamina(tuning.sprint_stamina_per_second * delta):
 			is_sprinting = true
 			_use_stamina(tuning.sprint_stamina_per_second * delta)
+			if stamina <= sprint_exhaust_threshold:
+				sprint_exhausted = true
 		else:
 			_regen_stamina(delta, is_moving)
 

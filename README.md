@@ -30,6 +30,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
 - **Dynamic Camera FOV (3D prototype)** — Data-driven FOV kick scales with movement speed and dash state, adding stronger sensation of momentum without hardcoding camera behavior
 - **Sprint Ramp Smoothing (3D prototype)** — Data-driven sprint ramp-up/ramp-down blends acceleration into and out of sprint for weightier, cleaner movement transitions
+- **Sprint Exhaustion Gate (3D prototype)** — Data-driven stamina thresholds now gate sprint re-engage after exhaustion, preventing rapid on/off sprint jitter at near-zero stamina
 - **Velocity Look-Ahead Camera (3D prototype)** — Data-driven camera look-ahead shifts focus toward movement direction based on speed, improving forward readability during traversal and combat repositioning
 - **Dash Charges (3D prototype)** — Data-driven multi-charge dash model (max charges + recharge time) adds tactical mobility pacing without hardcoding ability logic
 - **Air Jump HUD Readout (3D prototype)** — Modular HUD now shows remaining air jumps in real time, improving vertical mobility clarity during combat and traversal
@@ -176,6 +177,7 @@ arpg-game/
 - ✅ Added data-driven 3D dash input buffering so near-ready dash presses queue cleanly and fire as cooldown ends
 - ✅ Added data-driven contextual stamina regeneration (separate idle vs moving regen rates) to improve mobility/resource pacing
 - ✅ Added data-driven sprint ramp smoothing (separate ramp-up/ramp-down rates) for weightier transitions into and out of sprint movement
+- ✅ Added data-driven sprint exhaustion gating (exhaustion/resume stamina thresholds) to prevent near-empty stamina sprint flicker and improve movement pacing readability
 - ✅ Added data-driven velocity-based 3D camera look-ahead (distance + smoothing tuning) to improve forward visibility and movement readability
 - ✅ Added data-driven 3D jump stamina cost to curb spam-jumping and strengthen stamina tradeoff decisions
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)

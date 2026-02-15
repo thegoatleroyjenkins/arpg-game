@@ -21,6 +21,8 @@ class_name PlayerTuning3D
 @export_group("Sprint Feel")
 @export var sprint_ramp_up_per_second: float = 8.0
 @export var sprint_ramp_down_per_second: float = 10.0
+@export var sprint_exhaustion_threshold: float = 5.0
+@export var sprint_resume_threshold: float = 18.0
 
 @export_group("Facing")
 @export var turn_speed_degrees_per_second: float = 720.0
