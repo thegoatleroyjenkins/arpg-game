@@ -7,6 +7,7 @@ class_name PlayerTuning3D
 @export var gravity: float = 12.0
 @export var coyote_time: float = 0.12
 @export var jump_buffer_time: float = 0.12
+@export var jump_buffer_dash_bonus_time: float = 0.1
 @export var max_air_jumps: int = 1
 
 @export_group("Air Jump Feel")

@@ -99,6 +99,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Fall Recovery Safety Reset (3D prototype)** — Data-driven fall reset height now safely respawns the player at their start anchor with tunable stamina/recovery penalties, preventing softlocks from arena falls while preserving movement tradeoffs
 - **Landing Recovery Dash Cancel Window (3D prototype)** — Data-driven late-recovery dash-cancel timing lets skilled players spend dash resources to recover from heavy landings faster without hardcoded behavior
 - **Landing Recovery Dash Input Buffer (3D prototype)** — Data-driven recovery-buffer timing now queues dash input pressed shortly before landing recovery ends, improving movement responsiveness after hard landings without bypassing stamina/cooldown checks
+- **Dash-to-Jump Input Buffer Assist (3D prototype)** — Data-driven dash jump-buffer bonus timing now preserves jump presses made near dash end, improving movement chain responsiveness without bypassing stamina or grounded/air-jump rules
 - **Landing Recovery HUD (3D prototype)** — Modular HUD now tracks hard-landing recovery remaining time (data-driven duration), clarifying when movement lockout ends after heavy falls
 - **Camera Impulse Feedback (3D prototype)** — Data-driven camera impulse kick now reacts to dashes and hard landings (with tunable decay/max offset), improving movement impact without hardcoded camera behavior
 - **Air Dash Stamina Scaling (3D prototype)** — Data-driven airborne dash stamina multiplier now increases in-air dash cost versus grounded dashes, improving mobility tradeoff clarity in combat routing
@@ -230,6 +231,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven dash-to-jump input buffer assist (`jump_buffer_dash_bonus_time`) so jump presses near dash end are preserved into the post-dash window, improving movement-chain responsiveness without bypassing stamina or jump eligibility checks
 - ✅ Polished the 3D prototype UI readability: added a translucent HUD backdrop, stronger text outlining for mobility readouts, an in-HUD controls hint strip, and clearer pause-menu subtitle guidance so moment-to-moment movement information remains legible under action
 - ✅ Added data-driven landing-recovery dash input buffering (`hard_landing_dash_input_buffer_window`) so dash presses just before recovery ends are queued and fired as soon as dash cancel rules allow, improving post-landing responsiveness without bypassing stamina/cooldown gating
 - ✅ Added data-driven sprint-efficiency pickup profile tuning (`sprint_efficiency_boost_duration`, `sprint_efficiency_boost_multiplier`) to `StaminaPickupProfile3D`, so reusable orb profile resources can author mobility-burst behavior without scene-level hardcoding

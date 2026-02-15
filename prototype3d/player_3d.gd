@@ -144,7 +144,10 @@ func _physics_process(delta: float) -> void:
 
 	# Jump buffering gives more forgiving timing before landing.
 	if _is_jump_just_pressed():
-		jump_buffer_left = tuning.jump_buffer_time
+		var jump_buffer_window: float = max(0.0, tuning.jump_buffer_time)
+		if dash_time_left > 0.0:
+			jump_buffer_window += min(dash_time_left, max(0.0, tuning.jump_buffer_dash_bonus_time))
+		jump_buffer_left = jump_buffer_window
 	else:
 		jump_buffer_left = max(0.0, jump_buffer_left - delta)
 
