@@ -46,6 +46,8 @@ var stamina_action_warning_cooldown_left: float = 0.0
 var dash_invulnerability_left: float = 0.0
 var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
+var camera_orbit_yaw: float = 0.0
+var camera_orbit_pitch: float = 0.0
 var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
 
@@ -54,6 +56,8 @@ func _ready() -> void:
 	look_target = global_position
 	respawn_position = global_position
 	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
+	camera_orbit_yaw = 0.0
+	camera_orbit_pitch = deg_to_rad(clamp(0.0, tuning.camera_orbit_pitch_min_degrees, tuning.camera_orbit_pitch_max_degrees))
 	stamina = tuning.max_stamina
 	dash_charges = max(1, tuning.dash_max_charges)
 	air_jumps_left = max(0, tuning.max_air_jumps)
@@ -73,6 +77,8 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		_adjust_camera_orbit(event.relative)
 	if event is InputEventMouseButton and event.pressed:
 		if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -469,7 +475,16 @@ func _update_camera_impulse(delta: float) -> void:
 	camera_impulse_offset = camera_impulse_offset.move_toward(Vector3.ZERO, decay * delta)
 
 func _resolve_camera_pivot_target() -> Vector3:
-	var desired_pivot_position := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance) + camera_impulse_offset
+	var orbit_distance: float = max(0.0, target_camera_distance)
+	var orbit_offset := Vector3(0.0, 0.0, orbit_distance)
+	if tuning.camera_orbit_enabled:
+		var orbit_basis := Basis(Vector3.UP, camera_orbit_yaw)
+		orbit_offset = orbit_basis * orbit_offset
+		if absf(camera_orbit_pitch) > 0.0001:
+			var horizontal_distance: float = orbit_distance * cos(camera_orbit_pitch)
+			orbit_offset = orbit_offset.normalized() * horizontal_distance
+			orbit_offset.y = sin(camera_orbit_pitch) * orbit_distance
+	var desired_pivot_position := global_position + Vector3(0.0, tuning.camera_height, 0.0) + orbit_offset + camera_impulse_offset
 	if not tuning.camera_collision_enabled:
 		return desired_pivot_position
 
@@ -501,6 +516,21 @@ func _add_camera_impulse(direction: Vector3, strength: float) -> void:
 	var max_offset: float = max(0.0, tuning.camera_impulse_max_offset)
 	if camera_impulse_offset.length() > max_offset and max_offset > 0.0:
 		camera_impulse_offset = camera_impulse_offset.normalized() * max_offset
+
+func _adjust_camera_orbit(relative_motion: Vector2) -> void:
+	if not tuning.camera_orbit_enabled:
+		return
+	var sensitivity: float = max(0.0, tuning.camera_orbit_sensitivity)
+	if sensitivity <= 0.0:
+		return
+	camera_orbit_yaw -= relative_motion.x * sensitivity * 0.01
+	var pitch_input: float = -relative_motion.y
+	if tuning.camera_orbit_invert_y:
+		pitch_input = -pitch_input
+	camera_orbit_pitch += pitch_input * sensitivity * 0.01
+	var min_pitch_rad: float = deg_to_rad(min(tuning.camera_orbit_pitch_min_degrees, tuning.camera_orbit_pitch_max_degrees))
+	var max_pitch_rad: float = deg_to_rad(max(tuning.camera_orbit_pitch_min_degrees, tuning.camera_orbit_pitch_max_degrees))
+	camera_orbit_pitch = clamp(camera_orbit_pitch, min_pitch_rad, max_pitch_rad)
 
 func _adjust_camera_zoom(amount: float) -> void:
 	target_camera_distance = clamp(

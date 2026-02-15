@@ -47,6 +47,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
+- **Mouse Orbit Camera (3D prototype)** — Data-driven camera orbit yaw/pitch (sensitivity, pitch clamp, invert-Y toggle) now lets players rotate the combat camera while keeping movement camera-relative and modular
 - **Dynamic Camera FOV (3D prototype)** — Data-driven FOV kick scales with movement speed and dash state, adding stronger sensation of momentum without hardcoding camera behavior
 - **Sprint Ramp Smoothing (3D prototype)** — Data-driven sprint ramp-up/ramp-down blends acceleration into and out of sprint for weightier, cleaner movement transitions
 - **Sprint Exhaustion Gate (3D prototype)** — Data-driven stamina thresholds now gate sprint re-engage after exhaustion, preventing rapid on/off sprint jitter at near-zero stamina
@@ -135,6 +136,7 @@ Release assets uploaded:
 | Shift / Gamepad LB (in 3D prototype) | Sprint |
 | Q / Gamepad B (in 3D prototype) | Dash |
 | Space / Gamepad A (in 3D prototype) | Jump (press again in air for air jump) |
+| Mouse Move (captured, in 3D prototype) | Orbit Camera |
 | Mouse Wheel (in 3D prototype) | Camera Zoom In/Out |
 | Walk over items | Pick up / Equip |
 
@@ -194,6 +196,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D mouse orbit camera tuning (sensitivity, pitch clamp, invert-Y toggle) so players can steer combat framing while preserving modular camera-relative movement
 - ✅ Added data-driven 3D camera collision layer mask tuning so camera occlusion checks can ignore non-blocking physics layers (like gameplay props/pickups), reducing unwanted camera jitter while preserving level readability
 - ✅ Added data-driven stamina pickup anti-waste collect threshold (minimum missing-stamina ratio) so near-full players do not accidentally consume orbs, preserving intentional resource routing
 - ✅ Added data-driven 3D stamina pickup respawn telegraph tuning (toggle + telegraph duration + pulse speed + alpha range) so depleted stamina orbs visibly pulse before becoming collectible again, improving pickup timing readability during movement-heavy combat routing

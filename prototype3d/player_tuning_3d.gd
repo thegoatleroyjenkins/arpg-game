@@ -106,6 +106,13 @@ class_name PlayerTuning3D
 @export var camera_look_ahead_distance: float = 2.25
 @export var camera_look_ahead_smooth: float = 8.0
 
+@export_group("Camera Orbit")
+@export var camera_orbit_enabled: bool = true
+@export var camera_orbit_sensitivity: float = 0.1
+@export var camera_orbit_pitch_min_degrees: float = -20.0
+@export var camera_orbit_pitch_max_degrees: float = 35.0
+@export var camera_orbit_invert_y: bool = false
+
 @export_group("Camera Collision")
 @export var camera_collision_enabled: bool = true
 @export_flags_3d_physics var camera_collision_mask: int = 1
