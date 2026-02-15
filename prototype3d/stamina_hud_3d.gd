@@ -15,6 +15,7 @@ var dash_charges_current: int = 0
 var dash_charges_max: int = 1
 var low_stamina_warning_ratio: float = 0.25
 var low_stamina_pulse_speed: float = 7.0
+var hard_landing_dash_cancel_window: float = 0.0
 var low_stamina_active: bool = false
 var base_stamina_modulate: Color = Color(1.0, 1.0, 1.0)
 
@@ -69,6 +70,7 @@ func _ready() -> void:
 		if tuning_resource.has_method("get"):
 			low_stamina_warning_ratio = clamp(float(tuning_resource.get("low_stamina_warning_ratio")), 0.0, 1.0)
 			low_stamina_pulse_speed = max(0.01, float(tuning_resource.get("low_stamina_pulse_speed")))
+			hard_landing_dash_cancel_window = max(0.0, float(tuning_resource.get("hard_landing_dash_cancel_window")))
 	set_process(true)
 	_on_stamina_changed(current_stamina, max_stamina)
 	_on_dash_charges_changed(current_dash_charges, max_dash_charges)
@@ -130,8 +132,12 @@ func _on_landing_recovery_changed(remaining: float, max_value: float) -> void:
 	landing_recovery_bar.max_value = max(0.01, max_value)
 	landing_recovery_bar.value = clamp(remaining, 0.0, landing_recovery_bar.max_value)
 	if remaining > 0.01:
-		landing_recovery_label.text = "Landing Recovery %.2fs" % remaining
-		landing_recovery_label.modulate = Color(1.0, 0.82, 0.45)
+		if hard_landing_dash_cancel_window > 0.0 and remaining <= hard_landing_dash_cancel_window:
+			landing_recovery_label.text = "Landing Recovery %.2fs (Dash Cancel Ready)" % remaining
+			landing_recovery_label.modulate = Color(0.85, 0.95, 1.0)
+		else:
+			landing_recovery_label.text = "Landing Recovery %.2fs" % remaining
+			landing_recovery_label.modulate = Color(1.0, 0.82, 0.45)
 	else:
 		landing_recovery_label.text = "Landing Recovery Ready"
 		landing_recovery_label.modulate = Color(0.8, 1.0, 0.8)

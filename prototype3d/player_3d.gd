@@ -139,7 +139,7 @@ func _physics_process(delta: float) -> void:
 	if dash_state_changed:
 		_emit_dash_cooldown_changed()
 
-	if landing_recovery_left <= 0.0 and Input.is_action_just_pressed("dash"):
+	if _can_dash_now() and Input.is_action_just_pressed("dash"):
 		if _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 			_use_stamina(tuning.dash_stamina_cost)
 			_start_dash(move_dir)
@@ -147,7 +147,7 @@ func _physics_process(delta: float) -> void:
 			dash_buffer_left = tuning.dash_input_buffer_time
 			buffered_dash_direction = move_dir
 
-	if landing_recovery_left <= 0.0 and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
+	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 		_use_stamina(tuning.dash_stamina_cost)
 		_start_dash(buffered_dash_direction)
 		dash_buffer_left = 0.0
@@ -246,6 +246,9 @@ func _is_jump_pressed() -> bool:
 	return Input.is_action_pressed("ui_accept")
 
 func _start_dash(move_dir: Vector3) -> void:
+	if landing_recovery_left > 0.0:
+		landing_recovery_left = 0.0
+		_emit_landing_recovery_changed()
 	dash_direction = move_dir
 	if dash_direction.length() <= 0.01:
 		dash_direction = -global_transform.basis.z
@@ -319,6 +322,14 @@ func _adjust_camera_zoom(amount: float) -> void:
 		tuning.camera_min_distance,
 		tuning.camera_max_distance
 	)
+
+func _can_dash_now() -> bool:
+	if landing_recovery_left <= 0.0:
+		return true
+	var cancel_window: float = max(0.0, tuning.hard_landing_dash_cancel_window)
+	if cancel_window <= 0.0:
+		return false
+	return landing_recovery_left <= cancel_window
 
 func _can_start_dash() -> bool:
 	return dash_time_left <= 0.0 and dash_cooldown_left <= 0.0 and dash_charges > 0
