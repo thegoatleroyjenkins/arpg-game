@@ -36,6 +36,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
 - **Dash I-Frame HUD Readout (3D prototype)** — Modular HUD now tracks remaining dash invulnerability time via player signals, making defensive timing windows readable during high-pressure movement chains
 - **Stamina Pickup Orbs (3D prototype)** — World pickup nodes now restore player stamina on contact and respawn on a timer, adding a readable, data-driven sustain loop to movement-heavy combat pacing
+- **Low-Stamina Pickup Magnet (3D prototype)** — Data-driven stamina orb magnet radius/speed now gently pulls nearby orbs toward the player only when missing stamina crosses a tunable threshold, improving recovery readability during high-pressure movement chains
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -182,6 +183,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven low-stamina pickup magnet tuning (radius/speed/missing-stamina threshold) so nearby stamina orbs pull toward resource-starved players for cleaner recovery routing under pressure
 - ✅ Added data-driven 3D camera-relative movement toggle (camera-forward/right mapping) so movement intent remains consistent with camera framing and is easier to tune per-scene
 - ✅ Added equipment system (weapons, armor, accessories)
 - ✅ Implemented enemy AI state machine

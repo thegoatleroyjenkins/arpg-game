@@ -46,6 +46,7 @@ var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
 
 func _ready() -> void:
+	add_to_group("player_3d")
 	look_target = global_position
 	respawn_position = global_position
 	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
