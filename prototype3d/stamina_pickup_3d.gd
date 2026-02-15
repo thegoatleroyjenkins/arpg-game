@@ -16,6 +16,10 @@ extends Area3D
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
 @export var magnet_line_of_sight_height_offset: float = 0.5
 
+@export_group("Spawn Recovery")
+@export var return_to_spawn_speed: float = 3.5
+@export var return_to_spawn_snap_distance: float = 0.05
+
 @onready var mesh: Node3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
 
@@ -76,18 +80,23 @@ func _activate() -> void:
 
 func _update_magnet_motion(delta: float) -> void:
 	if magnet_radius <= 0.0 or magnet_speed <= 0.0:
+		_move_toward_spawn(delta)
 		return
 	var player := _get_magnet_target()
 	if player == null:
+		_move_toward_spawn(delta)
 		return
 	var to_player: Vector3 = player.global_position - global_position
 	to_player.y = 0.0
 	var distance: float = to_player.length()
 	if distance <= 0.01 or distance > magnet_radius:
+		_move_toward_spawn(delta)
 		return
 	if not _target_needs_stamina(player):
+		_move_toward_spawn(delta)
 		return
 	if magnet_requires_line_of_sight and not _has_line_of_sight_to_target(player):
+		_move_toward_spawn(delta)
 		return
 	if distance <= max(0.05, magnet_auto_collect_radius):
 		_try_collect(player)
@@ -97,6 +106,20 @@ func _update_magnet_motion(delta: float) -> void:
 	var speed_curve: float = pow(magnet_progress, max(0.5, magnet_speed_curve_power))
 	var speed_scale: float = lerpf(clamp(magnet_min_speed_ratio, 0.0, 1.0), 1.0, speed_curve)
 	global_position += direction * magnet_speed * speed_scale * delta
+
+func _move_toward_spawn(delta: float) -> void:
+	var speed: float = max(0.0, return_to_spawn_speed)
+	if speed <= 0.0:
+		return
+	var target_position := _spawn_origin
+	var horizontal_delta := target_position - global_position
+	horizontal_delta.y = 0.0
+	var distance: float = horizontal_delta.length()
+	if distance <= max(0.0, return_to_spawn_snap_distance):
+		global_position = Vector3(target_position.x, global_position.y, target_position.z)
+		return
+	var step: float = min(distance, speed * delta)
+	global_position += horizontal_delta.normalized() * step
 
 func _get_magnet_target() -> Node3D:
 	var players: Array[Node] = get_tree().get_nodes_in_group("player_3d")

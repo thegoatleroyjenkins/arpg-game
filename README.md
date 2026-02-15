@@ -41,6 +41,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Low-Stamina Pickup Magnet (3D prototype)** — Data-driven stamina orb magnet radius/speed now gently pulls nearby orbs toward the player only when missing stamina crosses a tunable threshold, improving recovery readability during high-pressure movement chains
 - **Pickup Magnet Line-of-Sight Gating (3D prototype)** — Data-driven line-of-sight toggle + collision mask now prevent stamina orbs from magnetizing through walls, preserving clearer spatial routing and pickup readability in denser arenas
 - **Pickup Magnet Ease-In + Auto-Collect (3D prototype)** — Data-driven magnet minimum speed ratio, distance-based speed curve, and close-range auto-collect radius now make stamina orbs accelerate smoothly into the player instead of jittering near contact
+- **Pickup Spawn Recovery Drift Correction (3D prototype)** — Data-driven return-to-spawn speed and snap distance now pull uncollected stamina orbs back toward their spawn anchor when magnet conditions are not met, keeping resource locations readable after failed pulls
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -190,6 +191,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven stamina pickup spawn-recovery drift correction (return speed + snap distance) so uncollected orbs slide back toward their spawn anchors when magnet pull conditions fail, preserving pickup location readability
 - ✅ Added data-driven stamina pickup magnet line-of-sight gating (toggle + collision mask + trace height offset) so pickup orbs no longer pull through walls, improving arena routing clarity and world-space readability
 - ✅ Added data-driven 3D dash trail afterimage VFX tuning (enable toggle, spawn interval, lifetime, alpha fade) so dashes read with clearer burst direction and stronger movement impact
 - ✅ Added data-driven 3D movement input deadzone remapping (tunable deadzone with normalized post-threshold scaling) to reduce gamepad drift while preserving low-tilt precision
