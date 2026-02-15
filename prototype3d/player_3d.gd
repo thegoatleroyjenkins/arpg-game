@@ -498,6 +498,17 @@ func _regen_stamina(delta: float, is_moving: bool) -> void:
 func _emit_stamina_changed() -> void:
 	stamina_changed.emit(stamina, tuning.max_stamina)
 
+func restore_stamina(amount: float) -> float:
+	var clamped_amount: float = max(0.0, amount)
+	if clamped_amount <= 0.0:
+		return 0.0
+	var previous_stamina: float = stamina
+	stamina = min(tuning.max_stamina, stamina + clamped_amount)
+	if stamina > previous_stamina:
+		_emit_stamina_changed()
+		return stamina - previous_stamina
+	return 0.0
+
 func _report_stamina_action_failed(reason: String) -> void:
 	if stamina_action_warning_cooldown_left > 0.0:
 		return

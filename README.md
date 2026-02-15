@@ -35,6 +35,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
 - **Dash I-Frame HUD Readout (3D prototype)** — Modular HUD now tracks remaining dash invulnerability time via player signals, making defensive timing windows readable during high-pressure movement chains
+- **Stamina Pickup Orbs (3D prototype)** — World pickup nodes now restore player stamina on contact and respawn on a timer, adding a readable, data-driven sustain loop to movement-heavy combat pacing
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -232,6 +233,7 @@ arpg-game/
 - ✅ Added data-driven 3D dash invulnerability duration tuning plus modular HUD i-frame readout wired to a new player dash-invulnerability signal, improving defensive timing clarity and combat-system integration readiness
 - ✅ Added data-driven 3D fall recovery safety reset (height + stamina/recovery penalties) so out-of-bounds falls respawn cleanly at the start anchor instead of risking softlocks
 - ✅ Added data-driven airborne jump stamina scaling (tunable air-jump multiplier) so mid-air jump chains carry a clearer stamina tradeoff than grounded jumps
+- ✅ Added modular 3D stamina pickup orb nodes (contact restore + timed respawn) and wired player-side stamina restoration API so arena routing can support deliberate resource recovery without hardcoded scene logic
 
 ## License
 
