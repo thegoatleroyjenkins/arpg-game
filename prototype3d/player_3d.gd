@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 const ACTION_JUMP := "jump"
+const ACTION_CAMERA_RECENTER := "camera_recenter"
 
 @export var tuning: PlayerTuning3D = preload("res://prototype3d/default_player_tuning_3d.tres")
 
@@ -86,6 +87,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_adjust_camera_zoom(-tuning.camera_zoom_step)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_adjust_camera_zoom(tuning.camera_zoom_step)
+	if event.is_action_pressed(ACTION_CAMERA_RECENTER):
+		_recenter_camera_orbit(1.0)
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
@@ -281,6 +284,8 @@ func _physics_process(delta: float) -> void:
 		rotation.y = lerp_angle(rotation.y, desired_yaw, deg_to_rad(tuning.turn_speed_degrees_per_second) * delta)
 
 	# Follow camera smoothly with scroll-wheel zoom and movement-aware look-ahead.
+	if Input.is_action_pressed(ACTION_CAMERA_RECENTER):
+		_recenter_camera_orbit(delta)
 	_update_camera_impulse(delta)
 	var target_cam_pos := _resolve_camera_pivot_target()
 	var camera_follow_smooth: float = tuning.camera_smooth
@@ -531,6 +536,20 @@ func _adjust_camera_orbit(relative_motion: Vector2) -> void:
 	var min_pitch_rad: float = deg_to_rad(min(tuning.camera_orbit_pitch_min_degrees, tuning.camera_orbit_pitch_max_degrees))
 	var max_pitch_rad: float = deg_to_rad(max(tuning.camera_orbit_pitch_min_degrees, tuning.camera_orbit_pitch_max_degrees))
 	camera_orbit_pitch = clamp(camera_orbit_pitch, min_pitch_rad, max_pitch_rad)
+
+func _recenter_camera_orbit(delta: float) -> void:
+	if not tuning.camera_orbit_enabled or not tuning.camera_recenter_enabled:
+		return
+	var desired_yaw: float = rotation.y
+	var difference: float = wrapf(desired_yaw - camera_orbit_yaw, -PI, PI)
+	var snap_threshold: float = deg_to_rad(max(0.0, tuning.camera_recenter_snap_angle_degrees))
+	if absf(difference) <= snap_threshold:
+		camera_orbit_yaw = desired_yaw
+		return
+	var recenter_step: float = deg_to_rad(max(0.0, tuning.camera_recenter_speed_degrees_per_second)) * max(0.0, delta)
+	if recenter_step <= 0.0:
+		return
+	camera_orbit_yaw = move_toward_angle(camera_orbit_yaw, desired_yaw, recenter_step)
 
 func _adjust_camera_zoom(amount: float) -> void:
 	target_camera_distance = clamp(

@@ -113,6 +113,11 @@ class_name PlayerTuning3D
 @export var camera_orbit_pitch_max_degrees: float = 35.0
 @export var camera_orbit_invert_y: bool = false
 
+@export_group("Camera Recentering")
+@export var camera_recenter_enabled: bool = true
+@export var camera_recenter_speed_degrees_per_second: float = 420.0
+@export_range(0.0, 45.0, 0.1) var camera_recenter_snap_angle_degrees: float = 1.25
+
 @export_group("Camera Collision")
 @export var camera_collision_enabled: bool = true
 @export_flags_3d_physics var camera_collision_mask: int = 1
