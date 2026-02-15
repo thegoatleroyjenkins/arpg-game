@@ -11,6 +11,10 @@ extends CanvasLayer
 
 var dash_charges_current: int = 0
 var dash_charges_max: int = 1
+var low_stamina_warning_ratio: float = 0.25
+var low_stamina_pulse_speed: float = 7.0
+var low_stamina_active: bool = false
+var base_stamina_modulate: Color = Color(1.0, 1.0, 1.0)
 
 func _ready() -> void:
 	var player := get_node_or_null(player_path)
@@ -53,16 +57,36 @@ func _ready() -> void:
 		max_dash_cooldown = max(0.01, float(player.call("_next_dash_ready_max")))
 		max_dash_charges = max(1, int(tuning_resource.get("dash_max_charges")))
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
+		if tuning_resource.has_method("get"):
+			low_stamina_warning_ratio = clamp(float(tuning_resource.get("low_stamina_warning_ratio")), 0.0, 1.0)
+			low_stamina_pulse_speed = max(0.01, float(tuning_resource.get("low_stamina_pulse_speed")))
+	set_process(true)
 	_on_stamina_changed(current_stamina, max_stamina)
 	_on_dash_charges_changed(current_dash_charges, max_dash_charges)
 	_on_dash_cooldown_changed(current_dash_cooldown, max_dash_cooldown)
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 
+func _process(_delta: float) -> void:
+	if not low_stamina_active:
+		return
+	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.001 * low_stamina_pulse_speed)
+	var warning_color := Color(1.0, 0.35, 0.35)
+	var pulse_strength := lerpf(0.35, 0.85, pulse)
+	stamina_label.modulate = base_stamina_modulate.lerp(warning_color, pulse_strength)
+	stamina_bar.modulate = base_stamina_modulate.lerp(warning_color, pulse_strength * 0.9)
+
 func _on_stamina_changed(current: float, max_value: float) -> void:
 	stamina_bar.max_value = max(1.0, max_value)
 	stamina_bar.value = clamp(current, 0.0, stamina_bar.max_value)
 	stamina_label.text = "Stamina %d / %d" % [roundi(current), roundi(max_value)]
+	var stamina_ratio := 0.0
+	if stamina_bar.max_value > 0.0:
+		stamina_ratio = stamina_bar.value / stamina_bar.max_value
+	low_stamina_active = stamina_ratio <= low_stamina_warning_ratio and stamina_bar.value < stamina_bar.max_value
+	if not low_stamina_active:
+		stamina_label.modulate = base_stamina_modulate
+		stamina_bar.modulate = base_stamina_modulate
 
 func _on_dash_charges_changed(current: int, max_value: int) -> void:
 	dash_charges_current = max(0, current)

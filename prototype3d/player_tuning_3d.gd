@@ -42,6 +42,10 @@ class_name PlayerTuning3D
 @export var stamina_regen_moving_per_second: float = 16.0
 @export var stamina_regen_delay: float = 0.7
 
+@export_group("HUD Feedback")
+@export_range(0.0, 1.0, 0.01) var low_stamina_warning_ratio: float = 0.25
+@export var low_stamina_pulse_speed: float = 7.0
+
 @export_group("Dash")
 @export var dash_speed: float = 18.0
 @export var dash_duration: float = 0.18

@@ -24,6 +24,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Jump Apex Hang Time (3D prototype)** — Data-driven apex gravity tuning softens gravity near jump peak for cleaner aerial control and better mid-air repositioning readability
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
+- **Low-Stamina Warning Pulse (3D prototype)** — Data-driven HUD warning ratio + pulse speed now drive a pulsing stamina alert when resources get critical, improving combat pacing readability
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
 - **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
@@ -196,6 +197,7 @@ arpg-game/
 - ✅ Added data-driven 3D hard landing recovery tuning (fall-speed threshold + recovery duration) to improve movement weight and curb hyperactive landing chains
 - ✅ Added data-driven 3D hard-landing stamina penalty tuning so heavy falls carry a meaningful stamina tradeoff and cleaner traversal discipline
 - ✅ Added data-driven 3D camera impulse feedback (dash + hard landing impulse, plus decay/max offset tuning) for clearer movement impact and stronger moment-to-moment game feel
+- ✅ Added data-driven low-stamina HUD warning pulse (threshold ratio + pulse speed tuning) to make critical stamina states more readable during combat movement decisions
 
 ## License
 
