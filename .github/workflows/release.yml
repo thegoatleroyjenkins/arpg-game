@@ -154,6 +154,13 @@ PY
           "${{ steps.godot.outputs.bin }}" --headless --path . --export-release "Windows Desktop" build/windows/ARPG.exe
           cd build/windows && zip -r ../arpg-windows.zip .
 
+      - name: Build Windows Single File
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/windows
+          "${{ steps.godot.outputs.bin }}" --headless --path . --export-release "Windows Single File" build/windows/ARPG-single.exe
+
       - name: Build Linux
         shell: bash
         run: |
@@ -169,6 +176,7 @@ PY
           name: arpg-build-bundles
           path: |
             build/arpg-windows.zip
+            build/windows/ARPG-single.exe
             build/arpg-linux.zip
           if-no-files-found: warn
 
@@ -181,4 +189,5 @@ PY
           generate_release_notes: true
           files: |
             build/arpg-windows.zip
+            build/windows/ARPG-single.exe
             build/arpg-linux.zip
