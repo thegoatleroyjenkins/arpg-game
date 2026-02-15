@@ -232,6 +232,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven stamina pickup dash-defense boost tuning (`dash_invulnerability_boost_duration`, `dash_invulnerability_boost_bonus_seconds`) plus modular `apply_dash_invulnerability_boost()` player API and HUD timer readout, so pickup routing can temporarily extend dash i-frames for higher-risk reposition windows without hardcoded scene logic
 - ✅ Added data-driven stamina pickup dash-charge recovery tuning (`dash_charge_restore_count`, collect/magnet missing-dash-charge thresholds) plus modular `restore_dash_charges()` player API, so pickup profiles can refill missing dash charges for cleaner mobility-route planning without hardcoded scene logic
 - ✅ Added data-driven dash-to-jump input buffer assist (`jump_buffer_dash_bonus_time`) so jump presses near dash end are preserved into the post-dash window, improving movement-chain responsiveness without bypassing stamina or jump eligibility checks
 - ✅ Polished the 3D prototype UI readability: added a translucent HUD backdrop, stronger text outlining for mobility readouts, an in-HUD controls hint strip, and clearer pause-menu subtitle guidance so moment-to-moment movement information remains legible under action

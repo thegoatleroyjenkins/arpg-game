@@ -23,6 +23,7 @@ signal dash_invulnerability_changed(remaining: float, max_value: float)
 signal stamina_regen_boost_changed(remaining: float, max_value: float, multiplier: float)
 signal sprint_efficiency_boost_changed(remaining: float, max_value: float, multiplier: float)
 signal move_speed_boost_changed(remaining: float, max_value: float, multiplier: float)
+signal dash_invulnerability_boost_changed(remaining: float, max_value: float, bonus_seconds: float)
 
 var look_target: Vector3
 var respawn_position: Vector3
@@ -57,6 +58,9 @@ var sprint_efficiency_boost_multiplier: float = 1.0
 var move_speed_boost_left: float = 0.0
 var move_speed_boost_max: float = 0.0
 var move_speed_boost_multiplier: float = 1.0
+var dash_invulnerability_boost_left: float = 0.0
+var dash_invulnerability_boost_max: float = 0.0
+var dash_invulnerability_boost_bonus_seconds: float = 0.0
 var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var camera_orbit_yaw: float = 0.0
@@ -93,6 +97,7 @@ func _ready() -> void:
 	_emit_stamina_regen_boost_changed()
 	_emit_sprint_efficiency_boost_changed()
 	_emit_move_speed_boost_changed()
+	_emit_dash_invulnerability_boost_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -138,6 +143,12 @@ func _physics_process(delta: float) -> void:
 			move_speed_boost_multiplier = 1.0
 			move_speed_boost_max = 0.0
 		_emit_move_speed_boost_changed()
+	if dash_invulnerability_boost_left > 0.0:
+		dash_invulnerability_boost_left = max(0.0, dash_invulnerability_boost_left - delta)
+		if dash_invulnerability_boost_left <= 0.0:
+			dash_invulnerability_boost_bonus_seconds = 0.0
+			dash_invulnerability_boost_max = 0.0
+		_emit_dash_invulnerability_boost_changed()
 	_update_dash_invulnerability_visual(delta)
 
 	_handle_fall_reset_if_needed()
@@ -477,7 +488,10 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_time_left = tuning.dash_duration
 	dash_trail_spawn_left = 0.0
 	dash_cooldown_left = tuning.dash_cooldown
-	dash_invulnerability_left = max(dash_invulnerability_left, max(0.0, tuning.dash_invulnerability_duration))
+	var dash_invulnerability_duration: float = max(0.0, tuning.dash_invulnerability_duration)
+	if dash_invulnerability_boost_left > 0.0:
+		dash_invulnerability_duration += max(0.0, dash_invulnerability_boost_bonus_seconds)
+	dash_invulnerability_left = max(dash_invulnerability_left, dash_invulnerability_duration)
 	_emit_dash_invulnerability_changed()
 	dash_charges = max(0, dash_charges - 1)
 	if dash_charges < max(1, tuning.dash_max_charges) and dash_charge_recharge_left <= 0.0:
@@ -877,6 +891,18 @@ func apply_move_speed_boost(duration: float, multiplier: float) -> float:
 	_emit_move_speed_boost_changed()
 	return max(0.0, move_speed_boost_left - previous_remaining)
 
+func apply_dash_invulnerability_boost(duration: float, bonus_seconds: float) -> float:
+	var clamped_duration: float = max(0.0, duration)
+	var clamped_bonus_seconds: float = max(0.0, bonus_seconds)
+	if clamped_duration <= 0.0 or clamped_bonus_seconds <= 0.0:
+		return 0.0
+	var previous_remaining: float = dash_invulnerability_boost_left
+	dash_invulnerability_boost_left = max(dash_invulnerability_boost_left, clamped_duration)
+	dash_invulnerability_boost_max = max(dash_invulnerability_boost_max, dash_invulnerability_boost_left)
+	dash_invulnerability_boost_bonus_seconds = max(dash_invulnerability_boost_bonus_seconds, clamped_bonus_seconds)
+	_emit_dash_invulnerability_boost_changed()
+	return max(0.0, dash_invulnerability_boost_left - previous_remaining)
+
 func restore_dash_charges(count: int) -> int:
 	var grant_count: int = max(0, count)
 	if grant_count <= 0:
@@ -990,3 +1016,6 @@ func _emit_sprint_efficiency_boost_changed() -> void:
 
 func _emit_move_speed_boost_changed() -> void:
 	move_speed_boost_changed.emit(move_speed_boost_left, max(0.01, move_speed_boost_max), max(1.0, move_speed_boost_multiplier))
+
+func _emit_dash_invulnerability_boost_changed() -> void:
+	dash_invulnerability_boost_changed.emit(dash_invulnerability_boost_left, max(0.01, dash_invulnerability_boost_max), max(0.0, dash_invulnerability_boost_bonus_seconds))

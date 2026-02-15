@@ -18,6 +18,7 @@ extends CanvasLayer
 @onready var stamina_regen_boost_label: Label = $MarginContainer/VBoxContainer/StaminaRegenBoostLabel
 @onready var sprint_efficiency_boost_label: Label = $MarginContainer/VBoxContainer/SprintEfficiencyBoostLabel
 @onready var move_speed_boost_label: Label = get_node_or_null("MarginContainer/VBoxContainer/MoveSpeedBoostLabel") as Label
+@onready var dash_invulnerability_boost_label: Label = get_node_or_null("MarginContainer/VBoxContainer/DashInvulnerabilityBoostLabel") as Label
 @onready var dash_invulnerability_bar: ProgressBar = $MarginContainer/VBoxContainer/DashInvulnerabilityBar
 @onready var dash_invulnerability_label: Label = $MarginContainer/VBoxContainer/DashInvulnerabilityLabel
 @onready var stamina_warning_label: Label = $MarginContainer/VBoxContainer/StaminaWarningLabel
@@ -80,6 +81,9 @@ func _ready() -> void:
 	if not player.has_signal("move_speed_boost_changed"):
 		push_warning("StaminaHud3D target does not expose move_speed_boost_changed signal")
 		return
+	if not player.has_signal("dash_invulnerability_boost_changed"):
+		push_warning("StaminaHud3D target does not expose dash_invulnerability_boost_changed signal")
+		return
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
@@ -95,6 +99,7 @@ func _ready() -> void:
 	player.stamina_regen_boost_changed.connect(_on_stamina_regen_boost_changed)
 	player.sprint_efficiency_boost_changed.connect(_on_sprint_efficiency_boost_changed)
 	player.move_speed_boost_changed.connect(_on_move_speed_boost_changed)
+	player.dash_invulnerability_boost_changed.connect(_on_dash_invulnerability_boost_changed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_charge_recharge := float(player.get("dash_charge_recharge_left"))
@@ -113,6 +118,9 @@ func _ready() -> void:
 	var current_move_speed_boost := float(player.get("move_speed_boost_left"))
 	var current_move_speed_boost_max := float(player.get("move_speed_boost_max"))
 	var current_move_speed_boost_multiplier := float(player.get("move_speed_boost_multiplier"))
+	var current_dash_invulnerability_boost := float(player.get("dash_invulnerability_boost_left"))
+	var current_dash_invulnerability_boost_max := float(player.get("dash_invulnerability_boost_max"))
+	var current_dash_invulnerability_boost_bonus := float(player.get("dash_invulnerability_boost_bonus_seconds"))
 	var tuning_resource: Resource = player.get("tuning")
 	var max_stamina := 100.0
 	var max_dash_cooldown := 1.0
@@ -144,6 +152,13 @@ func _ready() -> void:
 		move_speed_boost_label.text = "Momentum Boost Ready"
 		vbox.add_child(move_speed_boost_label)
 		vbox.move_child(move_speed_boost_label, sprint_efficiency_boost_label.get_index() + 1)
+	if dash_invulnerability_boost_label == null:
+		var vbox: VBoxContainer = $MarginContainer/VBoxContainer
+		dash_invulnerability_boost_label = Label.new()
+		dash_invulnerability_boost_label.name = "DashInvulnerabilityBoostLabel"
+		dash_invulnerability_boost_label.text = "Dash I-Frame Boost Ready"
+		vbox.add_child(dash_invulnerability_boost_label)
+		vbox.move_child(dash_invulnerability_boost_label, move_speed_boost_label.get_index() + 1)
 	stamina_warning_label.visible = false
 	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
 	_apply_readability_theme()
@@ -160,6 +175,7 @@ func _ready() -> void:
 	_on_stamina_regen_boost_changed(current_stamina_regen_boost, max(0.01, current_stamina_regen_boost_max), max(1.0, current_stamina_regen_boost_multiplier))
 	_on_sprint_efficiency_boost_changed(current_sprint_efficiency_boost, max(0.01, current_sprint_efficiency_boost_max), max(1.0, current_sprint_efficiency_boost_multiplier))
 	_on_move_speed_boost_changed(current_move_speed_boost, max(0.01, current_move_speed_boost_max), max(1.0, current_move_speed_boost_multiplier))
+	_on_dash_invulnerability_boost_changed(current_dash_invulnerability_boost, max(0.01, current_dash_invulnerability_boost_max), max(0.0, current_dash_invulnerability_boost_bonus))
 	_on_dash_invulnerability_changed(current_dash_invulnerability, max_dash_invulnerability)
 
 func _process(delta: float) -> void:
@@ -190,6 +206,8 @@ func _apply_readability_theme() -> void:
 	]
 	if move_speed_boost_label != null:
 		labels.append(move_speed_boost_label)
+	if dash_invulnerability_boost_label != null:
+		labels.append(dash_invulnerability_boost_label)
 	for ui_label in labels:
 		ui_label.add_theme_constant_override("outline_size", 3)
 		ui_label.add_theme_color_override("font_outline_color", ui_outline_color)
@@ -328,6 +346,17 @@ func _on_move_speed_boost_changed(remaining: float, _max_value: float, multiplie
 	else:
 		move_speed_boost_label.text = "Momentum Boost Ready"
 		move_speed_boost_label.modulate = Color(0.94, 0.86, 0.72)
+
+func _on_dash_invulnerability_boost_changed(remaining: float, _max_value: float, bonus_seconds: float) -> void:
+	if dash_invulnerability_boost_label == null:
+		return
+	var clamped_remaining: float = max(0.0, remaining)
+	if clamped_remaining > 0.01 and bonus_seconds > 0.0:
+		dash_invulnerability_boost_label.text = "Dash I-Frame Boost +%.2fs (%.2fs)" % [bonus_seconds, clamped_remaining]
+		dash_invulnerability_boost_label.modulate = Color(0.66, 0.95, 1.0)
+	else:
+		dash_invulnerability_boost_label.text = "Dash I-Frame Boost Ready"
+		dash_invulnerability_boost_label.modulate = Color(0.76, 0.88, 0.98)
 
 func _on_dash_invulnerability_changed(remaining: float, max_value: float) -> void:
 	dash_invulnerability_bar.max_value = max(0.01, max_value)

@@ -46,6 +46,10 @@ class_name StaminaPickupProfile3D
 @export var move_speed_boost_duration: float = 1.75
 @export_range(1.0, 3.0, 0.05) var move_speed_boost_multiplier: float = 1.2
 
+@export_group("Dash Defense Boost")
+@export var dash_invulnerability_boost_duration: float = 2.0
+@export_range(0.0, 0.5, 0.01) var dash_invulnerability_boost_bonus_seconds: float = 0.05
+
 @export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
