@@ -1,5 +1,7 @@
 extends Area3D
 
+@export var profile: StaminaPickupProfile3D
+
 @export var stamina_restore: float = 24.0
 @export var respawn_time: float = 8.0
 @export var bob_height: float = 0.2
@@ -55,9 +57,34 @@ var _spawn_origin: Vector3 = Vector3.ZERO
 var _respawn_remaining: float = 0.0
 
 func _ready() -> void:
+	_apply_profile_overrides()
 	body_entered.connect(_on_body_entered)
 	_base_y = global_position.y
 	_spawn_origin = global_position
+
+func _apply_profile_overrides() -> void:
+	if profile == null:
+		return
+	var settable_properties: Dictionary = {}
+	for property_info in get_property_list():
+		var property_name: StringName = StringName(property_info.name)
+		settable_properties[property_name] = true
+	var ignored_properties := {
+		&"resource_local_to_scene": true,
+		&"resource_name": true,
+		&"resource_path": true,
+		&"script": true
+	}
+	for property_info in profile.get_property_list():
+		var property_name: StringName = StringName(property_info.name)
+		if ignored_properties.has(property_name):
+			continue
+		var usage: int = int(property_info.usage)
+		if (usage & PROPERTY_USAGE_STORAGE) == 0:
+			continue
+		if not settable_properties.has(property_name):
+			continue
+		set(property_name, profile.get(property_name))
 
 func _process(delta: float) -> void:
 	_time += delta

@@ -1,8 +1,10 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_pickup_3d.gd" id="3_stamina_pickup_script"]
+[ext_resource type="Resource" path="res://prototype3d/stamina_pickup_profile_standard_3d.tres" id="4_pickup_profile_standard"]
+[ext_resource type="Resource" path="res://prototype3d/stamina_pickup_profile_quick_3d.tres" id="5_pickup_profile_quick"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 radius = 0.35
@@ -61,6 +63,7 @@ current = true
 [node name="StaminaPickupA" type="Area3D" parent="."]
 position = Vector3(4, 1.2, 1)
 script = ExtResource("3_stamina_pickup_script")
+profile = ExtResource("4_pickup_profile_standard")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaminaPickupA"]
 shape = SubResource("SphereShape3D_stamina_pickup")
@@ -71,6 +74,7 @@ mesh = SubResource("SphereMesh_stamina_pickup")
 [node name="StaminaPickupB" type="Area3D" parent="."]
 position = Vector3(-5, 1.2, -2)
 script = ExtResource("3_stamina_pickup_script")
+profile = ExtResource("4_pickup_profile_standard")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaminaPickupB"]
 shape = SubResource("SphereShape3D_stamina_pickup")
@@ -81,8 +85,7 @@ mesh = SubResource("SphereMesh_stamina_pickup")
 [node name="StaminaPickupC" type="Area3D" parent="."]
 position = Vector3(1, 1.2, -6)
 script = ExtResource("3_stamina_pickup_script")
-stamina_restore = 18.0
-respawn_time = 6.0
+profile = ExtResource("5_pickup_profile_quick")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaminaPickupC"]
 shape = SubResource("SphereShape3D_stamina_pickup")
