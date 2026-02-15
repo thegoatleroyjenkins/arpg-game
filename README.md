@@ -56,6 +56,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
 - **Jump Queue HUD Feedback (3D prototype)** — Modular HUD now also surfaces jump input buffer state and remaining queue time from player signals, making coyote-time jump timing windows clearer during fast movement chains
 - **Buffered Light Attack Input (3D prototype)** — Data-driven light-attack input buffering now queues attacks pressed slightly before cooldown ends, improving melee responsiveness under pressure; HUD now surfaces attack queue timing for clearer execution feedback
+- **Light Attack Lunge Commitment (3D prototype)** — Data-driven light-attack lunge tuning (`light_attack_lunge_enabled`, duration/speed/control blend) now adds a short forward commit toward the primary target on successful swings, improving melee impact/readability while keeping movement behavior modular
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
 - **Dash I-Frame HUD Readout (3D prototype)** — Modular HUD now tracks remaining dash invulnerability time via player signals, making defensive timing windows readable during high-pressure movement chains
@@ -246,6 +247,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven light-attack lunge commitment tuning (`light_attack_lunge_enabled`, `light_attack_lunge_duration`, `light_attack_lunge_speed`, `light_attack_lunge_control_multiplier`) so successful melee swings include a short target-aware forward commit for cleaner impact feel without hardcoded scene logic
 - ✅ Added data-driven critical-hit camera punch tuning (`light_attack_crit_camera_impulse_strength`, `light_attack_crit_camera_impulse_vertical`) wired to modular `DamageResolver` results, so player crits now add a short directional camera kick for clearer high-impact melee feedback
 - ✅ Added data-driven combat dummy damage popup tuning (`damage_popup_enabled`, `damage_popup_duration`, `damage_popup_rise_distance`, `damage_popup_color`) that spawns rising/fading world-space hit numbers, improving per-hit combat readability without hardcoded scene effects
 - ✅ Added a modular combat-dummy world-space health readout with data-driven timing/color tuning (`health_label_visible_time_on_hit`, `health_label_color_*`, `health_label_show_when_full`) to improve 3D combat clarity while keeping feedback behavior script-configurable

@@ -94,6 +94,8 @@ var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 @export var light_attack_crit_camera_impulse_vertical: float = 0.15
 
 var light_attack_cooldown_left: float = 0.0
+var light_attack_lunge_left: float = 0.0
+var light_attack_lunge_direction: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	add_to_group("player_3d")
@@ -154,6 +156,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
 	light_attack_cooldown_left = max(0.0, light_attack_cooldown_left - delta)
+	light_attack_lunge_left = max(0.0, light_attack_lunge_left - delta)
 	if light_attack_buffer_left > 0.0:
 		light_attack_buffer_left = max(0.0, light_attack_buffer_left - delta)
 		_emit_attack_buffer_changed()
@@ -374,6 +377,9 @@ func _physics_process(delta: float) -> void:
 		var move_speed_multiplier: float = move_speed_boost_multiplier if move_speed_boost_left > 0.0 else 1.0
 		var speed := tuning.move_speed * sprint_multiplier * low_stamina_move_multiplier * move_speed_multiplier
 		var target_velocity := move_dir * speed
+		var lunge_velocity: Vector3 = _current_light_attack_lunge_velocity()
+		if lunge_velocity.length() > 0.001:
+			target_velocity = (target_velocity * clamp(tuning.light_attack_lunge_control_multiplier, 0.0, 1.0)) + lunge_velocity
 		var control_scale := 1.0 if is_on_floor() else tuning.air_control
 		var accel := tuning.ground_acceleration * control_scale
 		var decel := tuning.ground_deceleration * control_scale
@@ -545,6 +551,7 @@ func _start_dash(move_dir: Vector3) -> void:
 	if landing_recovery_left > 0.0:
 		landing_recovery_left = 0.0
 		_emit_landing_recovery_changed()
+	light_attack_lunge_left = 0.0
 	dash_direction = _resolve_dash_start_direction(move_dir)
 	if dash_direction.length() <= 0.01:
 		dash_direction = _resolve_neutral_dash_direction()
@@ -1067,6 +1074,7 @@ func _try_light_attack() -> bool:
 		return false
 
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
+	_start_light_attack_lunge(targets[0])
 	for target in targets:
 		damage_resolver.request_damage({
 			"source": self,
@@ -1112,6 +1120,34 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 		if results.size() >= max_targets:
 			break
 	return results
+
+func _start_light_attack_lunge(primary_target: Node3D) -> void:
+	if not tuning.light_attack_lunge_enabled:
+		return
+	var lunge_duration: float = max(0.0, tuning.light_attack_lunge_duration)
+	if lunge_duration <= 0.0:
+		return
+	var lunge_direction: Vector3 = -global_transform.basis.z
+	if is_instance_valid(primary_target):
+		var to_target: Vector3 = primary_target.global_position - global_position
+		to_target.y = 0.0
+		if to_target.length() > 0.01:
+			lunge_direction = to_target.normalized()
+	lunge_direction.y = 0.0
+	if lunge_direction.length() <= 0.01:
+		return
+	light_attack_lunge_direction = lunge_direction.normalized()
+	light_attack_lunge_left = lunge_duration
+
+func _current_light_attack_lunge_velocity() -> Vector3:
+	if light_attack_lunge_left <= 0.0:
+		return Vector3.ZERO
+	var duration: float = max(0.01, tuning.light_attack_lunge_duration)
+	var lunge_ratio: float = clamp(light_attack_lunge_left / duration, 0.0, 1.0)
+	var lunge_speed: float = max(0.0, tuning.light_attack_lunge_speed) * lunge_ratio
+	if lunge_speed <= 0.0 or light_attack_lunge_direction.length() <= 0.01:
+		return Vector3.ZERO
+	return light_attack_lunge_direction.normalized() * lunge_speed
 
 func _on_damage_applied(result: Dictionary) -> void:
 	if result.get("source", null) != self:

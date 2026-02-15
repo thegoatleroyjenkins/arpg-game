@@ -78,6 +78,10 @@ class_name PlayerTuning3D
 
 @export_group("Attack Feel")
 @export var light_attack_input_buffer_time: float = 0.14
+@export var light_attack_lunge_enabled: bool = true
+@export var light_attack_lunge_duration: float = 0.1
+@export var light_attack_lunge_speed: float = 7.5
+@export_range(0.0, 1.0, 0.01) var light_attack_lunge_control_multiplier: float = 0.35
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0
