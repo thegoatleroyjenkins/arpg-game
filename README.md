@@ -143,6 +143,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Equipment Drops** — Weapons, armor, and accessories spawn in world
 - **Starter Level Zone Marker Query API (3D scaffold)** — `StarterLevelController` now builds a data-driven cache from JSON zone IDs to in-scene marker nodes, exposing modular lookup helpers for encounter systems (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`)
 - **World Chunk Grid Index Streaming (3D scaffold)** — `WorldStreamer` now resolves loadable chunk IDs from explicit JSON `chunks[]` grid coordinates (`grid_x`,`grid_y`) instead of relying only on placeholder generated IDs, improving modular world-streaming correctness as layout data scales
+- **Biome Spawn Weight Profiles (3D scaffold)** — `SpawnDirector` now reads weighted enemy archetype entries from `data/world/spawn_profiles.json` (with fallback handling) so wilderness wave composition remains modular and data-authored per biome instead of hardcoded in script
 
 ## Download
 
@@ -250,6 +251,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added biome-weighted 3D spawn profile data (`data/world/spawn_profiles.json`) and wired `SpawnDirector` to roll enemy archetypes from profile weights (with fallback/default handling), improving modular wilderness encounter authoring without hardcoded biome branches
 - ✅ Added data-driven light-attack lunge commitment tuning (`light_attack_lunge_enabled`, `light_attack_lunge_duration`, `light_attack_lunge_speed`, `light_attack_lunge_control_multiplier`) so successful melee swings include a short target-aware forward commit for cleaner impact feel without hardcoded scene logic
 - ✅ Added data-driven critical-hit camera punch tuning (`light_attack_crit_camera_impulse_strength`, `light_attack_crit_camera_impulse_vertical`) wired to modular `DamageResolver` results, so player crits now add a short directional camera kick for clearer high-impact melee feedback
 - ✅ Added data-driven combat dummy damage popup tuning (`damage_popup_enabled`, `damage_popup_duration`, `damage_popup_rise_distance`, `damage_popup_color`) that spawns rising/fading world-space hit numbers, improving per-hit combat readability without hardcoded scene effects

@@ -1,0 +1,19 @@
+{
+  "biomes": {
+    "ashwood_frontier": [
+      { "enemy_archetype_id": "bandit_raider", "weight": 0.7 },
+      { "enemy_archetype_id": "blight_husk", "weight": 0.3 }
+    ],
+    "blight_marsh": [
+      { "enemy_archetype_id": "blight_husk", "weight": 0.8 },
+      { "enemy_archetype_id": "bandit_raider", "weight": 0.2 }
+    ],
+    "stonepass": [
+      { "enemy_archetype_id": "bandit_raider", "weight": 0.55 },
+      { "enemy_archetype_id": "blight_husk", "weight": 0.45 }
+    ]
+  },
+  "fallback": [
+    { "enemy_archetype_id": "blight_husk", "weight": 1.0 }
+  ]
+}
