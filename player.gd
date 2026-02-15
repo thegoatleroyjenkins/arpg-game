@@ -29,8 +29,14 @@ var total_damage: int:
 	get: return attack_damage + damage_bonus
 
 @onready var sprite = $Sprite2D
+@onready var sword_pivot: Node2D = $SwordPivot
+@onready var sword_sprite: Sprite2D = $SwordPivot/SwordSprite2D
 @onready var attack_area = $AttackArea
 @onready var health_bar = $HealthBar
+
+var _sword_rest_rotation_right: float = deg_to_rad(28.0)
+var _sword_rest_rotation_left: float = deg_to_rad(152.0)
+var _sword_swinging: bool = false
 
 signal stats_changed
 
@@ -41,6 +47,7 @@ var xp_to_next_level: int:
 func _ready():
 	current_health = max_health
 	_update_health_bar()
+	_update_sword_rest_pose()
 	emit_signal("stats_changed")
 
 func _physics_process(delta):
@@ -63,6 +70,9 @@ func _physics_process(delta):
 	elif velocity.x < 0:
 		sprite.scale.x = -1
 
+	if not _sword_swinging:
+		_update_sword_rest_pose()
+
 func _input(event):
 	if event.is_action_pressed("attack"):
 		attack()
@@ -76,6 +86,7 @@ func attack():
 		var tween = create_tween()
 		tween.tween_property(sprite, "scale:x", sprite.scale.x * 1.3, 0.1)
 		tween.tween_property(sprite, "scale:x", sprite.scale.x, 0.1)
+		_play_sword_swing()
 		
 		# Deal damage to enemies in range (use total damage with bonuses)
 		for area in attack_area.get_overlapping_areas():
@@ -188,3 +199,22 @@ func _apply_bonuses():
 	current_health = min(current_health, total_max_health)
 	_update_health_bar()
 	emit_signal("stats_changed")
+
+func _update_sword_rest_pose() -> void:
+	if sprite.scale.x >= 0:
+		sword_pivot.position = Vector2(12, 4)
+		sword_sprite.rotation = _sword_rest_rotation_right
+	else:
+		sword_pivot.position = Vector2(-12, 4)
+		sword_sprite.rotation = _sword_rest_rotation_left
+
+func _play_sword_swing() -> void:
+	_sword_swinging = true
+	var facing_right := sprite.scale.x >= 0
+	var swing_peak := deg_to_rad(-70.0) if facing_right else deg_to_rad(250.0)
+	var recover_rot := _sword_rest_rotation_right if facing_right else _sword_rest_rotation_left
+
+	var swing := create_tween()
+	swing.tween_property(sword_sprite, "rotation", swing_peak, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	swing.tween_property(sword_sprite, "rotation", recover_rot, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	swing.finished.connect(func(): _sword_swinging = false)

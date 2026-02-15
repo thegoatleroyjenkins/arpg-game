@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://player_scene"]
+[gd_scene load_steps=6 format=3 uid="uid://player_scene"]
 
 [ext_resource type="Script" path="res://player.gd" id="1_player"]
 [ext_resource type="Texture2D" path="res://assets/placeholders/player_knight.png" id="2_player_tex"]
+[ext_resource type="Texture2D" path="res://assets/placeholders/equipment_weapon.png" id="3_sword_tex"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 14.0
@@ -15,6 +16,15 @@ script = ExtResource("1_player")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_player_tex")
 modulate = Color(1, 1, 1, 1)
+
+[node name="SwordPivot" type="Node2D" parent="."]
+position = Vector2(12, 4)
+
+[node name="SwordSprite2D" type="Sprite2D" parent="SwordPivot"]
+texture = ExtResource("3_sword_tex")
+position = Vector2(14, 0)
+rotation = 0.5
+scale = Vector2(0.7, 0.7)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_player")
