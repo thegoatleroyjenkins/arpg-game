@@ -48,6 +48,10 @@ extends Area3D
 @export var dash_invulnerability_boost_duration: float = 2.0
 @export_range(0.0, 0.5, 0.01) var dash_invulnerability_boost_bonus_seconds: float = 0.05
 
+@export_group("Dash Charge Recovery Boost")
+@export var dash_charge_recovery_boost_duration: float = 1.8
+@export_range(1.0, 3.0, 0.05) var dash_charge_recovery_boost_multiplier: float = 1.35
+
 @export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
@@ -149,7 +153,8 @@ func _try_collect(body: Node) -> void:
 	var wants_sprint_efficiency_boost: bool = _target_needs_sprint_efficiency_boost(target)
 	var wants_move_speed_boost: bool = _target_needs_move_speed_boost(target)
 	var wants_dash_invulnerability_boost: bool = _target_needs_dash_invulnerability_boost(target)
-	if not wants_stamina and not wants_dash_recovery and not wants_dash_charge_recovery and not wants_air_jump_recovery and not wants_sprint_efficiency_boost and not wants_move_speed_boost and not wants_dash_invulnerability_boost:
+	var wants_dash_charge_recovery_boost: bool = _target_needs_dash_charge_recovery_boost(target)
+	if not wants_stamina and not wants_dash_recovery and not wants_dash_charge_recovery and not wants_air_jump_recovery and not wants_sprint_efficiency_boost and not wants_move_speed_boost and not wants_dash_invulnerability_boost and not wants_dash_charge_recovery_boost:
 		return
 
 	var restored: float = 0.0
@@ -184,7 +189,11 @@ func _try_collect(body: Node) -> void:
 	if wants_dash_invulnerability_boost and dash_invulnerability_boost_duration > 0.0 and dash_invulnerability_boost_bonus_seconds > 0.0 and target.has_method("apply_dash_invulnerability_boost"):
 		dash_invulnerability_boost_applied = float(target.call("apply_dash_invulnerability_boost", dash_invulnerability_boost_duration, dash_invulnerability_boost_bonus_seconds))
 
-	if restored <= 0.0 and dash_recovered <= 0.0 and dash_charges_recovered <= 0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0 and sprint_efficiency_boost_applied <= 0.0 and move_speed_boost_applied <= 0.0 and dash_invulnerability_boost_applied <= 0.0:
+	var dash_charge_recovery_boost_applied: float = 0.0
+	if wants_dash_charge_recovery_boost and dash_charge_recovery_boost_duration > 0.0 and dash_charge_recovery_boost_multiplier > 1.0 and target.has_method("apply_dash_charge_recovery_boost"):
+		dash_charge_recovery_boost_applied = float(target.call("apply_dash_charge_recovery_boost", dash_charge_recovery_boost_duration, dash_charge_recovery_boost_multiplier))
+
+	if restored <= 0.0 and dash_recovered <= 0.0 and dash_charges_recovered <= 0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0 and sprint_efficiency_boost_applied <= 0.0 and move_speed_boost_applied <= 0.0 and dash_invulnerability_boost_applied <= 0.0 and dash_charge_recovery_boost_applied <= 0.0:
 		return
 	_deactivate()
 
@@ -307,7 +316,8 @@ func _target_needs_any_recovery(player: Node3D, stamina_threshold: float, dash_t
 		or _target_needs_air_jump_recovery(player, air_jump_threshold) \
 		or _target_needs_sprint_efficiency_boost(player) \
 		or _target_needs_move_speed_boost(player) \
-		or _target_needs_dash_invulnerability_boost(player)
+		or _target_needs_dash_invulnerability_boost(player) \
+		or _target_needs_dash_charge_recovery_boost(player)
 
 func _update_contextual_visual_tint() -> void:
 	_runtime_albedo_tint = Color(1.0, 1.0, 1.0, 1.0)
@@ -420,6 +430,16 @@ func _target_needs_dash_invulnerability_boost(player: Node3D) -> bool:
 	if not player.has_method("get"):
 		return true
 	var remaining: float = float(player.get("dash_invulnerability_boost_left"))
+	return remaining <= 0.01
+
+func _target_needs_dash_charge_recovery_boost(player: Node3D) -> bool:
+	if dash_charge_recovery_boost_duration <= 0.0 or dash_charge_recovery_boost_multiplier <= 1.0:
+		return false
+	if not player.has_method("apply_dash_charge_recovery_boost"):
+		return false
+	if not player.has_method("get"):
+		return true
+	var remaining: float = float(player.get("dash_charge_recovery_boost_left"))
 	return remaining <= 0.01
 
 func _get_target_missing_stamina_ratio(player: Node3D) -> float:

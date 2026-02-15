@@ -24,6 +24,7 @@ signal stamina_regen_boost_changed(remaining: float, max_value: float, multiplie
 signal sprint_efficiency_boost_changed(remaining: float, max_value: float, multiplier: float)
 signal move_speed_boost_changed(remaining: float, max_value: float, multiplier: float)
 signal dash_invulnerability_boost_changed(remaining: float, max_value: float, bonus_seconds: float)
+signal dash_charge_recovery_boost_changed(remaining: float, max_value: float, multiplier: float)
 
 var look_target: Vector3
 var respawn_position: Vector3
@@ -61,6 +62,9 @@ var move_speed_boost_multiplier: float = 1.0
 var dash_invulnerability_boost_left: float = 0.0
 var dash_invulnerability_boost_max: float = 0.0
 var dash_invulnerability_boost_bonus_seconds: float = 0.0
+var dash_charge_recovery_boost_left: float = 0.0
+var dash_charge_recovery_boost_max: float = 0.0
+var dash_charge_recovery_boost_multiplier: float = 1.0
 var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var camera_orbit_yaw: float = 0.0
@@ -98,6 +102,7 @@ func _ready() -> void:
 	_emit_sprint_efficiency_boost_changed()
 	_emit_move_speed_boost_changed()
 	_emit_dash_invulnerability_boost_changed()
+	_emit_dash_charge_recovery_boost_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -149,6 +154,12 @@ func _physics_process(delta: float) -> void:
 			dash_invulnerability_boost_bonus_seconds = 0.0
 			dash_invulnerability_boost_max = 0.0
 		_emit_dash_invulnerability_boost_changed()
+	if dash_charge_recovery_boost_left > 0.0:
+		dash_charge_recovery_boost_left = max(0.0, dash_charge_recovery_boost_left - delta)
+		if dash_charge_recovery_boost_left <= 0.0:
+			dash_charge_recovery_boost_multiplier = 1.0
+			dash_charge_recovery_boost_max = 0.0
+		_emit_dash_charge_recovery_boost_changed()
 	_update_dash_invulnerability_visual(delta)
 
 	_handle_fall_reset_if_needed()
@@ -217,7 +228,8 @@ func _physics_process(delta: float) -> void:
 		dash_state_changed = true
 
 	if dash_charge_recharge_left > 0.0:
-		dash_charge_recharge_left = max(0.0, dash_charge_recharge_left - delta)
+		var recharge_speed_multiplier: float = dash_charge_recovery_boost_multiplier if dash_charge_recovery_boost_left > 0.0 else 1.0
+		dash_charge_recharge_left = max(0.0, dash_charge_recharge_left - (delta * max(1.0, recharge_speed_multiplier)))
 		dash_state_changed = true
 		_emit_dash_charge_recharge_changed()
 		if dash_charge_recharge_left <= 0.0 and dash_charges < max(1, tuning.dash_max_charges):
@@ -903,6 +915,18 @@ func apply_dash_invulnerability_boost(duration: float, bonus_seconds: float) -> 
 	_emit_dash_invulnerability_boost_changed()
 	return max(0.0, dash_invulnerability_boost_left - previous_remaining)
 
+func apply_dash_charge_recovery_boost(duration: float, multiplier: float) -> float:
+	var clamped_duration: float = max(0.0, duration)
+	var clamped_multiplier: float = max(1.0, multiplier)
+	if clamped_duration <= 0.0 or clamped_multiplier <= 1.0:
+		return 0.0
+	var previous_remaining: float = dash_charge_recovery_boost_left
+	dash_charge_recovery_boost_left = max(dash_charge_recovery_boost_left, clamped_duration)
+	dash_charge_recovery_boost_max = max(dash_charge_recovery_boost_max, dash_charge_recovery_boost_left)
+	dash_charge_recovery_boost_multiplier = max(dash_charge_recovery_boost_multiplier, clamped_multiplier)
+	_emit_dash_charge_recovery_boost_changed()
+	return max(0.0, dash_charge_recovery_boost_left - previous_remaining)
+
 func restore_dash_charges(count: int) -> int:
 	var grant_count: int = max(0, count)
 	if grant_count <= 0:
@@ -1019,3 +1043,6 @@ func _emit_move_speed_boost_changed() -> void:
 
 func _emit_dash_invulnerability_boost_changed() -> void:
 	dash_invulnerability_boost_changed.emit(dash_invulnerability_boost_left, max(0.01, dash_invulnerability_boost_max), max(0.0, dash_invulnerability_boost_bonus_seconds))
+
+func _emit_dash_charge_recovery_boost_changed() -> void:
+	dash_charge_recovery_boost_changed.emit(dash_charge_recovery_boost_left, max(0.01, dash_charge_recovery_boost_max), max(1.0, dash_charge_recovery_boost_multiplier))
