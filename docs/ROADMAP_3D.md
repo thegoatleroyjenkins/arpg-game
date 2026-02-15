@@ -187,3 +187,27 @@ The repo is still prototype-heavy; locking a reusable combat contract first unlo
 
 ### Why this order
 The project already has movement feel and initial world-streaming stubs; a real combat contract is the blocking dependency for enemy AI, progression balancing, and open-world encounter scalability.
+
+## Focused Planning Pass — 2026-02-15 09:02 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Ship the first true 3D combat loop in-engine (player + enemy + death) this pass**
+   - Create `res://systems/combat/damage_resolver.gd` and `combat_actor_3d.gd` and treat them as the only HP mutation path.
+   - Add a minimal attack payload contract (`source`, `target`, `base_damage`, `damage_type`, `tags`) so skills/loot can scale without rewrites.
+   - Validate in `prototype3d/main_3d.tscn`: player can damage enemy, enemy can damage player, death signal fires.
+
+2. **Replace placeholder enemy behavior with NavMesh-ready combat AI**
+   - Implement one `EnemyBrain3D` state loop (Idle/Chase/Attack/Leash) driven by `NavigationAgent3D`.
+   - Move enemy tuning values (move speed, aggro range, attack cooldown) into a resource for data-driven scaling.
+   - Route enemy attacks through the same resolver contract to keep parity with player combat.
+
+3. **Turn world streaming stubs into open-world-ready lifecycle hooks**
+   - Extend `WorldSector` + `WorldStreamer` + `SpawnDirector` with explicit load/activate/deactivate/unload signals.
+   - Add per-chunk spawn budget caps + cooldowns so encounters stay deterministic under streaming.
+   - Keep chunk/biome metadata in resource/data files; avoid embedding progression logic in scene scripts.
+
+### Immediate Next Implementation Task
+**Implement now:** scaffold `res://systems/combat/` with `damage_resolver.gd` and `combat_actor_3d.gd`, then wire one light attack in `prototype3d/player_3d.gd` and one enemy attack call to `request_damage()`.
+
+### Why this order
+Combat is still the highest-risk missing contract. Locking it first unlocks AI encounter tuning and prevents costly rework when streamed open-world combat density increases.
