@@ -224,6 +224,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Polished the 2D HUD for readability: split stats and controls into dedicated translucent panels, upgraded the stat readout to BBCode-rich color-coded text, and added an explicit objective line (`Defeat N enemies`) for clearer moment-to-moment UX
 - ✅ Added modular starter-level zone marker query helpers to `StarterLevelController` (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`) so encounter systems can consume JSON-authored zone IDs and scene marker nodes through a clean, data-driven API
 - ✅ Added data-driven neutral dash direction fallback tuning (`dash_neutral_uses_camera_forward`) so neutral-input dashes can follow camera forward when no live/recent move input exists, preserving camera-framed reposition intent
 - ✅ Added data-driven stamina pickup profile visual identity tuning (`visual_albedo_color`, `visual_emission_color`, `visual_emission_energy`) so different pickup profile types are readable in-world at a glance without hardcoded scene materials

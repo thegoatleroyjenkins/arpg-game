@@ -3,7 +3,7 @@ extends Node2D
 @onready var player = $Player
 @onready var camera = $Camera2D
 @onready var ui = $UI
-@onready var stats_label = $UI/StatsLabel
+@onready var stats_label = $UI/StatsPanel/StatsLabel
 
 var world_size = Vector2(2000, 2000)
 var enemies_remaining: int = 0
@@ -266,10 +266,21 @@ func update_stats():
 		accessory_name = player.accessory.item_name
 		accessory_health = player.accessory.health_bonus
 	
-	stats_label.text = "Level: %d\nXP: %d/%d\nHealth: %d/%d\nDamage: %d\nDefense: %d\nEnemies: %d\n\nEquipment:\n- Weapon: %s (+%d dmg)\n- Armor: %s (+%d def)\n- Accessory: %s (+%d hp)" % [
+	var health_ratio = 0.0
+	if player.total_max_health > 0:
+		health_ratio = float(player.current_health) / float(player.total_max_health)
+	
+	var health_color = "#7CFF6B"
+	if health_ratio < 0.6:
+		health_color = "#FFD166"
+	if health_ratio < 0.3:
+		health_color = "#FF6B6B"
+	
+	stats_label.text = "[b][color=#F6E27A]Level %d[/color][/b]\n[color=#A9D6FF]XP:[/color] %d/%d\n[color=%s]Health:[/color] %d/%d\n[color=#FFB26B]Damage:[/color] %d    [color=#8BD3FF]Defense:[/color] %d\n[b]Objective:[/b] Defeat [color=#FF8FA3]%d[/color] enemies\n\n[b][color=#DCC7FF]Equipment[/color][/b]\n• Weapon: %s (+%d dmg)\n• Armor: %s (+%d def)\n• Accessory: %s (+%d hp)" % [
 		player.level,
 		player.xp,
 		player.xp_to_next_level,
+		health_color,
 		player.current_health,
 		player.total_max_health,
 		player.total_damage,
