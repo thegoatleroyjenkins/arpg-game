@@ -46,6 +46,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Pickup Spawn Recovery Drift Correction (3D prototype)** — Data-driven return-to-spawn speed and snap distance now pull uncollected stamina orbs back toward their spawn anchor when magnet conditions are not met, keeping resource locations readable after failed pulls
 - **Pickup Respawn Telegraphs (3D prototype)** — Data-driven pre-respawn telegraph timing + pulse/alpha tuning now make stamina orb re-entry visible before reactivation, improving resource timing readability during combat routing
 - **Stamina Orbs Grant Dash Recovery (3D prototype)** — Data-driven stamina pickups can now shave configurable time off dash readiness when dash resources are missing, allowing intentional sustain-or-routing plays even when stamina is near full
+- **Stamina Orbs Grant Air Jump Recovery (3D prototype)** — Data-driven stamina pickups can now restore configurable air-jump charges when missing-jump thresholds are met, improving vertical recovery routing without hardcoded pickup behavior
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -201,6 +202,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven stamina pickup air-jump recovery tuning (`air_jump_recovery_count`, collect/magnet missing-air-jump thresholds) plus modular `restore_air_jumps()` player API, so pickups can restore vertical mobility when needed without hardcoded scene logic
 - ✅ Added data-driven 3D air-jump directional boost tuning (`air_jump_horizontal_boost`, `air_jump_horizontal_speed_cap`) so mid-air jumps carry movement intent and preserve cleaner aerial repositioning without hardcoded impulses
 - ✅ Added data-driven 3D hold-to-recenter camera behavior (enable toggle, recenter speed, snap-angle threshold + `camera_recenter` input action) so players can quickly realign camera orbit behind facing direction after manual orbit adjustments
 - ✅ Added data-driven 3D mouse orbit camera tuning (sensitivity, pitch clamp, invert-Y toggle) so players can steer combat framing while preserving modular camera-relative movement

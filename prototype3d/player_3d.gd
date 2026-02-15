@@ -745,6 +745,20 @@ func restore_stamina(amount: float) -> float:
 		return stamina - previous_stamina
 	return 0.0
 
+func restore_air_jumps(count: int) -> int:
+	var grant_count: int = max(0, count)
+	if grant_count <= 0:
+		return 0
+	var max_air_jumps: int = max(0, tuning.max_air_jumps)
+	if max_air_jumps <= 0:
+		return 0
+	var previous_air_jumps: int = air_jumps_left
+	air_jumps_left = min(max_air_jumps, air_jumps_left + grant_count)
+	var restored: int = air_jumps_left - previous_air_jumps
+	if restored > 0:
+		_emit_air_jumps_changed()
+	return restored
+
 func refund_dash_recovery(seconds: float) -> float:
 	var reduction: float = max(0.0, seconds)
 	if reduction <= 0.0:

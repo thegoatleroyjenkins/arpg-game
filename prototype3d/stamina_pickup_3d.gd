@@ -20,6 +20,11 @@ extends Area3D
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_dash_ratio: float = 0.1
 @export_range(0.0, 1.0, 0.01) var magnet_missing_dash_ratio: float = 0.2
 
+@export_group("Air Jump Recovery")
+@export var air_jump_recovery_count: int = 1
+@export_range(0.0, 1.0, 0.01) var min_collect_missing_air_jump_ratio: float = 0.34
+@export_range(0.0, 1.0, 0.01) var magnet_missing_air_jump_ratio: float = 0.5
+
 @export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
@@ -75,7 +80,8 @@ func _try_collect(body: Node) -> void:
 	var target: Node3D = body as Node3D
 	var wants_stamina: bool = _target_needs_stamina_for_collection(target)
 	var wants_dash_recovery: bool = _target_needs_dash_recovery(target, min_collect_missing_dash_ratio)
-	if not wants_stamina and not wants_dash_recovery:
+	var wants_air_jump_recovery: bool = _target_needs_air_jump_recovery(target, min_collect_missing_air_jump_ratio)
+	if not wants_stamina and not wants_dash_recovery and not wants_air_jump_recovery:
 		return
 
 	var restored: float = 0.0
@@ -86,7 +92,11 @@ func _try_collect(body: Node) -> void:
 	if dash_recovery_bonus_seconds > 0.0 and target.has_method("refund_dash_recovery") and wants_dash_recovery:
 		dash_recovered = float(target.call("refund_dash_recovery", dash_recovery_bonus_seconds))
 
-	if restored <= 0.0 and dash_recovered <= 0.0:
+	var air_jumps_recovered: int = 0
+	if air_jump_recovery_count > 0 and target.has_method("restore_air_jumps") and wants_air_jump_recovery:
+		air_jumps_recovered = int(target.call("restore_air_jumps", air_jump_recovery_count))
+
+	if restored <= 0.0 and dash_recovered <= 0.0 and air_jumps_recovered <= 0:
 		return
 	_deactivate()
 
@@ -156,7 +166,7 @@ func _update_magnet_motion(delta: float) -> void:
 	if distance <= 0.01 or distance > magnet_radius:
 		_move_toward_spawn(delta)
 		return
-	if not _target_needs_stamina(player) and not _target_needs_dash_recovery(player, magnet_missing_dash_ratio):
+	if not _target_needs_stamina(player) and not _target_needs_dash_recovery(player, magnet_missing_dash_ratio) and not _target_needs_air_jump_recovery(player, magnet_missing_air_jump_ratio):
 		_move_toward_spawn(delta)
 		return
 	if magnet_requires_line_of_sight and not _has_line_of_sight_to_target(player):
@@ -218,6 +228,21 @@ func _target_needs_dash_recovery(player: Node3D, threshold_ratio: float) -> bool
 		return true
 	var max_value: float = max(0.01, float(player.call("_next_dash_ready_max")))
 	var missing_ratio: float = clamp(remaining / max_value, 0.0, 1.0)
+	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
+
+func _target_needs_air_jump_recovery(player: Node3D, threshold_ratio: float) -> bool:
+	if air_jump_recovery_count <= 0:
+		return false
+	if not player.has_method("restore_air_jumps"):
+		return false
+	var tuning: Resource = player.get("tuning")
+	if tuning == null:
+		return false
+	var max_air_jumps: int = max(0, int(tuning.get("max_air_jumps")))
+	if max_air_jumps <= 0:
+		return false
+	var current_air_jumps: int = clampi(int(player.get("air_jumps_left")), 0, max_air_jumps)
+	var missing_ratio: float = float(max_air_jumps - current_air_jumps) / float(max_air_jumps)
 	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
 
 func _get_target_missing_stamina_ratio(player: Node3D) -> float:
