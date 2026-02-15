@@ -877,6 +877,27 @@ func apply_move_speed_boost(duration: float, multiplier: float) -> float:
 	_emit_move_speed_boost_changed()
 	return max(0.0, move_speed_boost_left - previous_remaining)
 
+func restore_dash_charges(count: int) -> int:
+	var grant_count: int = max(0, count)
+	if grant_count <= 0:
+		return 0
+	var max_dash_charges: int = max(1, tuning.dash_max_charges)
+	if dash_charges >= max_dash_charges:
+		return 0
+	var previous_charges: int = dash_charges
+	dash_charges = min(max_dash_charges, dash_charges + grant_count)
+	if dash_charges >= max_dash_charges:
+		dash_charge_recharge_left = 0.0
+	else:
+		if dash_charge_recharge_left <= 0.0:
+			dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
+		else:
+			dash_charge_recharge_left = min(dash_charge_recharge_left, max(0.01, tuning.dash_charge_recovery_time))
+	_emit_dash_charges_changed()
+	_emit_dash_charge_recharge_changed()
+	_emit_dash_cooldown_changed()
+	return dash_charges - previous_charges
+
 func restore_air_jumps(count: int) -> int:
 	var grant_count: int = max(0, count)
 	if grant_count <= 0:

@@ -62,6 +62,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Pickup Spawn Recovery Drift Correction (3D prototype)** — Data-driven return-to-spawn speed and snap distance now pull uncollected stamina orbs back toward their spawn anchor when magnet conditions are not met, keeping resource locations readable after failed pulls
 - **Pickup Respawn Telegraphs (3D prototype)** — Data-driven pre-respawn telegraph timing + pulse/alpha tuning now make stamina orb re-entry visible before reactivation, improving resource timing readability during combat routing
 - **Stamina Orbs Grant Dash Recovery (3D prototype)** — Data-driven stamina pickups can now shave configurable time off dash readiness when dash resources are missing, allowing intentional sustain-or-routing plays even when stamina is near full
+- **Stamina Orbs Grant Dash Charge Recovery (3D prototype)** — Data-driven pickup profiles can now restore configurable dash charge counts using separate collection/magnet missing-charge thresholds, enabling stronger mobility-route planning without hardcoded orb behavior
 - **Stamina Orbs Grant Air Jump Recovery (3D prototype)** — Data-driven stamina pickups can now restore configurable air-jump charges when missing-jump thresholds are met, improving vertical recovery routing without hardcoded pickup behavior
 - **Stamina Orbs Grant Sprint Efficiency Burst (3D prototype)** — Data-driven pickups can now grant a temporary sprint efficiency buff (reduced sprint stamina drain) with modular HUD timing/multiplier feedback, enabling short reposition windows without hardcoded stamina discounts
 - **Stamina Orbs Grant Momentum Burst (3D prototype)** — Data-driven pickups can now grant a temporary move-speed multiplier (duration + multiplier tuning) with modular HUD timing/multiplier feedback, enabling short commit-and-reposition windows without hardcoded movement overrides
@@ -231,6 +232,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven stamina pickup dash-charge recovery tuning (`dash_charge_restore_count`, collect/magnet missing-dash-charge thresholds) plus modular `restore_dash_charges()` player API, so pickup profiles can refill missing dash charges for cleaner mobility-route planning without hardcoded scene logic
 - ✅ Added data-driven dash-to-jump input buffer assist (`jump_buffer_dash_bonus_time`) so jump presses near dash end are preserved into the post-dash window, improving movement-chain responsiveness without bypassing stamina or jump eligibility checks
 - ✅ Polished the 3D prototype UI readability: added a translucent HUD backdrop, stronger text outlining for mobility readouts, an in-HUD controls hint strip, and clearer pause-menu subtitle guidance so moment-to-moment movement information remains legible under action
 - ✅ Added data-driven landing-recovery dash input buffering (`hard_landing_dash_input_buffer_window`) so dash presses just before recovery ends are queued and fired as soon as dash cancel rules allow, improving post-landing responsiveness without bypassing stamina/cooldown gating

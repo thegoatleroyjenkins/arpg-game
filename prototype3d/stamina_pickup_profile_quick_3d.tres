@@ -6,6 +6,9 @@
 script = ExtResource("1_profile_script")
 stamina_restore = 18.0
 respawn_time = 6.0
+dash_charge_restore_count = 1
+min_collect_missing_dash_charge_ratio = 0.25
+magnet_missing_dash_charge_ratio = 0.4
 sprint_efficiency_boost_duration = 3.2
 sprint_efficiency_boost_multiplier = 1.8
 visual_albedo_color = Color(1, 0.82, 0.4, 1)

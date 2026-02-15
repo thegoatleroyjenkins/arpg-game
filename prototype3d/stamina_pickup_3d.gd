@@ -22,6 +22,11 @@ extends Area3D
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_dash_ratio: float = 0.1
 @export_range(0.0, 1.0, 0.01) var magnet_missing_dash_ratio: float = 0.2
 
+@export_group("Dash Charge Recovery")
+@export var dash_charge_restore_count: int = 1
+@export_range(0.0, 1.0, 0.01) var min_collect_missing_dash_charge_ratio: float = 0.34
+@export_range(0.0, 1.0, 0.01) var magnet_missing_dash_charge_ratio: float = 0.5
+
 @export_group("Air Jump Recovery")
 @export var air_jump_recovery_count: int = 1
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_air_jump_ratio: float = 0.34
@@ -124,10 +129,11 @@ func _try_collect(body: Node) -> void:
 	var target: Node3D = body as Node3D
 	var wants_stamina: bool = _target_needs_stamina_for_collection(target)
 	var wants_dash_recovery: bool = _target_needs_dash_recovery(target, min_collect_missing_dash_ratio)
+	var wants_dash_charge_recovery: bool = _target_needs_dash_charge_recovery(target, min_collect_missing_dash_charge_ratio)
 	var wants_air_jump_recovery: bool = _target_needs_air_jump_recovery(target, min_collect_missing_air_jump_ratio)
 	var wants_sprint_efficiency_boost: bool = _target_needs_sprint_efficiency_boost(target)
 	var wants_move_speed_boost: bool = _target_needs_move_speed_boost(target)
-	if not wants_stamina and not wants_dash_recovery and not wants_air_jump_recovery and not wants_sprint_efficiency_boost and not wants_move_speed_boost:
+	if not wants_stamina and not wants_dash_recovery and not wants_dash_charge_recovery and not wants_air_jump_recovery and not wants_sprint_efficiency_boost and not wants_move_speed_boost:
 		return
 
 	var restored: float = 0.0
@@ -137,6 +143,10 @@ func _try_collect(body: Node) -> void:
 	var dash_recovered: float = 0.0
 	if dash_recovery_bonus_seconds > 0.0 and target.has_method("refund_dash_recovery") and wants_dash_recovery:
 		dash_recovered = float(target.call("refund_dash_recovery", dash_recovery_bonus_seconds))
+
+	var dash_charges_recovered: int = 0
+	if dash_charge_restore_count > 0 and target.has_method("restore_dash_charges") and wants_dash_charge_recovery:
+		dash_charges_recovered = int(target.call("restore_dash_charges", dash_charge_restore_count))
 
 	var air_jumps_recovered: int = 0
 	if air_jump_recovery_count > 0 and target.has_method("restore_air_jumps") and wants_air_jump_recovery:
@@ -154,7 +164,7 @@ func _try_collect(body: Node) -> void:
 	if wants_move_speed_boost and move_speed_boost_duration > 0.0 and move_speed_boost_multiplier > 1.0 and target.has_method("apply_move_speed_boost"):
 		move_speed_boost_applied = float(target.call("apply_move_speed_boost", move_speed_boost_duration, move_speed_boost_multiplier))
 
-	if restored <= 0.0 and dash_recovered <= 0.0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0 and sprint_efficiency_boost_applied <= 0.0 and move_speed_boost_applied <= 0.0:
+	if restored <= 0.0 and dash_recovered <= 0.0 and dash_charges_recovered <= 0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0 and sprint_efficiency_boost_applied <= 0.0 and move_speed_boost_applied <= 0.0:
 		return
 	_deactivate()
 
@@ -273,6 +283,7 @@ func _get_magnet_target() -> Node3D:
 func _target_needs_any_recovery(player: Node3D, stamina_threshold: float, dash_threshold: float, air_jump_threshold: float) -> bool:
 	return _target_needs_stamina_with_threshold(player, stamina_threshold) \
 		or _target_needs_dash_recovery(player, dash_threshold) \
+		or _target_needs_dash_charge_recovery(player, magnet_missing_dash_charge_ratio) \
 		or _target_needs_air_jump_recovery(player, air_jump_threshold)
 
 func _target_needs_stamina(player: Node3D) -> bool:
@@ -301,6 +312,19 @@ func _target_needs_dash_recovery(player: Node3D, threshold_ratio: float) -> bool
 		return true
 	var max_value: float = max(0.01, float(player.call("_next_dash_ready_max")))
 	var missing_ratio: float = clamp(remaining / max_value, 0.0, 1.0)
+	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
+
+func _target_needs_dash_charge_recovery(player: Node3D, threshold_ratio: float) -> bool:
+	if dash_charge_restore_count <= 0:
+		return false
+	if not player.has_method("restore_dash_charges"):
+		return false
+	var tuning: Resource = player.get("tuning")
+	if tuning == null:
+		return false
+	var max_dash_charges: int = max(1, int(tuning.get("dash_max_charges")))
+	var current_dash_charges: int = clampi(int(player.get("dash_charges")), 0, max_dash_charges)
+	var missing_ratio: float = float(max_dash_charges - current_dash_charges) / float(max_dash_charges)
 	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
 
 func _target_needs_air_jump_recovery(player: Node3D, threshold_ratio: float) -> bool:

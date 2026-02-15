@@ -24,6 +24,11 @@ class_name StaminaPickupProfile3D
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_dash_ratio: float = 0.1
 @export_range(0.0, 1.0, 0.01) var magnet_missing_dash_ratio: float = 0.2
 
+@export_group("Dash Charge Recovery")
+@export var dash_charge_restore_count: int = 1
+@export_range(0.0, 1.0, 0.01) var min_collect_missing_dash_charge_ratio: float = 0.34
+@export_range(0.0, 1.0, 0.01) var magnet_missing_dash_charge_ratio: float = 0.5
+
 @export_group("Air Jump Recovery")
 @export var air_jump_recovery_count: int = 1
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_air_jump_ratio: float = 0.34
