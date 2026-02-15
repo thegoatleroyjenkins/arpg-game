@@ -49,7 +49,7 @@ func _load_layout(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		return {}
-	var parsed := JSON.parse_string(file.get_as_text())
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return {}
 	var stream_data: Dictionary = parsed.get("streaming", {})
@@ -63,7 +63,7 @@ func _load_layout(path: String) -> Dictionary:
 	return parsed
 
 func _world_to_chunk(pos: Vector3) -> Vector2i:
-	var size := max(1.0, chunk_size_meters)
+	var size: float = max(1.0, chunk_size_meters)
 	return Vector2i(floori(pos.x / size), floori(pos.z / size))
 
 func _chunk_id_at(grid_x: int, grid_y: int) -> String:

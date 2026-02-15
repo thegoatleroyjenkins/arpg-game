@@ -21,6 +21,7 @@ signal stamina_regen_delay_changed(remaining: float, max_value: float)
 signal stamina_action_failed(reason: String, remaining: float)
 signal dash_invulnerability_changed(remaining: float, max_value: float)
 signal stamina_regen_boost_changed(remaining: float, max_value: float, multiplier: float)
+signal sprint_efficiency_boost_changed(remaining: float, max_value: float, multiplier: float)
 
 var look_target: Vector3
 var respawn_position: Vector3
@@ -49,6 +50,9 @@ var dash_invulnerability_left: float = 0.0
 var stamina_regen_boost_left: float = 0.0
 var stamina_regen_boost_max: float = 0.0
 var stamina_regen_boost_multiplier: float = 1.0
+var sprint_efficiency_boost_left: float = 0.0
+var sprint_efficiency_boost_max: float = 0.0
+var sprint_efficiency_boost_multiplier: float = 1.0
 var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var camera_orbit_yaw: float = 0.0
@@ -83,6 +87,7 @@ func _ready() -> void:
 	_emit_stamina_regen_delay_changed()
 	_emit_dash_invulnerability_changed()
 	_emit_stamina_regen_boost_changed()
+	_emit_sprint_efficiency_boost_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -116,6 +121,12 @@ func _physics_process(delta: float) -> void:
 			stamina_regen_boost_multiplier = 1.0
 			stamina_regen_boost_max = 0.0
 		_emit_stamina_regen_boost_changed()
+	if sprint_efficiency_boost_left > 0.0:
+		sprint_efficiency_boost_left = max(0.0, sprint_efficiency_boost_left - delta)
+		if sprint_efficiency_boost_left <= 0.0:
+			sprint_efficiency_boost_multiplier = 1.0
+			sprint_efficiency_boost_max = 0.0
+		_emit_sprint_efficiency_boost_changed()
 	_update_dash_invulnerability_visual(delta)
 
 	_handle_fall_reset_if_needed()
@@ -236,9 +247,12 @@ func _physics_process(delta: float) -> void:
 		var sprint_resume_threshold: float = max(sprint_exhaust_threshold, tuning.sprint_resume_threshold)
 		if sprint_exhausted and stamina >= sprint_resume_threshold:
 			sprint_exhausted = false
-		if is_trying_to_sprint and not sprint_exhausted and _can_pay_stamina(tuning.sprint_stamina_per_second * delta):
+		var sprint_stamina_drain: float = tuning.sprint_stamina_per_second * delta
+		if sprint_efficiency_boost_left > 0.0:
+			sprint_stamina_drain /= max(1.0, sprint_efficiency_boost_multiplier)
+		if is_trying_to_sprint and not sprint_exhausted and _can_pay_stamina(sprint_stamina_drain):
 			is_sprinting = true
-			_use_stamina(tuning.sprint_stamina_per_second * delta)
+			_use_stamina(sprint_stamina_drain)
 			if stamina <= sprint_exhaust_threshold:
 				sprint_exhausted = true
 		else:
@@ -813,6 +827,18 @@ func apply_stamina_regen_boost(duration: float, multiplier: float) -> float:
 	_emit_stamina_regen_boost_changed()
 	return max(0.0, stamina_regen_boost_left - previous_remaining)
 
+func apply_sprint_efficiency_boost(duration: float, multiplier: float) -> float:
+	var clamped_duration: float = max(0.0, duration)
+	var clamped_multiplier: float = max(1.0, multiplier)
+	if clamped_duration <= 0.0 or clamped_multiplier <= 1.0:
+		return 0.0
+	var previous_remaining: float = sprint_efficiency_boost_left
+	sprint_efficiency_boost_left = max(sprint_efficiency_boost_left, clamped_duration)
+	sprint_efficiency_boost_max = max(sprint_efficiency_boost_max, sprint_efficiency_boost_left)
+	sprint_efficiency_boost_multiplier = max(sprint_efficiency_boost_multiplier, clamped_multiplier)
+	_emit_sprint_efficiency_boost_changed()
+	return max(0.0, sprint_efficiency_boost_left - previous_remaining)
+
 func restore_air_jumps(count: int) -> int:
 	var grant_count: int = max(0, count)
 	if grant_count <= 0:
@@ -899,3 +925,6 @@ func _emit_dash_invulnerability_changed() -> void:
 
 func _emit_stamina_regen_boost_changed() -> void:
 	stamina_regen_boost_changed.emit(stamina_regen_boost_left, max(0.01, stamina_regen_boost_max), max(1.0, stamina_regen_boost_multiplier))
+
+func _emit_sprint_efficiency_boost_changed() -> void:
+	sprint_efficiency_boost_changed.emit(sprint_efficiency_boost_left, max(0.01, sprint_efficiency_boost_max), max(1.0, sprint_efficiency_boost_multiplier))

@@ -226,6 +226,7 @@ arpg-game/
 ## Recent Updates
 
 - ✅ Added data-driven dash-aware camera follow-assist tuning (`camera_follow_assist_dash_multiplier`) so orbit yaw realigns faster during active dashes for clearer burst-mobility framing without hardcoded camera logic
+- ✅ Promoted a new default playable open-world scene (`res://world/levels/open_world_3d.tscn`) with chunk-based terrain generation from `data/world/world_map_layout.json`, streaming hooks (`WorldStreamer`), and procedural prop population per chunk for immediate large-world traversal
 - ✅ Extended the Phase-1 procedural asset pipeline with an auto-generated player placeholder mesh (`generated_assets/characters/player_knight.tscn`) so character blocking/readability can iterate without manual modeling
 - ✅ Added a Phase-1 offline procedural asset pipeline (`tools/procedural_asset_generator.gd`) that auto-generates modular weapons, props, and pickup scenes into `res://generated_assets/`; usage is documented in `docs/PROCEDURAL_ASSET_PIPELINE.md`
 - ✅ Added data-driven 3D dash trail visual identity tuning (`dash_trail_color`, `dash_trail_emission_energy`) so afterimage trail readability/style can be authored per tuning resource without hardcoded material values

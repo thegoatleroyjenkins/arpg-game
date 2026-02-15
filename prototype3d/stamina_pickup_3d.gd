@@ -31,6 +31,10 @@ extends Area3D
 @export var regen_boost_duration: float = 1.6
 @export_range(1.0, 4.0, 0.05) var regen_boost_multiplier: float = 1.35
 
+@export_group("Sprint Efficiency")
+@export var sprint_efficiency_boost_duration: float = 2.4
+@export_range(1.0, 4.0, 0.05) var sprint_efficiency_boost_multiplier: float = 1.5
+
 @export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
@@ -117,7 +121,8 @@ func _try_collect(body: Node) -> void:
 	var wants_stamina: bool = _target_needs_stamina_for_collection(target)
 	var wants_dash_recovery: bool = _target_needs_dash_recovery(target, min_collect_missing_dash_ratio)
 	var wants_air_jump_recovery: bool = _target_needs_air_jump_recovery(target, min_collect_missing_air_jump_ratio)
-	if not wants_stamina and not wants_dash_recovery and not wants_air_jump_recovery:
+	var wants_sprint_efficiency_boost: bool = _target_needs_sprint_efficiency_boost(target)
+	if not wants_stamina and not wants_dash_recovery and not wants_air_jump_recovery and not wants_sprint_efficiency_boost:
 		return
 
 	var restored: float = 0.0
@@ -136,7 +141,11 @@ func _try_collect(body: Node) -> void:
 	if regen_boost_duration > 0.0 and regen_boost_multiplier > 1.0 and target.has_method("apply_stamina_regen_boost"):
 		regen_boost_applied = float(target.call("apply_stamina_regen_boost", regen_boost_duration, regen_boost_multiplier))
 
-	if restored <= 0.0 and dash_recovered <= 0.0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0:
+	var sprint_efficiency_boost_applied: float = 0.0
+	if wants_sprint_efficiency_boost and sprint_efficiency_boost_duration > 0.0 and sprint_efficiency_boost_multiplier > 1.0 and target.has_method("apply_sprint_efficiency_boost"):
+		sprint_efficiency_boost_applied = float(target.call("apply_sprint_efficiency_boost", sprint_efficiency_boost_duration, sprint_efficiency_boost_multiplier))
+
+	if restored <= 0.0 and dash_recovered <= 0.0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0 and sprint_efficiency_boost_applied <= 0.0:
 		return
 	_deactivate()
 
