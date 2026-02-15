@@ -143,6 +143,7 @@ func _physics_process(delta: float) -> void:
 		if can_ground_jump:
 			coyote_time_left = 0.0
 		elif can_air_jump:
+			_apply_air_jump_horizontal_boost()
 			air_jumps_left -= 1
 			_emit_air_jumps_changed()
 
@@ -371,6 +372,33 @@ func _apply_sprint_jump_momentum_boost() -> void:
 	var boosted_velocity: Vector3 = horizontal_velocity.normalized() * boosted_speed
 	velocity.x = boosted_velocity.x
 	velocity.z = boosted_velocity.z
+
+func _apply_air_jump_horizontal_boost() -> void:
+	var boost: float = max(0.0, tuning.air_jump_horizontal_boost)
+	if boost <= 0.0:
+		return
+	var boost_direction: Vector3 = _resolve_air_jump_boost_direction()
+	if boost_direction.length() <= 0.01:
+		return
+	var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+	var speed_cap: float = max(tuning.move_speed, tuning.air_jump_horizontal_speed_cap)
+	var boosted_velocity: Vector3 = horizontal_velocity + boost_direction * boost
+	if boosted_velocity.length() > speed_cap:
+		boosted_velocity = boosted_velocity.normalized() * speed_cap
+	velocity.x = boosted_velocity.x
+	velocity.z = boosted_velocity.z
+
+func _resolve_air_jump_boost_direction() -> Vector3:
+	if recent_move_direction_left > 0.0 and recent_move_direction.length() > 0.01:
+		return recent_move_direction.normalized()
+	var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+	if horizontal_velocity.length() > 0.01:
+		return horizontal_velocity.normalized()
+	var forward := -global_transform.basis.z
+	forward.y = 0.0
+	if forward.length() <= 0.01:
+		return Vector3.ZERO
+	return forward.normalized()
 
 func _start_dash(move_dir: Vector3) -> void:
 	if landing_recovery_left > 0.0:

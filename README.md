@@ -23,6 +23,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability
 - **Air Jump (3D prototype)** — Data-driven extra mid-air jump count enables cleaner vertical repositioning and more expressive traversal/combat routing
+- **Air Jump Directional Boost (3D prototype)** — Data-driven airborne jump horizontal boost + speed cap now preserve forward momentum and recent movement intent, improving mid-air reposition control without hardcoded impulses
 - **Air Jump Stamina Scaling (3D prototype)** — Data-driven airborne jump stamina multiplier now increases air-jump cost versus grounded jumps, improving vertical mobility tradeoff clarity
 - **Jump Apex Hang Time (3D prototype)** — Data-driven apex gravity tuning softens gravity near jump peak for cleaner aerial control and better mid-air repositioning readability
 - **Sprint Jump Momentum Carry (3D prototype)** — Data-driven sprint-jump momentum boost and speed cap preserve forward flow when jumping out of sprint, improving traversal/combat movement continuity without hardcoded values
@@ -199,6 +200,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D air-jump directional boost tuning (`air_jump_horizontal_boost`, `air_jump_horizontal_speed_cap`) so mid-air jumps carry movement intent and preserve cleaner aerial repositioning without hardcoded impulses
 - ✅ Added data-driven 3D hold-to-recenter camera behavior (enable toggle, recenter speed, snap-angle threshold + `camera_recenter` input action) so players can quickly realign camera orbit behind facing direction after manual orbit adjustments
 - ✅ Added data-driven 3D mouse orbit camera tuning (sensitivity, pitch clamp, invert-Y toggle) so players can steer combat framing while preserving modular camera-relative movement
 - ✅ Added data-driven 3D camera collision layer mask tuning so camera occlusion checks can ignore non-blocking physics layers (like gameplay props/pickups), reducing unwanted camera jitter while preserving level readability

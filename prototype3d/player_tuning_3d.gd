@@ -8,6 +8,11 @@ class_name PlayerTuning3D
 @export var coyote_time: float = 0.12
 @export var jump_buffer_time: float = 0.12
 @export var max_air_jumps: int = 1
+
+@export_group("Air Jump Feel")
+@export var air_jump_horizontal_boost: float = 2.2
+@export var air_jump_horizontal_speed_cap: float = 8.8
+
 @export var jump_release_gravity_multiplier: float = 2.2
 @export var jump_apex_gravity_multiplier: float = 0.7
 @export var jump_apex_vertical_speed_threshold: float = 1.0
