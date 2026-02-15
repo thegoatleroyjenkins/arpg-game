@@ -52,7 +52,7 @@ func _rebuild_zone_caches() -> void:
 		_zone_data_by_id[zone_id] = zone_data
 		var prefix: String = str(zone_data.get("scene_marker_prefix", ""))
 		var marker_nodes: Array[Node3D] = _find_markers_by_prefix(markers_root, prefix)
-		_zone_markers_by_id[zone_id] = marker_nodes
+		_zone_markers_by_id[zone_id] = marker_nodes.duplicate()
 		if marker_nodes.is_empty():
 			push_warning("StarterLevelController: No markers found for zone '%s' prefix '%s'" % [zone_id, prefix])
 
@@ -61,10 +61,14 @@ func _find_markers_by_prefix(markers_root: Node, prefix: String) -> Array[Node3D
 	if prefix.is_empty():
 		return nodes
 
-	for child in markers_root.get_children():
-		if child is Node3D and child.name.begins_with(prefix):
-			nodes.append(child as Node3D)
+	_collect_markers_by_prefix_recursive(markers_root, prefix, nodes)
 	return nodes
+
+func _collect_markers_by_prefix_recursive(root: Node, prefix: String, out_nodes: Array[Node3D]) -> void:
+	for child in root.get_children():
+		if child is Node3D and child.name.begins_with(prefix):
+			out_nodes.append(child as Node3D)
+		_collect_markers_by_prefix_recursive(child, prefix, out_nodes)
 
 func get_zone_data(zone_id: String) -> Dictionary:
 	var normalized_id := zone_id.strip_edges()
@@ -76,11 +80,16 @@ func get_zone_data(zone_id: String) -> Dictionary:
 
 func get_zone_marker_nodes(zone_id: String) -> Array[Node3D]:
 	var normalized_id := zone_id.strip_edges()
+	var result: Array[Node3D] = []
 	if normalized_id.is_empty():
-		return []
+		return result
 	if not _zone_markers_by_id.has(normalized_id):
-		return []
-	return (_zone_markers_by_id[normalized_id] as Array[Node3D]).duplicate()
+		return result
+	var stored_markers: Array = _zone_markers_by_id[normalized_id]
+	for marker in stored_markers:
+		if marker is Node3D:
+			result.append(marker)
+	return result
 
 func get_random_zone_marker(zone_id: String, rng: RandomNumberGenerator = null) -> Node3D:
 	var markers := get_zone_marker_nodes(zone_id)
