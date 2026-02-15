@@ -6,6 +6,7 @@ const ACTION_JUMP := "jump"
 
 @onready var pivot: Node3D = $CameraPivot
 @onready var camera: Camera3D = $CameraPivot/Camera3D
+@onready var body_mesh: MeshInstance3D = $MeshInstance3D
 
 signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
@@ -43,6 +44,7 @@ var recent_move_direction: Vector3 = Vector3.ZERO
 var recent_move_direction_left: float = 0.0
 var stamina_action_warning_cooldown_left: float = 0.0
 var dash_invulnerability_left: float = 0.0
+var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
@@ -185,6 +187,10 @@ func _physics_process(delta: float) -> void:
 
 	if dash_time_left > 0.0:
 		dash_time_left = max(0.0, dash_time_left - delta)
+		dash_trail_spawn_left = max(0.0, dash_trail_spawn_left - delta)
+		if tuning.dash_trail_enabled and dash_trail_spawn_left <= 0.0:
+			_spawn_dash_trail()
+			dash_trail_spawn_left = max(0.01, tuning.dash_trail_spawn_interval)
 		_update_dash_direction(move_dir, delta)
 		velocity.x = dash_direction.x * tuning.dash_speed
 		velocity.z = dash_direction.z * tuning.dash_speed
@@ -192,6 +198,7 @@ func _physics_process(delta: float) -> void:
 			sprinting_now = false
 			_emit_sprint_state_changed()
 	else:
+		dash_trail_spawn_left = 0.0
 		var is_recovering := landing_recovery_left > 0.0
 		var is_moving := move_dir.length() > 0.01
 		var is_trying_to_sprint := Input.is_action_pressed("sprint") and is_moving and not is_recovering
@@ -355,6 +362,7 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_direction.y = 0.0
 	dash_direction = dash_direction.normalized()
 	dash_time_left = tuning.dash_duration
+	dash_trail_spawn_left = 0.0
 	dash_cooldown_left = tuning.dash_cooldown
 	dash_invulnerability_left = max(dash_invulnerability_left, max(0.0, tuning.dash_invulnerability_duration))
 	_emit_dash_invulnerability_changed()
@@ -383,6 +391,28 @@ func _update_dash_direction(move_dir: Vector3, delta: float) -> void:
 	if dash_direction.length() <= 0.01:
 		dash_direction = steering_target
 	dash_direction = dash_direction.normalized()
+
+func _spawn_dash_trail() -> void:
+	if not tuning.dash_trail_enabled:
+		return
+	if not is_instance_valid(body_mesh) or body_mesh.mesh == null:
+		return
+	var current_scene := get_tree().current_scene
+	if current_scene == null:
+		return
+	var trail := MeshInstance3D.new()
+	trail.mesh = body_mesh.mesh
+	trail.global_transform = body_mesh.global_transform
+	trail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var trail_material := StandardMaterial3D.new()
+	trail_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	trail_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	trail_material.albedo_color = Color(0.45, 0.8, 1.0, clamp(tuning.dash_trail_start_alpha, 0.0, 1.0))
+	trail.material_override = trail_material
+	current_scene.add_child(trail)
+	var tween := create_tween()
+	tween.tween_property(trail_material, "albedo_color:a", clamp(tuning.dash_trail_end_alpha, 0.0, 1.0), max(0.01, tuning.dash_trail_lifetime))
+	tween.tween_callback(trail.queue_free)
 
 func _update_camera_fov(delta: float) -> void:
 	var horizontal_speed := Vector3(velocity.x, 0.0, velocity.z).length()
