@@ -104,6 +104,16 @@ show_percentage = false
 layout_mode = 2
 text = "Landing Recovery Ready"
 
+[node name="StaminaRegenDelayBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 0.7
+value = 0.0
+show_percentage = false
+
+[node name="StaminaRegenDelayLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Regen Active"
+
 [node name="StaminaWarningLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 visible = false
 layout_mode = 2

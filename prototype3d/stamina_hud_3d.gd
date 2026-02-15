@@ -11,6 +11,8 @@ extends CanvasLayer
 @onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
 @onready var landing_recovery_bar: ProgressBar = $MarginContainer/VBoxContainer/LandingRecoveryBar
 @onready var landing_recovery_label: Label = $MarginContainer/VBoxContainer/LandingRecoveryLabel
+@onready var stamina_regen_delay_bar: ProgressBar = $MarginContainer/VBoxContainer/StaminaRegenDelayBar
+@onready var stamina_regen_delay_label: Label = $MarginContainer/VBoxContainer/StaminaRegenDelayLabel
 @onready var stamina_warning_label: Label = $MarginContainer/VBoxContainer/StaminaWarningLabel
 
 var dash_charges_current: int = 0
@@ -49,6 +51,9 @@ func _ready() -> void:
 	if not player.has_signal("landing_recovery_changed"):
 		push_warning("StaminaHud3D target does not expose landing_recovery_changed signal")
 		return
+	if not player.has_signal("stamina_regen_delay_changed"):
+		push_warning("StaminaHud3D target does not expose stamina_regen_delay_changed signal")
+		return
 	if not player.has_signal("stamina_action_failed"):
 		push_warning("StaminaHud3D target does not expose stamina_action_failed signal")
 		return
@@ -60,6 +65,7 @@ func _ready() -> void:
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
 	player.sprint_state_changed.connect(_on_sprint_state_changed)
 	player.landing_recovery_changed.connect(_on_landing_recovery_changed)
+	player.stamina_regen_delay_changed.connect(_on_stamina_regen_delay_changed)
 	player.stamina_action_failed.connect(_on_stamina_action_failed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
@@ -67,6 +73,7 @@ func _ready() -> void:
 	var current_dash_charges := int(player.get("dash_charges"))
 	var current_air_jumps := int(player.get("air_jumps_left"))
 	var current_landing_recovery := float(player.get("landing_recovery_left"))
+	var current_stamina_regen_delay := float(player.get("stamina_regen_delay_left"))
 	var tuning_resource: Resource = player.get("tuning")
 	var max_stamina := 100.0
 	var max_dash_cooldown := 1.0
@@ -74,6 +81,7 @@ func _ready() -> void:
 	var max_dash_charges := 1
 	var max_air_jumps := 0
 	var max_landing_recovery := 0.18
+	var max_stamina_regen_delay := 0.7
 	if tuning_resource != null:
 		max_stamina = float(tuning_resource.get("max_stamina"))
 		max_dash_cooldown = max(0.01, float(player.call("_next_dash_ready_max")))
@@ -81,6 +89,7 @@ func _ready() -> void:
 		max_dash_charges = max(1, int(tuning_resource.get("dash_max_charges")))
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
 		max_landing_recovery = max(0.01, float(tuning_resource.get("hard_landing_recovery_time")))
+		max_stamina_regen_delay = max(0.01, float(tuning_resource.get("stamina_regen_delay")))
 		if tuning_resource.has_method("get"):
 			low_stamina_warning_ratio = clamp(float(tuning_resource.get("low_stamina_warning_ratio")), 0.0, 1.0)
 			low_stamina_pulse_speed = max(0.01, float(tuning_resource.get("low_stamina_pulse_speed")))
@@ -95,6 +104,7 @@ func _ready() -> void:
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
+	_on_stamina_regen_delay_changed(current_stamina_regen_delay, max_stamina_regen_delay)
 
 func _process(delta: float) -> void:
 	if low_stamina_active:
@@ -170,6 +180,16 @@ func _on_landing_recovery_changed(remaining: float, max_value: float) -> void:
 	else:
 		landing_recovery_label.text = "Landing Recovery Ready"
 		landing_recovery_label.modulate = Color(0.8, 1.0, 0.8)
+
+func _on_stamina_regen_delay_changed(remaining: float, max_value: float) -> void:
+	stamina_regen_delay_bar.max_value = max(0.01, max_value)
+	stamina_regen_delay_bar.value = clamp(remaining, 0.0, stamina_regen_delay_bar.max_value)
+	if remaining > 0.01:
+		stamina_regen_delay_label.text = "Regen Delay %.2fs" % remaining
+		stamina_regen_delay_label.modulate = Color(1.0, 0.72, 0.4)
+	else:
+		stamina_regen_delay_label.text = "Regen Active"
+		stamina_regen_delay_label.modulate = Color(0.72, 1.0, 0.72)
 
 func _on_stamina_action_failed(reason: String, duration: float) -> void:
 	stamina_warning_left = max(0.0, duration)

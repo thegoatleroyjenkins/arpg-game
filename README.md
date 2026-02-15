@@ -31,6 +31,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
 - **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
+- **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -215,6 +216,7 @@ arpg-game/
 - ✅ Added data-driven low-stamina HUD warning pulse (threshold ratio + pulse speed tuning) to make critical stamina states more readable during combat movement decisions
 - ✅ Added data-driven low-stamina action failure feedback (warning duration + anti-spam cooldown tuning) so failed jump/dash inputs clearly message resource shortages during combat movement chains
 - ✅ Added data-driven low-stamina movement drag (threshold ratio + minimum movement multiplier) so critical stamina states carry a clear movement pacing tradeoff
+- ✅ Added modular 3D stamina regen-delay HUD readout (remaining lockout timer + regen-active state) wired to a new player regen-delay signal for clearer resource recovery timing after movement actions
 - ✅ Added data-driven airborne stamina regeneration tuning (separate in-air regen rate) to keep aerial mobility chains as a meaningful stamina commitment
 - ✅ Added data-driven sprint-jump momentum carry tuning (momentum multiplier + speed cap) so jumping out of sprint preserves cleaner forward flow without hardcoded movement boosts
 - ✅ Added data-driven airborne dash stamina scaling (tunable airborne multiplier) so in-air dash chains carry a clearer stamina tradeoff than grounded repositioning

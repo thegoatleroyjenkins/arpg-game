@@ -14,6 +14,7 @@ signal dash_charges_changed(current: int, max_value: int)
 signal air_jumps_changed(current: int, max_value: int)
 signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
 signal landing_recovery_changed(remaining: float, max_value: float)
+signal stamina_regen_delay_changed(remaining: float, max_value: float)
 signal stamina_action_failed(reason: String, remaining: float)
 
 var look_target: Vector3
@@ -54,6 +55,7 @@ func _ready() -> void:
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
+	_emit_stamina_regen_delay_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -415,10 +417,14 @@ func _use_stamina(cost: float) -> void:
 	stamina = max(0.0, stamina - cost)
 	stamina_regen_delay_left = tuning.stamina_regen_delay
 	_emit_stamina_changed()
+	_emit_stamina_regen_delay_changed()
 
 func _regen_stamina(delta: float, is_moving: bool) -> void:
 	if stamina_regen_delay_left > 0.0:
+		var previous_delay := stamina_regen_delay_left
 		stamina_regen_delay_left = max(0.0, stamina_regen_delay_left - delta)
+		if absf(previous_delay - stamina_regen_delay_left) > 0.0001:
+			_emit_stamina_regen_delay_changed()
 		return
 	if stamina >= tuning.max_stamina:
 		return
@@ -460,6 +466,12 @@ func _emit_sprint_state_changed(force: bool = false) -> void:
 
 func _landing_recovery_max() -> float:
 	return max(0.01, tuning.hard_landing_recovery_time)
+
+func _stamina_regen_delay_max() -> float:
+	return max(0.01, tuning.stamina_regen_delay)
+
+func _emit_stamina_regen_delay_changed() -> void:
+	stamina_regen_delay_changed.emit(stamina_regen_delay_left, _stamina_regen_delay_max())
 
 func _emit_landing_recovery_changed() -> void:
 	landing_recovery_changed.emit(landing_recovery_left, _landing_recovery_max())
