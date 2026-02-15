@@ -11,6 +11,7 @@ signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_buffer_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
+signal dash_charge_recharge_changed(remaining: float, max_value: float)
 signal air_jumps_changed(current: int, max_value: int)
 signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
 signal landing_recovery_changed(remaining: float, max_value: float)
@@ -52,6 +53,7 @@ func _ready() -> void:
 	camera.fov = tuning.camera_base_fov
 	_emit_stamina_changed()
 	_emit_dash_charges_changed()
+	_emit_dash_charge_recharge_changed()
 	_emit_dash_cooldown_changed()
 	_emit_dash_buffer_changed()
 	_emit_air_jumps_changed()
@@ -141,12 +143,14 @@ func _physics_process(delta: float) -> void:
 	if dash_charge_recharge_left > 0.0:
 		dash_charge_recharge_left = max(0.0, dash_charge_recharge_left - delta)
 		dash_state_changed = true
+		_emit_dash_charge_recharge_changed()
 		if dash_charge_recharge_left <= 0.0 and dash_charges < max(1, tuning.dash_max_charges):
 			dash_charges += 1
 			_emit_dash_charges_changed()
 			if dash_charges < max(1, tuning.dash_max_charges):
 				dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
 				dash_state_changed = true
+			_emit_dash_charge_recharge_changed()
 
 	if dash_buffer_left > 0.0:
 		dash_buffer_left = max(0.0, dash_buffer_left - delta)
@@ -308,6 +312,7 @@ func _start_dash(move_dir: Vector3) -> void:
 	var dash_impulse_direction := Vector3(-dash_direction.x, tuning.camera_dash_impulse_vertical, -dash_direction.z)
 	_add_camera_impulse(dash_impulse_direction, tuning.camera_dash_impulse_strength)
 	_emit_dash_charges_changed()
+	_emit_dash_charge_recharge_changed()
 	_emit_dash_cooldown_changed()
 	_emit_dash_buffer_changed()
 
@@ -456,6 +461,12 @@ func _report_stamina_action_failed(reason: String) -> void:
 
 func _emit_dash_charges_changed() -> void:
 	dash_charges_changed.emit(dash_charges, max(1, tuning.dash_max_charges))
+
+func _dash_charge_recharge_max() -> float:
+	return max(0.01, tuning.dash_charge_recovery_time)
+
+func _emit_dash_charge_recharge_changed() -> void:
+	dash_charge_recharge_changed.emit(dash_charge_recharge_left, _dash_charge_recharge_max())
 
 func _emit_dash_cooldown_changed() -> void:
 	dash_cooldown_changed.emit(_next_dash_ready_remaining(), _next_dash_ready_max())

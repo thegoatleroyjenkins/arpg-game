@@ -6,6 +6,8 @@ extends CanvasLayer
 @onready var stamina_label: Label = $MarginContainer/VBoxContainer/StaminaLabel
 @onready var dash_cooldown_bar: ProgressBar = $MarginContainer/VBoxContainer/DashCooldownBar
 @onready var dash_cooldown_label: Label = $MarginContainer/VBoxContainer/DashCooldownLabel
+@onready var dash_charge_recharge_bar: ProgressBar = $MarginContainer/VBoxContainer/DashChargeRechargeBar
+@onready var dash_charge_recharge_label: Label = $MarginContainer/VBoxContainer/DashChargeRechargeLabel
 @onready var dash_buffer_label: Label = $MarginContainer/VBoxContainer/DashBufferLabel
 @onready var air_jump_label: Label = $MarginContainer/VBoxContainer/AirJumpLabel
 @onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
@@ -44,6 +46,9 @@ func _ready() -> void:
 	if not player.has_signal("dash_charges_changed"):
 		push_warning("StaminaHud3D target does not expose dash_charges_changed signal")
 		return
+	if not player.has_signal("dash_charge_recharge_changed"):
+		push_warning("StaminaHud3D target does not expose dash_charge_recharge_changed signal")
+		return
 	if not player.has_signal("air_jumps_changed"):
 		push_warning("StaminaHud3D target does not expose air_jumps_changed signal")
 		return
@@ -65,6 +70,7 @@ func _ready() -> void:
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
+	player.dash_charge_recharge_changed.connect(_on_dash_charge_recharge_changed)
 	player.dash_buffer_changed.connect(_on_dash_buffer_changed)
 	player.dash_charges_changed.connect(_on_dash_charges_changed)
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
@@ -75,6 +81,7 @@ func _ready() -> void:
 	player.dash_invulnerability_changed.connect(_on_dash_invulnerability_changed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
+	var current_dash_charge_recharge := float(player.get("dash_charge_recharge_left"))
 	var current_dash_buffer := float(player.get("dash_buffer_left"))
 	var current_dash_charges := int(player.get("dash_charges"))
 	var current_air_jumps := int(player.get("air_jumps_left"))
@@ -84,6 +91,7 @@ func _ready() -> void:
 	var tuning_resource: Resource = player.get("tuning")
 	var max_stamina := 100.0
 	var max_dash_cooldown := 1.0
+	var max_dash_charge_recharge := 1.25
 	var max_dash_buffer := 0.15
 	var max_dash_charges := 1
 	var max_air_jumps := 0
@@ -93,6 +101,7 @@ func _ready() -> void:
 	if tuning_resource != null:
 		max_stamina = float(tuning_resource.get("max_stamina"))
 		max_dash_cooldown = max(0.01, float(player.call("_next_dash_ready_max")))
+		max_dash_charge_recharge = max(0.01, float(tuning_resource.get("dash_charge_recovery_time")))
 		max_dash_buffer = max(0.01, float(tuning_resource.get("dash_input_buffer_time")))
 		max_dash_charges = max(1, int(tuning_resource.get("dash_max_charges")))
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
@@ -109,6 +118,7 @@ func _ready() -> void:
 	_on_stamina_changed(current_stamina, max_stamina)
 	_on_dash_charges_changed(current_dash_charges, max_dash_charges)
 	_on_dash_cooldown_changed(current_dash_cooldown, max_dash_cooldown)
+	_on_dash_charge_recharge_changed(current_dash_charge_recharge, max_dash_charge_recharge)
 	_on_dash_buffer_changed(current_dash_buffer, max_dash_buffer)
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
@@ -150,6 +160,16 @@ func _on_dash_cooldown_changed(remaining: float, max_value: float) -> void:
 		dash_cooldown_label.text = "Dash Ready (%d/%d)" % [dash_charges_current, dash_charges_max]
 	else:
 		dash_cooldown_label.text = "Dash %.2fs (%d/%d)" % [remaining, dash_charges_current, dash_charges_max]
+
+func _on_dash_charge_recharge_changed(remaining: float, max_value: float) -> void:
+	dash_charge_recharge_bar.max_value = max(0.01, max_value)
+	dash_charge_recharge_bar.value = clamp(remaining, 0.0, dash_charge_recharge_bar.max_value)
+	if remaining > 0.01 and dash_charges_current < dash_charges_max:
+		dash_charge_recharge_label.text = "Dash Charge +1 in %.2fs" % remaining
+		dash_charge_recharge_label.modulate = Color(0.92, 0.87, 0.55)
+	else:
+		dash_charge_recharge_label.text = "Dash Charges Full"
+		dash_charge_recharge_label.modulate = Color(0.75, 0.9, 1.0)
 
 func _on_dash_buffer_changed(remaining: float, max_value: float) -> void:
 	var clamped_max: float = max(0.01, max_value)
