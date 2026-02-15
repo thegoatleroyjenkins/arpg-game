@@ -90,6 +90,9 @@ class_name PlayerTuning3D
 @export var dash_steer_responsiveness: float = 14.0
 @export var dash_cancel_on_wall_collision: bool = true
 @export_range(0.0, 1.0, 0.01) var dash_wall_collision_dot_threshold: float = 0.45
+@export var dash_chain_window: float = 0.9
+@export_range(1.0, 3.0, 0.01) var dash_chain_stamina_multiplier: float = 1.2
+@export var dash_chain_max_stacks: int = 2
 
 @export_group("Dash VFX")
 @export var dash_trail_enabled: bool = true

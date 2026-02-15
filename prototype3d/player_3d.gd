@@ -39,6 +39,8 @@ var dash_charge_recharge_left: float = 0.0
 var dash_charges: int = 0
 var dash_buffer_left: float = 0.0
 var buffered_dash_direction: Vector3 = Vector3.ZERO
+var dash_chain_stacks: int = 0
+var dash_chain_window_left: float = 0.0
 var stamina: float = 0.0
 var stamina_regen_delay_left: float = 0.0
 var sprint_blend: float = 0.0
@@ -241,6 +243,11 @@ func _physics_process(delta: float) -> void:
 	_update_recent_move_direction(move_dir, delta)
 	if landing_recovery_left > 0.0:
 		move_dir = Vector3.ZERO
+
+	if dash_chain_window_left > 0.0:
+		dash_chain_window_left = max(0.0, dash_chain_window_left - delta)
+		if dash_chain_window_left <= 0.0:
+			dash_chain_stacks = 0
 
 	var dash_state_changed := false
 	if dash_cooldown_left > 0.0:
@@ -535,6 +542,8 @@ func _start_dash(move_dir: Vector3) -> void:
 		dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
 	dash_buffer_left = 0.0
 	buffered_dash_direction = Vector3.ZERO
+	dash_chain_stacks = mini(dash_chain_stacks + 1, max(0, tuning.dash_chain_max_stacks))
+	dash_chain_window_left = max(0.0, tuning.dash_chain_window)
 	var dash_impulse_direction := Vector3(-dash_direction.x, tuning.camera_dash_impulse_vertical, -dash_direction.z)
 	_add_camera_impulse(dash_impulse_direction, tuning.camera_dash_impulse_strength)
 	_emit_dash_charges_changed()
@@ -740,6 +749,8 @@ func _handle_fall_reset_if_needed() -> void:
 	dash_cooldown_left = max(dash_cooldown_left, tuning.dash_cooldown * 0.25)
 	dash_buffer_left = 0.0
 	buffered_dash_direction = Vector3.ZERO
+	dash_chain_stacks = 0
+	dash_chain_window_left = 0.0
 	landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.fall_reset_recovery_time))
 	_use_stamina(max(0.0, tuning.fall_reset_stamina_cost))
 	_emit_dash_cooldown_changed()
@@ -788,9 +799,20 @@ func _next_dash_ready_max() -> float:
 
 func _current_dash_stamina_cost() -> float:
 	var base_cost: float = max(0.0, tuning.dash_stamina_cost)
-	if is_on_floor():
-		return base_cost
-	return base_cost * max(1.0, tuning.dash_airborne_stamina_multiplier)
+	var chain_multiplier: float = _current_dash_chain_multiplier()
+	if not is_on_floor():
+		base_cost *= max(1.0, tuning.dash_airborne_stamina_multiplier)
+	return base_cost * chain_multiplier
+
+func _current_dash_chain_multiplier() -> float:
+	var dash_chain_multiplier: float = max(1.0, tuning.dash_chain_stamina_multiplier)
+	if dash_chain_multiplier <= 1.0:
+		return 1.0
+	var max_stacks: int = max(0, tuning.dash_chain_max_stacks)
+	var applied_stacks: int = mini(dash_chain_stacks, max_stacks)
+	if applied_stacks <= 0:
+		return 1.0
+	return pow(dash_chain_multiplier, float(applied_stacks))
 
 func _try_spend_stamina(cost: float, reason: String) -> bool:
 	var clamped_cost: float = max(0.0, cost)
