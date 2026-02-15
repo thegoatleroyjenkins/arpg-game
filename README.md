@@ -351,3 +351,10 @@ arpg-game/
 ## License
 
 MIT
+
+
+### UI readability pass (2026-02-15)
+- Rethemed core HUD panels (`StatsPanel`, `ObjectivePanel`, `ControlsPanel`, `MinimapPanel`) with darker translucent backgrounds to improve contrast against world visuals.
+- Improved HUD text readability with explicit cool-light font overrides on objective/controls/minimap legend labels.
+- Added dynamic objective status text in the stats block (`Clear all hostiles` -> `Keep pressure on the remaining enemies` -> `Final push`) for clearer combat pacing feedback.
+- Centered and anchored victory messaging to the viewport center so it remains readable across camera movement/resolution differences.

@@ -249,7 +249,12 @@ func _show_victory_message():
 	var victory_label = Label.new()
 	victory_label.text = "VICTORY!\nAll Enemies Defeated!"
 	victory_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	victory_label.position = Vector2(540, 300)
+	victory_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	victory_label.anchors_preset = Control.PRESET_CENTER
+	victory_label.offset_left = -260
+	victory_label.offset_top = -70
+	victory_label.offset_right = 260
+	victory_label.offset_bottom = 70
 	victory_label.add_theme_font_size_override("font_size", 32)
 	victory_label.modulate = Color.GOLD
 	ui.add_child(victory_label)
@@ -283,9 +288,19 @@ func update_stats():
 		health_color = "#FFD166"
 	if health_ratio < 0.3:
 		health_color = "#FF6B6B"
+
+	var objective_ratio = 0.0
+	if total_enemies > 0:
+		objective_ratio = float(max(total_enemies - enemies_remaining, 0)) / float(total_enemies)
+	var objective_status = "Clear all hostiles"
+	if objective_ratio >= 0.5:
+		objective_status = "Keep pressure on the remaining enemies"
+	if objective_ratio >= 0.85:
+		objective_status = "Final push"
 	
-	stats_label.text = "[b][color=#F6E27A]Level %d[/color][/b]\n[color=#A9D6FF]XP:[/color] %d/%d\n[color=%s]Health:[/color] %d/%d\n[color=#FFB26B]Damage:[/color] %d    [color=#8BD3FF]Defense:[/color] %d\n\n[b][color=#DCC7FF]Equipment[/color][/b]\n• Weapon: %s (+%d dmg)\n• Armor: %s (+%d def)\n• Accessory: %s (+%d hp)" % [
+	stats_label.text = "[b][color=#F6E27A]Level %d[/color][/b]      [color=#7ED7A5]Objective:[/color] %s\n[color=#A9D6FF]XP:[/color] %d/%d\n[color=%s]Health:[/color] %d/%d\n[color=#FFB26B]Damage:[/color] %d    [color=#8BD3FF]Defense:[/color] %d\n\n[b][color=#DCC7FF]Equipment[/color][/b]\n• Weapon: %s (+%d dmg)\n• Armor: %s (+%d def)\n• Accessory: %s (+%d hp)" % [
 		player.level,
+		objective_status,
 		player.xp,
 		player.xp_to_next_level,
 		health_color,
