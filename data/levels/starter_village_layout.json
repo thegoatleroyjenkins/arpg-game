@@ -9,14 +9,14 @@
       "id": "starter_zone_1",
       "label": "Entry Lane",
       "scene_marker_prefix": "Zone1_",
-      "encounter": "tutorial_skirmish",
+      "encounter": "goblin_tutorial_skirmish",
       "optional": false
     },
     {
       "id": "starter_zone_2",
       "label": "Village Split",
       "scene_marker_prefix": "Zone2_",
-      "encounter": "mixed_group",
+      "encounter": "goblin_mixed_group",
       "optional": false
     },
     {

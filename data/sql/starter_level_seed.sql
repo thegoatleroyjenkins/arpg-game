@@ -4,6 +4,7 @@ INSERT OR REPLACE INTO enemy_archetype
 (id, display_name, tier, hp, damage, move_speed, xp_reward, posture_max, aggro_radius, attack_range, notes)
 VALUES
 ('corrupted_villager', 'Corrupted Villager', 'T1', 45, 6, 2.8, 12, 0, 7.5, 1.6, 'Slow melee opener'),
+('goblin_scout', 'Goblin Scout', 'T1', 38, 7, 3.6, 14, 0, 8.5, 1.5, 'Fast early-game skirmisher to establish goblin presence'),
 ('blight_archer', 'Blight Archer', 'T2', 36, 5, 3.2, 16, 0, 10.0, 8.5, 'Ranged poison support'),
 ('corrupted_brute_elite', 'Corrupted Brute', 'Elite', 140, 14, 2.4, 48, 40, 8.0, 2.2, 'Staggerable heavy melee'),
 ('rotbound_warden', 'The Rotbound Warden', 'Boss', 420, 18, 2.6, 180, 80, 12.0, 2.5, 'Mini-boss arena controller');
@@ -12,6 +13,7 @@ INSERT OR REPLACE INTO enemy_ability
 (id, enemy_id, ability_name, damage, cooldown, telegraph_ms, area_radius, dot_damage, dot_duration, phase_gate_hp_ratio)
 VALUES
 ('villager_swipe', 'corrupted_villager', 'Rusty Swipe', 6, 1.4, 300, 1.8, 0, 0, 1.0),
+('goblin_shiv', 'goblin_scout', 'Jagged Shiv', 7, 1.1, 260, 1.5, 0, 0, 1.0),
 ('archer_blight_shot', 'blight_archer', 'Blight Shot', 5, 1.8, 450, 0.0, 2, 3.0, 1.0),
 ('brute_crush', 'corrupted_brute_elite', 'Crushing Blow', 14, 2.1, 700, 2.0, 0, 0, 1.0),
 ('warden_ground_slam', 'rotbound_warden', 'Ground Slam', 24, 4.2, 950, 3.5, 0, 0, 1.0),
@@ -22,6 +24,7 @@ INSERT OR REPLACE INTO loot_table
 (id, source_id, source_kind, common_weight, magic_weight, rare_weight, gold_min, gold_max, guaranteed_rarity)
 VALUES
 ('loot_villager', 'corrupted_villager', 'enemy', 72, 25, 3, 4, 9, NULL),
+('loot_goblin', 'goblin_scout', 'enemy', 70, 27, 3, 5, 10, NULL),
 ('loot_archer', 'blight_archer', 'enemy', 65, 30, 5, 5, 11, NULL),
 ('loot_brute', 'corrupted_brute_elite', 'enemy', 30, 55, 15, 14, 24, NULL),
 ('loot_mid_chest', 'starter_mid_chest', 'chest', 0, 100, 0, 12, 18, 'Magic'),
@@ -37,8 +40,10 @@ VALUES
 ('starter_zone_optional_chest', 'ashfall_outskirts', 5, 'Collapsed Shed', 'optional', 'open_chest', 0, 0, 0, 0, NULL);
 
 INSERT INTO encounter_spawn_entry (zone_id, enemy_id, weight, min_count, max_count) VALUES
-('starter_zone_1', 'corrupted_villager', 100, 2, 3),
-('starter_zone_2', 'corrupted_villager', 70, 2, 4),
+('starter_zone_1', 'goblin_scout', 100, 2, 3),
+('starter_zone_1', 'corrupted_villager', 55, 1, 2),
+('starter_zone_2', 'goblin_scout', 80, 2, 4),
+('starter_zone_2', 'corrupted_villager', 60, 1, 3),
 ('starter_zone_2', 'blight_archer', 55, 1, 2),
 ('starter_zone_3', 'corrupted_villager', 40, 1, 2),
 ('starter_zone_3', 'corrupted_brute_elite', 100, 1, 1),

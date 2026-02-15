@@ -47,6 +47,7 @@ References to target:
 - Keep intro pull sizes modest; increase pressure by composition, not raw HP inflation.
 
 ## Enemy Roster (Starter)
+- **Goblin Scout** (Tier 1): fast melee skirmisher, low HP.
 - **Corrupted Villager** (Tier 1): slow melee, low HP.
 - **Blight Archer** (Tier 2): ranged poison shot, kites lightly.
 - **Corrupted Brute (Elite)**: heavy melee, stagger interaction.
@@ -87,6 +88,7 @@ References to target:
 ## Enemy Stat Table (Starter Baseline)
 | Enemy | HP | Damage | Move Speed | XP | Notes |
 |---|---:|---:|---:|---:|---|
+| Goblin Scout | 38 | 7 | 3.6 | 14 | Early fast skirmisher |
 | Corrupted Villager | 45 | 6 | 2.8 | 12 | Intro melee fodder |
 | Blight Archer | 36 | 5 (+poison 2/s x3s) | 3.2 | 16 | Ranged pressure |
 | Corrupted Brute (Elite) | 140 | 14 | 2.4 | 48 | Stagger threshold: 40 posture |
