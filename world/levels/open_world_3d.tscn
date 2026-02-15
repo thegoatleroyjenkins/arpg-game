@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
@@ -21,6 +21,33 @@ height = 1.65
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_npc"]
 radius = 0.33
 mid_height = 0.95
+
+[sub_resource type="ConeMesh" id="ConeMesh_gnome_hat"]
+bottom_radius = 0.38
+height = 0.75
+
+[sub_resource type="SphereMesh" id="SphereMesh_gnome_nose"]
+radius = 0.09
+height = 0.18
+
+[sub_resource type="BoxMesh" id="BoxMesh_gnome_beard"]
+size = Vector3(0.34, 0.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gnome_clothes"]
+albedo_color = Color(0.12, 0.28, 0.88, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gnome_hat"]
+albedo_color = Color(0.83, 0.1, 0.1, 1)
+roughness = 0.72
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gnome_skin"]
+albedo_color = Color(0.97, 0.8, 0.66, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gnome_beard"]
+albedo_color = Color(0.94, 0.94, 0.95, 1)
+roughness = 0.95
 
 [node name="OpenWorld3D" type="Node3D"]
 
@@ -59,12 +86,28 @@ position = Vector3(30, 2, 26)
 position = Vector3(0, 0.82, 0)
 shape = SubResource("CapsuleShape3D_npc")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="NpcGnome"]
+[node name="Body" type="MeshInstance3D" parent="NpcGnome"]
 position = Vector3(0, 0.82, 0)
 mesh = SubResource("CapsuleMesh_npc")
+material_override = SubResource("StandardMaterial3D_gnome_clothes")
+
+[node name="Hat" type="MeshInstance3D" parent="NpcGnome"]
+position = Vector3(0, 1.7, 0)
+mesh = SubResource("ConeMesh_gnome_hat")
+material_override = SubResource("StandardMaterial3D_gnome_hat")
+
+[node name="Nose" type="MeshInstance3D" parent="NpcGnome"]
+position = Vector3(0, 1.22, -0.27)
+mesh = SubResource("SphereMesh_gnome_nose")
+material_override = SubResource("StandardMaterial3D_gnome_skin")
+
+[node name="Beard" type="MeshInstance3D" parent="NpcGnome"]
+position = Vector3(0, 1.0, -0.21)
+mesh = SubResource("BoxMesh_gnome_beard")
+material_override = SubResource("StandardMaterial3D_gnome_beard")
 
 [node name="NameLabel" type="Label3D" parent="NpcGnome"]
-position = Vector3(0, 2.05, 0)
+position = Vector3(0, 2.2, 0)
 billboard = 1
 text = "Gnome"
 
