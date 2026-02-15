@@ -81,6 +81,13 @@ extends Area3D
 @export var contextual_mixed_tint: Color = Color(0.68, 0.92, 0.74, 1.0)
 @export_range(0.0, 1.0, 0.01) var contextual_tint_blend: float = 0.7
 
+@export_group("Proximity Feedback")
+@export var proximity_feedback_enabled: bool = true
+@export var proximity_feedback_radius: float = 5.5
+@export_range(0.0, 1.0, 0.01) var proximity_scale_boost: float = 0.22
+@export_range(0.0, 2.0, 0.01) var proximity_emission_boost: float = 0.7
+@export_range(0.5, 20.0, 0.1) var proximity_response_speed: float = 8.0
+
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
 
@@ -91,12 +98,16 @@ var _spawn_origin: Vector3 = Vector3.ZERO
 var _respawn_remaining: float = 0.0
 var _runtime_albedo_tint: Color = Color(1.0, 1.0, 1.0, 1.0)
 var _runtime_emission_tint: Color = Color(1.0, 1.0, 1.0, 1.0)
+var _base_mesh_scale: Vector3 = Vector3.ONE
+var _proximity_feedback_weight: float = 0.0
 
 func _ready() -> void:
 	_apply_profile_overrides()
 	body_entered.connect(_on_body_entered)
 	_base_y = global_position.y
 	_spawn_origin = global_position
+	if is_instance_valid(mesh):
+		_base_mesh_scale = mesh.scale
 
 func _apply_profile_overrides() -> void:
 	if profile == null:
@@ -129,10 +140,12 @@ func _process(delta: float) -> void:
 			mesh.rotation_degrees.y += spin_speed_degrees * delta
 			mesh.position.y = sin(_time * bob_speed) * bob_height
 			_update_contextual_visual_tint()
+			_update_proximity_feedback(delta)
 			_set_mesh_alpha(1.0)
 		_update_magnet_motion(delta)
 		return
 
+	_update_proximity_feedback(delta, true)
 	_update_respawn(delta)
 
 func _on_body_entered(body: Node) -> void:
@@ -346,6 +359,22 @@ func _update_contextual_visual_tint() -> void:
 	_runtime_albedo_tint = Color(1.0, 1.0, 1.0, 1.0).lerp(target_tint, blend)
 	_runtime_emission_tint = Color(1.0, 1.0, 1.0, 1.0).lerp(target_tint, blend)
 
+func _update_proximity_feedback(delta: float, force_reset: bool = false) -> void:
+	if not is_instance_valid(mesh):
+		return
+	var target_weight: float = 0.0
+	if not force_reset and proximity_feedback_enabled and proximity_feedback_radius > 0.01:
+		var player := _get_magnet_target()
+		if player != null:
+			var to_player: Vector3 = player.global_position - global_position
+			to_player.y = 0.0
+			var proximity_ratio: float = clamp(1.0 - (to_player.length() / proximity_feedback_radius), 0.0, 1.0)
+			target_weight = proximity_ratio
+	var response_speed: float = max(0.5, proximity_response_speed)
+	_proximity_feedback_weight = move_toward(_proximity_feedback_weight, target_weight, response_speed * delta)
+	var scale_multiplier: float = 1.0 + (clamp(proximity_scale_boost, 0.0, 1.0) * _proximity_feedback_weight)
+	mesh.scale = _base_mesh_scale * scale_multiplier
+
 func _target_needs_stamina(player: Node3D) -> bool:
 	return _target_needs_stamina_with_threshold(player, magnet_missing_stamina_ratio)
 
@@ -483,4 +512,5 @@ func _set_mesh_alpha(alpha: float) -> void:
 		material.albedo_color = albedo_color
 		material.emission_enabled = visual_emission_energy > 0.0
 		material.emission = visual_emission_color * _runtime_emission_tint
-		material.emission_energy_multiplier = max(0.0, visual_emission_energy)
+		var emission_multiplier: float = 1.0 + (max(0.0, proximity_emission_boost) * _proximity_feedback_weight)
+		material.emission_energy_multiplier = max(0.0, visual_emission_energy) * emission_multiplier
