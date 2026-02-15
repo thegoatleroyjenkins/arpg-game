@@ -32,6 +32,8 @@ class_name PlayerTuning3D
 
 @export_group("Landing Feel")
 @export var hard_landing_speed_threshold: float = 12.0
+@export var hard_landing_max_penalty_speed: float = 24.0
+@export_range(0.1, 1.0, 0.01) var hard_landing_min_penalty_multiplier: float = 0.35
 @export var hard_landing_recovery_time: float = 0.18
 @export var hard_landing_stamina_cost: float = 14.0
 @export var hard_landing_dash_cancel_window: float = 0.07

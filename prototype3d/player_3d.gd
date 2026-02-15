@@ -223,9 +223,18 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	if not was_on_floor and is_on_floor() and pre_move_vertical_velocity <= -absf(tuning.hard_landing_speed_threshold):
-		landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.hard_landing_recovery_time))
-		_use_stamina(max(0.0, tuning.hard_landing_stamina_cost))
-		_add_camera_impulse(Vector3(0.0, -1.0, 0.0), tuning.camera_landing_impulse_strength)
+		var landing_speed := absf(pre_move_vertical_velocity)
+		var threshold_speed := absf(tuning.hard_landing_speed_threshold)
+		var max_penalty_speed := max(threshold_speed + 0.01, absf(tuning.hard_landing_max_penalty_speed))
+		var landing_impact_t := clamp((landing_speed - threshold_speed) / (max_penalty_speed - threshold_speed), 0.0, 1.0)
+		var min_penalty_multiplier := clamp(tuning.hard_landing_min_penalty_multiplier, 0.1, 1.0)
+		var landing_penalty_multiplier := lerpf(min_penalty_multiplier, 1.0, landing_impact_t)
+		landing_recovery_left = max(
+			landing_recovery_left,
+			max(0.0, tuning.hard_landing_recovery_time) * landing_penalty_multiplier
+		)
+		_use_stamina(max(0.0, tuning.hard_landing_stamina_cost) * landing_penalty_multiplier)
+		_add_camera_impulse(Vector3(0.0, -1.0, 0.0), tuning.camera_landing_impulse_strength * landing_penalty_multiplier)
 		_emit_landing_recovery_changed()
 
 	# Face movement direction with data-driven turn speed smoothing.
