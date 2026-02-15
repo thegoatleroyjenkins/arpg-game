@@ -83,7 +83,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Charge-Bypass Dash Chaining (3D prototype)** — Data-driven toggle now allows available dash charges to bypass cooldown gating, enabling cleaner back-to-back reposition bursts while depleted charges still recover on timer
 - **Dash Steering Control (3D prototype)** — Data-driven in-dash steering (control + responsiveness tuning) allows limited course correction for more skill-expressive repositioning
 - **Dash Wall-Collision Cancel (3D prototype)** — Data-driven wall-impact detection now ends dash travel when colliding head-on with level geometry, preventing awkward wall-grind movement and improving close-quarters control readability
-- **Dash Trail Afterimage VFX (3D prototype)** — Data-driven dash trail toggles/timing/alpha now spawn short-lived afterimages during dashes, improving burst readability and movement impact without hardcoded scene effects
+- **Dash Trail Afterimage VFX (3D prototype)** — Data-driven dash trail toggles/timing/alpha plus tunable trail color/emission now spawn short-lived afterimages during dashes, improving burst readability and visual identity without hardcoded scene effects
 - **Dash Invulnerability Window (3D prototype)** — Data-driven dash i-frame duration now grants a short post-activation safety window, setting up cleaner combat integration without hardcoded timings
 - **Dash I-Frame Character Flash (3D prototype)** — Data-driven dash readability tuning now adds a pulsing character flash during active i-frames, making defensive timing windows visible in-world (not just on HUD)
 - **Air Jump HUD Readout (3D prototype)** — Modular HUD now shows remaining air jumps in real time, improving vertical mobility clarity during combat and traversal
@@ -224,6 +224,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D dash trail visual identity tuning (`dash_trail_color`, `dash_trail_emission_energy`) so afterimage trail readability/style can be authored per tuning resource without hardcoded material values
 - ✅ Polished the 2D HUD for readability: split stats and controls into dedicated translucent panels, upgraded the stat readout to BBCode-rich color-coded text, and added an explicit objective line (`Defeat N enemies`) for clearer moment-to-moment UX
 - ✅ Added modular starter-level zone marker query helpers to `StarterLevelController` (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`) so encounter systems can consume JSON-authored zone IDs and scene marker nodes through a clean, data-driven API
 - ✅ Added data-driven neutral dash direction fallback tuning (`dash_neutral_uses_camera_forward`) so neutral-input dashes can follow camera forward when no live/recent move input exists, preserving camera-framed reposition intent

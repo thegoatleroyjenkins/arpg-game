@@ -92,6 +92,8 @@ class_name PlayerTuning3D
 @export var dash_trail_enabled: bool = true
 @export var dash_trail_spawn_interval: float = 0.04
 @export var dash_trail_lifetime: float = 0.16
+@export var dash_trail_color: Color = Color(0.45, 0.8, 1.0, 1.0)
+@export_range(0.0, 8.0, 0.1) var dash_trail_emission_energy: float = 1.2
 @export_range(0.0, 1.0, 0.01) var dash_trail_start_alpha: float = 0.4
 @export_range(0.0, 1.0, 0.01) var dash_trail_end_alpha: float = 0.0
 

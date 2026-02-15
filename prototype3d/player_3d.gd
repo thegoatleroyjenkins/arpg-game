@@ -485,7 +485,12 @@ func _spawn_dash_trail() -> void:
 	var trail_material := StandardMaterial3D.new()
 	trail_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	trail_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	trail_material.albedo_color = Color(0.45, 0.8, 1.0, clamp(tuning.dash_trail_start_alpha, 0.0, 1.0))
+	var trail_color: Color = tuning.dash_trail_color
+	trail_color.a = clamp(tuning.dash_trail_start_alpha, 0.0, 1.0)
+	trail_material.albedo_color = trail_color
+	trail_material.emission_enabled = true
+	trail_material.emission = tuning.dash_trail_color
+	trail_material.emission_energy_multiplier = max(0.0, tuning.dash_trail_emission_energy)
 	trail.material_override = trail_material
 	current_scene.add_child(trail)
 	var tween := create_tween()
