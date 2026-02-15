@@ -106,6 +106,11 @@ class_name PlayerTuning3D
 @export var camera_look_ahead_distance: float = 2.25
 @export var camera_look_ahead_smooth: float = 8.0
 
+@export_group("Camera Collision")
+@export var camera_collision_enabled: bool = true
+@export var camera_collision_padding: float = 0.35
+@export var camera_collision_smooth: float = 18.0
+
 @export_group("Camera Impulse Feel")
 @export var camera_impulse_decay_per_second: float = 14.0
 @export var camera_impulse_max_offset: float = 0.85

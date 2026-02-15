@@ -46,6 +46,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Sprint Ramp Smoothing (3D prototype)** — Data-driven sprint ramp-up/ramp-down blends acceleration into and out of sprint for weightier, cleaner movement transitions
 - **Sprint Exhaustion Gate (3D prototype)** — Data-driven stamina thresholds now gate sprint re-engage after exhaustion, preventing rapid on/off sprint jitter at near-zero stamina
 - **Velocity Look-Ahead Camera (3D prototype)** — Data-driven camera look-ahead shifts focus toward movement direction based on speed, improving forward readability during traversal and combat repositioning
+- **Camera Collision Avoidance (3D prototype)** — Data-driven camera raycast + collision padding now prevent hard clipping through level geometry, preserving player readability in tight spaces while keeping camera behavior modular and tunable
 - **Dash Charges (3D prototype)** — Data-driven multi-charge dash model (max charges + recharge time) adds tactical mobility pacing without hardcoding ability logic
 - **Dash Charge Recharge HUD (3D prototype)** — Modular HUD now surfaces next-charge refill timing, improving dash resource planning in high-pressure movement chains
 - **Charge-Bypass Dash Chaining (3D prototype)** — Data-driven toggle now allows available dash charges to bypass cooldown gating, enabling cleaner back-to-back reposition bursts while depleted charges still recover on timer

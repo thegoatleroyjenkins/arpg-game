@@ -276,8 +276,11 @@ func _physics_process(delta: float) -> void:
 
 	# Follow camera smoothly with scroll-wheel zoom and movement-aware look-ahead.
 	_update_camera_impulse(delta)
-	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance) + camera_impulse_offset
-	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
+	var target_cam_pos := _resolve_camera_pivot_target()
+	var camera_follow_smooth: float = tuning.camera_smooth
+	if tuning.camera_collision_enabled:
+		camera_follow_smooth = max(camera_follow_smooth, tuning.camera_collision_smooth)
+	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * camera_follow_smooth)
 	_update_camera_look_ahead(delta)
 	camera.look_at(global_position + Vector3(0, 1.0, 0) + camera_look_ahead, Vector3.UP)
 	_update_camera_fov(delta)
@@ -464,6 +467,27 @@ func _update_camera_look_ahead(delta: float) -> void:
 func _update_camera_impulse(delta: float) -> void:
 	var decay: float = max(0.01, tuning.camera_impulse_decay_per_second)
 	camera_impulse_offset = camera_impulse_offset.move_toward(Vector3.ZERO, decay * delta)
+
+func _resolve_camera_pivot_target() -> Vector3:
+	var desired_pivot_position := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance) + camera_impulse_offset
+	if not tuning.camera_collision_enabled:
+		return desired_pivot_position
+
+	var focus_point := global_position + Vector3(0.0, 1.0, 0.0)
+	var ray_query := PhysicsRayQueryParameters3D.create(focus_point, desired_pivot_position)
+	ray_query.exclude = [self]
+	ray_query.collide_with_areas = false
+	ray_query.collide_with_bodies = true
+	var hit := get_world_3d().direct_space_state.intersect_ray(ray_query)
+	if hit.is_empty():
+		return desired_pivot_position
+
+	var hit_position: Vector3 = hit.position
+	var hit_normal: Vector3 = hit.normal
+	if hit_normal.length() <= 0.001:
+		hit_normal = (focus_point - desired_pivot_position).normalized()
+	var safe_padding: float = max(0.0, tuning.camera_collision_padding)
+	return hit_position + (hit_normal.normalized() * safe_padding)
 
 func _add_camera_impulse(direction: Vector3, strength: float) -> void:
 	if strength <= 0.0:
