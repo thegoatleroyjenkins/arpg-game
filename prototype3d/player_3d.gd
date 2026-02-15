@@ -107,7 +107,7 @@ func _physics_process(delta: float) -> void:
 			speed *= tuning.sprint_multiplier
 			_use_stamina(tuning.sprint_stamina_per_second * delta)
 		else:
-			_regen_stamina(delta)
+			_regen_stamina(delta, move_dir.length() > 0.01)
 
 		var target_velocity := move_dir * speed
 		var control_scale := 1.0 if is_on_floor() else tuning.air_control
@@ -162,13 +162,16 @@ func _use_stamina(cost: float) -> void:
 	stamina_regen_delay_left = tuning.stamina_regen_delay
 	_emit_stamina_changed()
 
-func _regen_stamina(delta: float) -> void:
+func _regen_stamina(delta: float, is_moving: bool) -> void:
 	if stamina_regen_delay_left > 0.0:
 		stamina_regen_delay_left = max(0.0, stamina_regen_delay_left - delta)
 		return
 	if stamina >= tuning.max_stamina:
 		return
-	stamina = min(tuning.max_stamina, stamina + tuning.stamina_regen_per_second * delta)
+	var regen_rate := tuning.stamina_regen_idle_per_second
+	if is_moving:
+		regen_rate = tuning.stamina_regen_moving_per_second
+	stamina = min(tuning.max_stamina, stamina + regen_rate * delta)
 	_emit_stamina_changed()
 
 func _emit_stamina_changed() -> void:
