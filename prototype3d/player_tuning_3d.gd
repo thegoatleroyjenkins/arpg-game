@@ -163,6 +163,7 @@ class_name PlayerTuning3D
 @export var camera_collision_enabled: bool = true
 @export_flags_3d_physics var camera_collision_mask: int = 1
 @export var camera_collision_padding: float = 0.35
+@export var camera_collision_min_distance: float = 2.5
 @export var camera_collision_smooth: float = 18.0
 
 @export_group("Camera Impulse Feel")

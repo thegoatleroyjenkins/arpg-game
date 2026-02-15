@@ -96,6 +96,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Velocity Look-Ahead Camera (3D prototype)** — Data-driven camera look-ahead shifts focus toward movement direction based on speed, improving forward readability during traversal and combat repositioning
 - **Camera Collision Avoidance (3D prototype)** — Data-driven camera raycast + collision padding now prevent hard clipping through level geometry, preserving player readability in tight spaces while keeping camera behavior modular and tunable
 - **Camera Collision Layer Mask (3D prototype)** — Data-driven camera collision mask now controls which physics layers can push the camera, preventing jitter from non-blocking gameplay props while preserving modular tuning
+- **Camera Collision Minimum Distance Clamp (3D prototype)** — Data-driven camera collision minimum distance (`camera_collision_min_distance`) now prevents obstruction pushes from collapsing the camera too close to the player, preserving combat readability in tight geometry while keeping collision behavior modular
 - **Dash Charges (3D prototype)** — Data-driven multi-charge dash model (max charges + recharge time) adds tactical mobility pacing without hardcoding ability logic
 - **Dash Charge Recharge HUD (3D prototype)** — Modular HUD now surfaces next-charge refill timing, improving dash resource planning in high-pressure movement chains
 - **Charge-Bypass Dash Chaining (3D prototype)** — Data-driven toggle now allows available dash charges to bypass cooldown gating, enabling cleaner back-to-back reposition bursts while depleted charges still recover on timer
@@ -251,6 +252,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D camera collision minimum-distance tuning (`camera_collision_min_distance`) so obstruction handling no longer collapses the camera too close to the player in tight spaces, improving combat readability while preserving modular camera collision behavior
 - ✅ Added biome-weighted 3D spawn profile data (`data/world/spawn_profiles.json`) and wired `SpawnDirector` to roll enemy archetypes from profile weights (with fallback/default handling), improving modular wilderness encounter authoring without hardcoded biome branches
 - ✅ Added data-driven light-attack lunge commitment tuning (`light_attack_lunge_enabled`, `light_attack_lunge_duration`, `light_attack_lunge_speed`, `light_attack_lunge_control_multiplier`) so successful melee swings include a short target-aware forward commit for cleaner impact feel without hardcoded scene logic
 - ✅ Added data-driven critical-hit camera punch tuning (`light_attack_crit_camera_impulse_strength`, `light_attack_crit_camera_impulse_vertical`) wired to modular `DamageResolver` results, so player crits now add a short directional camera kick for clearer high-impact melee feedback

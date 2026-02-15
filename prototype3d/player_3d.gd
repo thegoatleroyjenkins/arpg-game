@@ -706,7 +706,16 @@ func _resolve_camera_pivot_target() -> Vector3:
 	if hit_normal.length() <= 0.001:
 		hit_normal = (focus_point - desired_pivot_position).normalized()
 	var safe_padding: float = max(0.0, tuning.camera_collision_padding)
-	return hit_position + (hit_normal.normalized() * safe_padding)
+	var collision_adjusted_position: Vector3 = hit_position + (hit_normal.normalized() * safe_padding)
+	var collision_offset: Vector3 = collision_adjusted_position - focus_point
+	if collision_offset.length() <= 0.001:
+		var fallback_direction: Vector3 = (desired_pivot_position - focus_point).normalized()
+		if fallback_direction.length() <= 0.001:
+			fallback_direction = Vector3.BACK
+		collision_offset = fallback_direction
+	var min_distance: float = max(0.0, min(tuning.camera_collision_min_distance, orbit_distance))
+	var clamped_distance: float = clamp(collision_offset.length(), min_distance, orbit_distance)
+	return focus_point + collision_offset.normalized() * clamped_distance
 
 func _add_camera_impulse(direction: Vector3, strength: float) -> void:
 	if strength <= 0.0:
