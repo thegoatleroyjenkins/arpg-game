@@ -30,6 +30,7 @@ var hard_landing_dash_cancel_window: float = 0.0
 var low_stamina_active: bool = false
 var stamina_warning_left: float = 0.0
 var base_stamina_modulate: Color = Color(1.0, 1.0, 1.0)
+var ui_outline_color: Color = Color(0.02, 0.03, 0.04, 0.95)
 
 func _ready() -> void:
 	var player := get_node_or_null(player_path)
@@ -145,6 +146,7 @@ func _ready() -> void:
 		vbox.move_child(move_speed_boost_label, sprint_efficiency_boost_label.get_index() + 1)
 	stamina_warning_label.visible = false
 	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
+	_apply_readability_theme()
 	set_process(true)
 	_on_stamina_changed(current_stamina, max_stamina)
 	_on_dash_charges_changed(current_dash_charges, max_dash_charges)
@@ -170,6 +172,41 @@ func _process(delta: float) -> void:
 	if stamina_warning_left > 0.0:
 		stamina_warning_left = max(0.0, stamina_warning_left - delta)
 		stamina_warning_label.visible = stamina_warning_left > 0.0
+
+func _apply_readability_theme() -> void:
+	var labels: Array[Label] = [
+		stamina_label,
+		dash_cooldown_label,
+		dash_charge_recharge_label,
+		dash_buffer_label,
+		air_jump_label,
+		sprint_state_label,
+		landing_recovery_label,
+		stamina_regen_delay_label,
+		stamina_regen_boost_label,
+		sprint_efficiency_boost_label,
+		dash_invulnerability_label,
+		stamina_warning_label,
+	]
+	if move_speed_boost_label != null:
+		labels.append(move_speed_boost_label)
+	for ui_label in labels:
+		ui_label.add_theme_constant_override("outline_size", 3)
+		ui_label.add_theme_color_override("font_outline_color", ui_outline_color)
+
+	var bars: Array[ProgressBar] = [
+		stamina_bar,
+		dash_cooldown_bar,
+		dash_charge_recharge_bar,
+		landing_recovery_bar,
+		stamina_regen_delay_bar,
+		dash_invulnerability_bar,
+	]
+	for bar in bars:
+		bar.custom_minimum_size = Vector2(0.0, 14.0)
+
+	stamina_bar.custom_minimum_size = Vector2(0.0, 18.0)
+
 
 func _on_stamina_changed(current: float, max_value: float) -> void:
 	stamina_bar.max_value = max(1.0, max_value)

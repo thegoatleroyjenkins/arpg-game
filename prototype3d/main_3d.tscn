@@ -97,14 +97,31 @@ mesh = SubResource("SphereMesh_stamina_pickup")
 [node name="StaminaHud" type="CanvasLayer" parent="."]
 script = ExtResource("2_stamina_hud_script")
 
+[node name="HudBackdrop" type="ColorRect" parent="StaminaHud"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 352.0
+offset_bottom = 420.0
+color = Color(0.0156863, 0.027451, 0.0392157, 0.72)
+
 [node name="MarginContainer" type="MarginContainer" parent="StaminaHud"]
 offset_left = 16.0
 offset_top = 16.0
-offset_right = 296.0
-offset_bottom = 96.0
+offset_right = 344.0
+offset_bottom = 412.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="VBoxContainer" type="VBoxContainer" parent="StaminaHud/MarginContainer"]
 layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="HudTitle" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Movement HUD"
 
 [node name="StaminaBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -195,6 +212,11 @@ visible = false
 layout_mode = 2
 text = "Dash failed: low stamina"
 
+[node name="ControlsHintLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 0.9, 1)
+text = "Shift Sprint  •  Q Dash  •  Space Jump  •  Esc Pause"
+
 [node name="PauseMenu" type="CanvasLayer" parent="."]
 process_mode = 3
 script = ExtResource("6_pause_menu_script")
@@ -227,7 +249,7 @@ horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Esc to resume"
+text = "Esc to resume • settings apply instantly"
 horizontal_alignment = 1
 
 [node name="SensitivityRow" type="HBoxContainer" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]

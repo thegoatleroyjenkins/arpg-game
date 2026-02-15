@@ -43,6 +43,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Sprint Jump Momentum Carry (3D prototype)** — Data-driven sprint-jump momentum boost and speed cap preserve forward flow when jumping out of sprint, improving traversal/combat movement continuity without hardcoded values
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
+- **HUD Readability Pass (3D prototype)** — The stamina/mobility HUD now renders over a translucent backdrop, uses stronger text outlines, and includes an in-HUD control hint strip for better legibility during movement-heavy moments
 - **Low-Stamina Warning Pulse (3D prototype)** — Data-driven HUD warning ratio + pulse speed now drive a pulsing stamina alert when resources get critical, improving combat pacing readability
 - **Low-Stamina Action Feedback (3D prototype)** — Data-driven warning timing/cooldown now surface short HUD alerts when jump or dash fails from low stamina, improving input clarity during high-pressure movement chains
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
@@ -229,6 +230,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Polished the 3D prototype UI readability: added a translucent HUD backdrop, stronger text outlining for mobility readouts, an in-HUD controls hint strip, and clearer pause-menu subtitle guidance so moment-to-moment movement information remains legible under action
 - ✅ Added data-driven landing-recovery dash input buffering (`hard_landing_dash_input_buffer_window`) so dash presses just before recovery ends are queued and fired as soon as dash cancel rules allow, improving post-landing responsiveness without bypassing stamina/cooldown gating
 - ✅ Added data-driven sprint-efficiency pickup profile tuning (`sprint_efficiency_boost_duration`, `sprint_efficiency_boost_multiplier`) to `StaminaPickupProfile3D`, so reusable orb profile resources can author mobility-burst behavior without scene-level hardcoding
 - ✅ Added data-driven dash-aware camera follow-assist tuning (`camera_follow_assist_dash_multiplier`) so orbit yaw realigns faster during active dashes for clearer burst-mobility framing without hardcoded camera logic
