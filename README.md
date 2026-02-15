@@ -50,6 +50,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Hard Landing Recovery (3D prototype)** — Data-driven landing impact tuning adds a brief recovery after high-speed falls, making movement weightier and reducing bunny-hop style chaining
 - **Impact-Scaled Landing Penalties (3D prototype)** — Data-driven landing penalty scaling now lerps recovery lockout, stamina loss, and camera impact based on fall speed severity (threshold → max penalty speed), preserving readability while rewarding cleaner landings
 - **Hard Landing Stamina Penalty (3D prototype)** — Data-driven hard-landing stamina cost makes rough falls a meaningful mobility tradeoff and reinforces cleaner traversal/combat routing
+- **Fall Recovery Safety Reset (3D prototype)** — Data-driven fall reset height now safely respawns the player at their start anchor with tunable stamina/recovery penalties, preventing softlocks from arena falls while preserving movement tradeoffs
 - **Landing Recovery Dash Cancel Window (3D prototype)** — Data-driven late-recovery dash-cancel timing lets skilled players spend dash resources to recover from heavy landings faster without hardcoded behavior
 - **Landing Recovery HUD (3D prototype)** — Modular HUD now tracks hard-landing recovery remaining time (data-driven duration), clarifying when movement lockout ends after heavy falls
 - **Camera Impulse Feedback (3D prototype)** — Data-driven camera impulse kick now reacts to dashes and hard landings (with tunable decay/max offset), improving movement impact without hardcoded camera behavior
@@ -226,6 +227,7 @@ arpg-game/
 - ✅ Added data-driven airborne dash stamina scaling (tunable airborne multiplier) so in-air dash chains carry a clearer stamina tradeoff than grounded repositioning
 - ✅ Added data-driven impact-scaled hard-landing penalties (max penalty speed + min penalty multiplier) so recovery lockout, stamina cost, and landing camera impulse scale by fall severity instead of using a binary full-penalty landing model
 - ✅ Added data-driven 3D dash invulnerability duration tuning plus modular HUD i-frame readout wired to a new player dash-invulnerability signal, improving defensive timing clarity and combat-system integration readiness
+- ✅ Added data-driven 3D fall recovery safety reset (height + stamina/recovery penalties) so out-of-bounds falls respawn cleanly at the start anchor instead of risking softlocks
 
 ## License
 

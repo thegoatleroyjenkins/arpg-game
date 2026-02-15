@@ -20,6 +20,7 @@ signal stamina_action_failed(reason: String, remaining: float)
 signal dash_invulnerability_changed(remaining: float, max_value: float)
 
 var look_target: Vector3
+var respawn_position: Vector3
 var target_camera_distance: float = 0.0
 var dash_direction: Vector3 = Vector3.ZERO
 var dash_time_left: float = 0.0
@@ -46,6 +47,7 @@ var _last_emitted_sprint_exhausted: bool = false
 
 func _ready() -> void:
 	look_target = global_position
+	respawn_position = global_position
 	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
 	stamina = tuning.max_stamina
 	dash_charges = max(1, tuning.dash_max_charges)
@@ -82,6 +84,8 @@ func _physics_process(delta: float) -> void:
 	if dash_invulnerability_left > 0.0:
 		dash_invulnerability_left = max(0.0, dash_invulnerability_left - delta)
 		_emit_dash_invulnerability_changed()
+
+	_handle_fall_reset_if_needed()
 
 	# Jump buffering gives more forgiving timing before landing.
 	if _is_jump_just_pressed():
@@ -372,6 +376,21 @@ func _adjust_camera_zoom(amount: float) -> void:
 		tuning.camera_min_distance,
 		tuning.camera_max_distance
 	)
+
+func _handle_fall_reset_if_needed() -> void:
+	if global_position.y >= tuning.fall_reset_height:
+		return
+	global_position = respawn_position
+	velocity = Vector3.ZERO
+	dash_time_left = 0.0
+	dash_cooldown_left = max(dash_cooldown_left, tuning.dash_cooldown * 0.25)
+	dash_buffer_left = 0.0
+	buffered_dash_direction = Vector3.ZERO
+	landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.fall_reset_recovery_time))
+	_use_stamina(max(0.0, tuning.fall_reset_stamina_cost))
+	_emit_dash_cooldown_changed()
+	_emit_dash_buffer_changed()
+	_emit_landing_recovery_changed()
 
 func _can_dash_now() -> bool:
 	if landing_recovery_left <= 0.0:
