@@ -16,6 +16,7 @@ signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_buffer_changed(remaining: float, max_value: float)
 signal jump_buffer_changed(remaining: float, max_value: float)
 signal attack_buffer_changed(remaining: float, max_value: float)
+signal light_attack_cooldown_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal dash_charge_recharge_changed(remaining: float, max_value: float)
 signal air_jumps_changed(current: int, max_value: int)
@@ -116,6 +117,7 @@ func _ready() -> void:
 	_emit_dash_buffer_changed()
 	_emit_jump_buffer_changed()
 	_emit_attack_buffer_changed()
+	_emit_light_attack_cooldown_changed()
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
@@ -155,7 +157,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
+	var previous_light_attack_cooldown_left: float = light_attack_cooldown_left
 	light_attack_cooldown_left = max(0.0, light_attack_cooldown_left - delta)
+	if absf(previous_light_attack_cooldown_left - light_attack_cooldown_left) > 0.0001:
+		_emit_light_attack_cooldown_changed()
 	light_attack_lunge_left = max(0.0, light_attack_lunge_left - delta)
 	if light_attack_buffer_left > 0.0:
 		light_attack_buffer_left = max(0.0, light_attack_buffer_left - delta)
@@ -1074,6 +1079,7 @@ func _try_light_attack() -> bool:
 		return false
 
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
+	_emit_light_attack_cooldown_changed()
 	_start_light_attack_lunge(targets[0])
 	var cleave_falloff: float = clamp(tuning.light_attack_cleave_falloff_per_target, 0.0, 1.0)
 	var cleave_min_multiplier: float = clamp(tuning.light_attack_cleave_min_multiplier, 0.1, 1.0)
@@ -1198,6 +1204,12 @@ func _attack_buffer_max() -> float:
 
 func _emit_attack_buffer_changed() -> void:
 	attack_buffer_changed.emit(light_attack_buffer_left, _attack_buffer_max())
+
+func _light_attack_cooldown_max() -> float:
+	return max(0.01, max(0.0, light_attack_cooldown))
+
+func _emit_light_attack_cooldown_changed() -> void:
+	light_attack_cooldown_changed.emit(light_attack_cooldown_left, _light_attack_cooldown_max())
 
 func _emit_air_jumps_changed() -> void:
 	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))

@@ -11,6 +11,8 @@ extends CanvasLayer
 @onready var dash_buffer_label: Label = $MarginContainer/VBoxContainer/DashBufferLabel
 @onready var jump_buffer_label: Label = get_node_or_null("MarginContainer/VBoxContainer/JumpBufferLabel") as Label
 @onready var attack_buffer_label: Label = get_node_or_null("MarginContainer/VBoxContainer/AttackBufferLabel") as Label
+@onready var attack_cooldown_bar: ProgressBar = get_node_or_null("MarginContainer/VBoxContainer/AttackCooldownBar") as ProgressBar
+@onready var attack_cooldown_label: Label = get_node_or_null("MarginContainer/VBoxContainer/AttackCooldownLabel") as Label
 @onready var air_jump_label: Label = $MarginContainer/VBoxContainer/AirJumpLabel
 @onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
 @onready var landing_recovery_bar: ProgressBar = $MarginContainer/VBoxContainer/LandingRecoveryBar
@@ -56,6 +58,9 @@ func _ready() -> void:
 		return
 	if not player.has_signal("attack_buffer_changed"):
 		push_warning("StaminaHud3D target does not expose attack_buffer_changed signal")
+		return
+	if not player.has_signal("light_attack_cooldown_changed"):
+		push_warning("StaminaHud3D target does not expose light_attack_cooldown_changed signal")
 		return
 	if not player.has_signal("dash_charges_changed"):
 		push_warning("StaminaHud3D target does not expose dash_charges_changed signal")
@@ -103,6 +108,7 @@ func _ready() -> void:
 	player.dash_buffer_changed.connect(_on_dash_buffer_changed)
 	player.jump_buffer_changed.connect(_on_jump_buffer_changed)
 	player.attack_buffer_changed.connect(_on_attack_buffer_changed)
+	player.light_attack_cooldown_changed.connect(_on_light_attack_cooldown_changed)
 	player.dash_charges_changed.connect(_on_dash_charges_changed)
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
 	player.sprint_state_changed.connect(_on_sprint_state_changed)
@@ -121,6 +127,7 @@ func _ready() -> void:
 	var current_dash_buffer := float(player.get("dash_buffer_left"))
 	var current_jump_buffer := float(player.get("jump_buffer_left"))
 	var current_attack_buffer := float(player.get("light_attack_buffer_left"))
+	var current_attack_cooldown := float(player.get("light_attack_cooldown_left"))
 	var current_dash_charges := int(player.get("dash_charges"))
 	var current_air_jumps := int(player.get("air_jumps_left"))
 	var current_landing_recovery := float(player.get("landing_recovery_left"))
@@ -148,6 +155,7 @@ func _ready() -> void:
 	var max_dash_buffer := 0.15
 	var max_jump_buffer := 0.12
 	var max_attack_buffer := 0.14
+	var max_attack_cooldown := 0.35
 	var max_dash_charges := 1
 	var max_air_jumps := 0
 	var max_landing_recovery := 0.18
@@ -160,6 +168,7 @@ func _ready() -> void:
 		max_dash_buffer = max(0.01, float(tuning_resource.get("dash_input_buffer_time")))
 		max_jump_buffer = max(0.01, float(tuning_resource.get("jump_buffer_time")) + max(0.0, float(tuning_resource.get("jump_buffer_dash_bonus_time"))))
 		max_attack_buffer = max(0.01, float(tuning_resource.get("light_attack_input_buffer_time")))
+		max_attack_cooldown = max(0.01, float(player.call("_light_attack_cooldown_max")))
 		max_dash_charges = max(1, int(tuning_resource.get("dash_max_charges")))
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
 		max_landing_recovery = max(0.01, float(tuning_resource.get("hard_landing_recovery_time")))
@@ -204,6 +213,22 @@ func _ready() -> void:
 		attack_buffer_label.text = "Attack Queue Empty"
 		vbox.add_child(attack_buffer_label)
 		vbox.move_child(attack_buffer_label, jump_buffer_label.get_index() + 1)
+	if attack_cooldown_bar == null:
+		var vbox: VBoxContainer = $MarginContainer/VBoxContainer
+		attack_cooldown_bar = ProgressBar.new()
+		attack_cooldown_bar.name = "AttackCooldownBar"
+		attack_cooldown_bar.show_percentage = false
+		attack_cooldown_bar.max_value = 1.0
+		attack_cooldown_bar.value = 0.0
+		vbox.add_child(attack_cooldown_bar)
+		vbox.move_child(attack_cooldown_bar, attack_buffer_label.get_index() + 1)
+	if attack_cooldown_label == null:
+		var vbox: VBoxContainer = $MarginContainer/VBoxContainer
+		attack_cooldown_label = Label.new()
+		attack_cooldown_label.name = "AttackCooldownLabel"
+		attack_cooldown_label.text = "Attack Ready"
+		vbox.add_child(attack_cooldown_label)
+		vbox.move_child(attack_cooldown_label, attack_cooldown_bar.get_index() + 1)
 	stamina_warning_label.visible = false
 	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
 	_apply_readability_theme()
@@ -215,6 +240,7 @@ func _ready() -> void:
 	_on_dash_buffer_changed(current_dash_buffer, max_dash_buffer)
 	_on_jump_buffer_changed(current_jump_buffer, max_jump_buffer)
 	_on_attack_buffer_changed(current_attack_buffer, max_attack_buffer)
+	_on_light_attack_cooldown_changed(current_attack_cooldown, max_attack_cooldown)
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
@@ -245,6 +271,7 @@ func _apply_readability_theme() -> void:
 		dash_buffer_label,
 		jump_buffer_label,
 		attack_buffer_label,
+		attack_cooldown_label,
 		air_jump_label,
 		sprint_state_label,
 		landing_recovery_label,
@@ -268,6 +295,7 @@ func _apply_readability_theme() -> void:
 		stamina_bar,
 		dash_cooldown_bar,
 		dash_charge_recharge_bar,
+		attack_cooldown_bar,
 		landing_recovery_bar,
 		stamina_regen_delay_bar,
 		dash_invulnerability_bar,
@@ -345,6 +373,18 @@ func _on_attack_buffer_changed(remaining: float, max_value: float) -> void:
 	else:
 		attack_buffer_label.text = "Attack Queue Empty"
 		attack_buffer_label.modulate = Color(0.9, 0.82, 0.78)
+
+func _on_light_attack_cooldown_changed(remaining: float, max_value: float) -> void:
+	if attack_cooldown_bar == null or attack_cooldown_label == null:
+		return
+	attack_cooldown_bar.max_value = max(0.01, max_value)
+	attack_cooldown_bar.value = clamp(remaining, 0.0, attack_cooldown_bar.max_value)
+	if remaining > 0.01:
+		attack_cooldown_label.text = "Attack Cooldown %.2fs" % remaining
+		attack_cooldown_label.modulate = Color(1.0, 0.72, 0.55)
+	else:
+		attack_cooldown_label.text = "Attack Ready"
+		attack_cooldown_label.modulate = Color(0.88, 0.96, 0.88)
 
 func _on_air_jumps_changed(current: int, max_value: int) -> void:
 	var clamped_max: int = max(0, max_value)
