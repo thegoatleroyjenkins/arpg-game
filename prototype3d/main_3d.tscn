@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_pickup_3d.gd" id="3_stamina_pickup_script"]
 [ext_resource type="Resource" path="res://prototype3d/stamina_pickup_profile_standard_3d.tres" id="4_pickup_profile_standard"]
 [ext_resource type="Resource" path="res://prototype3d/stamina_pickup_profile_quick_3d.tres" id="5_pickup_profile_quick"]
+[ext_resource type="Script" path="res://prototype3d/pause_menu_3d.gd" id="6_pause_menu_script"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 radius = 0.35
@@ -185,3 +186,88 @@ text = "Dash I-Frames Ready"
 visible = false
 layout_mode = 2
 text = "Dash failed: low stamina"
+
+[node name="PauseMenu" type="CanvasLayer" parent="."]
+process_mode = 3
+script = ExtResource("6_pause_menu_script")
+
+[node name="CenterContainer" type="CenterContainer" parent="PauseMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="PauseMenu/CenterContainer"]
+custom_minimum_size = Vector2(460, 0)
+
+[node name="MarginContainer" type="MarginContainer" parent="PauseMenu/CenterContainer/PanelContainer"]
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Paused"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Esc to resume"
+horizontal_alignment = 1
+
+[node name="SensitivityRow" type="HBoxContainer" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SensitivityLabel" type="Label" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SensitivityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Camera Sensitivity"
+
+[node name="SensitivitySlider" type="HSlider" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SensitivityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.02
+max_value = 0.4
+step = 0.01
+value = 0.1
+
+[node name="SensitivityValue" type="Label" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SensitivityRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 0)
+text = "0.10"
+
+[node name="FullscreenToggle" type="CheckButton" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="HudToggle" type="CheckButton" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Show HUD"
+button_pressed = true
+
+[node name="MouseCaptureToggle" type="CheckButton" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Capture mouse on resume"
+button_pressed = true
+
+[node name="ButtonRow" type="HBoxContainer" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ResumeButton" type="Button" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Resume"
+
+[node name="QuitButton" type="Button" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Quit Game"
