@@ -367,3 +367,4 @@ MIT
 - Improved HUD text readability with explicit cool-light font overrides on objective/controls/minimap legend labels.
 - Added dynamic objective status text in the stats block (`Clear all hostiles` -> `Keep pressure on the remaining enemies` -> `Final push`) for clearer combat pacing feedback.
 - Centered and anchored victory messaging to the viewport center so it remains readable across camera movement/resolution differences.
+- Added cardinal direction markers around the minimap so spatial orientation stays clear without overwhelming the gameplay view.

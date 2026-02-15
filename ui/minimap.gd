@@ -12,6 +12,10 @@ class_name Minimap
 @export var center_axis_color: Color = Color(1, 1, 1, 0.16)
 @export var highlight_color: Color = Color(1, 1, 1, 0.05)
 @export var player_direction_color: Color = Color(0.8, 0.97, 0.85, 0.95)
+@export var show_cardinal_labels: bool = true
+@export var cardinal_label_color: Color = Color(0.85, 0.9, 1.0, 0.85)
+@export var cardinal_label_margin: float = 8.0
+@export var cardinal_font: Font
 
 func _process(_delta: float) -> void:
 	queue_redraw()
@@ -29,6 +33,7 @@ func _draw() -> void:
 	_draw_pickups()
 	_draw_enemies()
 	_draw_player()
+	_draw_cardinal_labels()
 
 func _draw_background_glow() -> void:
 	var center = size * 0.5
@@ -85,6 +90,34 @@ func _draw_pickups() -> void:
 		if n is Node2D:
 			var p = _to_minimap((n as Node2D).global_position)
 			draw_circle(p, 1.8, pickup_color)
+
+func _draw_cardinal_labels() -> void:
+	if not show_cardinal_labels:
+		return
+	var font = _resolve_cardinal_font()
+	if font == null:
+		return
+	var center = size * 0.5
+	var ascent = font.get_ascent()
+	var height = font.get_height()
+	var south_baseline = size.y - cardinal_label_margin - (height - ascent)
+	var side_baseline = center.y + ascent * 0.3
+
+	_draw_cardinal_label(font, "N", center.x - font.get_string_size("N").x * 0.5, cardinal_label_margin + ascent)
+	_draw_cardinal_label(font, "S", center.x - font.get_string_size("S").x * 0.5, south_baseline)
+	_draw_cardinal_label(font, "E", size.x - cardinal_label_margin - font.get_string_size("E").x, side_baseline)
+	_draw_cardinal_label(font, "W", cardinal_label_margin, side_baseline)
+
+func _draw_cardinal_label(font: Font, label: String, x: float, y: float) -> void:
+	draw_string(font, Vector2(x, y), label, cardinal_label_color)
+
+func _resolve_cardinal_font() -> Font:
+	if cardinal_font:
+		return cardinal_font
+	var theme_font = get_theme_font("font")
+	if theme_font:
+		return theme_font
+	return null
 
 func _to_minimap(pos: Vector2) -> Vector2:
 	if world_size.x <= 0.0 or world_size.y <= 0.0:
