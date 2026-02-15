@@ -140,14 +140,15 @@ func _physics_process(delta: float) -> void:
 
 	if dash_time_left > 0.0:
 		dash_time_left = max(0.0, dash_time_left - delta)
+		_update_dash_direction(move_dir, delta)
 		velocity.x = dash_direction.x * tuning.dash_speed
 		velocity.z = dash_direction.z * tuning.dash_speed
 	else:
 		var is_moving := move_dir.length() > 0.01
 		var is_trying_to_sprint := Input.is_action_pressed("sprint") and is_moving
 		var is_sprinting := false
-		var sprint_exhaust_threshold := max(0.0, tuning.sprint_exhaustion_threshold)
-		var sprint_resume_threshold := max(sprint_exhaust_threshold, tuning.sprint_resume_threshold)
+		var sprint_exhaust_threshold: float = max(0.0, tuning.sprint_exhaustion_threshold)
+		var sprint_resume_threshold: float = max(sprint_exhaust_threshold, tuning.sprint_resume_threshold)
 		if sprint_exhausted and stamina >= sprint_resume_threshold:
 			sprint_exhausted = false
 		if is_trying_to_sprint and not sprint_exhausted and _can_pay_stamina(tuning.sprint_stamina_per_second * delta):
@@ -218,6 +219,20 @@ func _start_dash(move_dir: Vector3) -> void:
 	buffered_dash_direction = Vector3.ZERO
 	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
+
+func _update_dash_direction(move_dir: Vector3, delta: float) -> void:
+	if move_dir.length() <= 0.01:
+		return
+	var steer_control: float = clamp(tuning.dash_steer_control, 0.0, 1.0)
+	if steer_control <= 0.0:
+		return
+	var steering_target: Vector3 = move_dir.normalized()
+	var steer_lerp: float = clamp(delta * max(0.01, tuning.dash_steer_responsiveness) * steer_control, 0.0, 1.0)
+	dash_direction = dash_direction.slerp(steering_target, steer_lerp)
+	dash_direction.y = 0.0
+	if dash_direction.length() <= 0.01:
+		dash_direction = steering_target
+	dash_direction = dash_direction.normalized()
 
 func _update_camera_fov(delta: float) -> void:
 	var horizontal_speed := Vector3(velocity.x, 0.0, velocity.z).length()
