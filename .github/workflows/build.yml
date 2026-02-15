@@ -1,0 +1,48 @@
+name: Build ARPG Game
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Godot
+      uses: chickensoft-games/setup-godot@v1
+      with:
+        version: 4.2.1
+        use-dotnet: false
+    
+    - name: Build Windows
+      run: |
+        mkdir -p build/windows
+        godot --headless --export-release "Windows Desktop" build/windows/ARPG.exe --path .
+        cd build/windows && zip -r ../arpg-windows.zip .
+    
+    - name: Build Linux
+      run: |
+        mkdir -p build/linux
+        godot --headless --export-release "Linux/X11" build/linux/ARPG.x86_64 --path .
+        cd build/linux && zip -r ../arpg-linux.zip .
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: arpg-builds
+        path: build/arpg-*.zip
+    
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: build-${{ github.run_number }}
+        name: ARPG Build ${{ github.run_number }}
+        files: build/arpg-*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
