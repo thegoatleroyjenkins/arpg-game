@@ -21,6 +21,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability
 - **Air Jump (3D prototype)** — Data-driven extra mid-air jump count enables cleaner vertical repositioning and more expressive traversal/combat routing
+- **Jump Apex Hang Time (3D prototype)** — Data-driven apex gravity tuning softens gravity near jump peak for cleaner aerial control and better mid-air repositioning readability
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
@@ -166,6 +167,7 @@ arpg-game/
 - ✅ Added data-driven 3D jump feel tuning (coyote time + jump buffering)
 - ✅ Added data-driven 3D movement smoothing (ground acceleration/deceleration + air control)
 - ✅ Added data-driven 3D variable jump height (jump-release gravity multiplier + terminal fall speed)
+- ✅ Added data-driven 3D jump apex hang-time tuning (apex gravity multiplier + vertical speed threshold) for cleaner aerial control near jump peak
 - ✅ Added data-driven 3D directional turn smoothing (turn speed + minimum movement threshold)
 - ✅ Added modular 3D stamina HUD wired to player stamina_changed signal for real-time stamina readability
 - ✅ Added modular 3D dash cooldown HUD wired to player dash_cooldown_changed signal for clearer dash timing windows

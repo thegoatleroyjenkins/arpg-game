@@ -9,6 +9,8 @@ class_name PlayerTuning3D
 @export var jump_buffer_time: float = 0.12
 @export var max_air_jumps: int = 1
 @export var jump_release_gravity_multiplier: float = 2.2
+@export var jump_apex_gravity_multiplier: float = 0.7
+@export var jump_apex_vertical_speed_threshold: float = 1.0
 @export var max_fall_speed: float = 18.0
 
 @export_group("Movement Feel")

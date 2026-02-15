@@ -71,6 +71,6 @@ func _on_dash_cooldown_changed(remaining: float, max_value: float) -> void:
 		dash_cooldown_label.text = "Dash %.2fs (%d/%d)" % [remaining, dash_charges_current, dash_charges_max]
 
 func _on_air_jumps_changed(current: int, max_value: int) -> void:
-	var clamped_max := max(0, max_value)
-	var clamped_current := clampi(current, 0, clamped_max)
+	var clamped_max: int = max(0, max_value)
+	var clamped_current: int = clampi(current, 0, clamped_max)
 	air_jump_label.text = "Air Jumps %d / %d" % [clamped_current, clamped_max]

@@ -65,7 +65,7 @@ func _physics_process(delta: float) -> void:
 	# Gravity + coyote time for forgiving jumps after stepping off ledges.
 	if was_on_floor:
 		coyote_time_left = tuning.coyote_time
-		var reset_air_jumps := max(0, tuning.max_air_jumps)
+		var reset_air_jumps: int = max(0, tuning.max_air_jumps)
 		if air_jumps_left != reset_air_jumps:
 			air_jumps_left = reset_air_jumps
 			_emit_air_jumps_changed()
@@ -75,6 +75,9 @@ func _physics_process(delta: float) -> void:
 		# Variable jump height: releasing jump early makes ascent fall off faster.
 		if velocity.y > 0.0 and not _is_jump_pressed():
 			gravity_scale = tuning.jump_release_gravity_multiplier
+		# Apex hang: near the top of a jump, reduce gravity for cleaner aerial control.
+		elif absf(velocity.y) <= tuning.jump_apex_vertical_speed_threshold:
+			gravity_scale = tuning.jump_apex_gravity_multiplier
 		velocity.y -= tuning.gravity * gravity_scale * delta
 		velocity.y = max(velocity.y, -tuning.max_fall_speed)
 
