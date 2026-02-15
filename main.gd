@@ -53,14 +53,18 @@ func _generate_enemies(count):
 		
 		# Random enemy type with weighted distribution
 		var rand = randf()
-		if rand < 0.45:
+		if rand < 0.35:
 			enemy.enemy_type = Enemy.EnemyType.GRUNT
-		elif rand < 0.75:
+		elif rand < 0.58:
 			enemy.enemy_type = Enemy.EnemyType.FAST
-		elif rand < 0.90:
+		elif rand < 0.74:
 			enemy.enemy_type = Enemy.EnemyType.TANK
-		else:
+		elif rand < 0.86:
 			enemy.enemy_type = Enemy.EnemyType.RANGED
+		elif rand < 0.94:
+			enemy.enemy_type = Enemy.EnemyType.BRUISER
+		else:
+			enemy.enemy_type = Enemy.EnemyType.ASSASSIN
 		
 		# Position away from player start
 		var valid_position = false
@@ -191,6 +195,8 @@ func _spawn_loot_drop(pos: Vector2, enemy_type: Enemy.EnemyType):
 		Enemy.EnemyType.FAST: drop_chance = 0.4
 		Enemy.EnemyType.TANK: drop_chance = 0.5
 		Enemy.EnemyType.RANGED: drop_chance = 0.45
+		Enemy.EnemyType.BRUISER: drop_chance = 0.55
+		Enemy.EnemyType.ASSASSIN: drop_chance = 0.5
 	
 	if rand > drop_chance:
 		return  # No drop

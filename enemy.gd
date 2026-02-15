@@ -2,7 +2,7 @@ class_name Enemy
 extends CharacterBody2D
 
 # Enemy types with different behaviors
-enum EnemyType { GRUNT, FAST, TANK, RANGED }
+enum EnemyType { GRUNT, FAST, TANK, RANGED, BRUISER, ASSASSIN }
 
 # Base stats (will be modified by type)
 @export var enemy_type: EnemyType = EnemyType.GRUNT
@@ -108,6 +108,32 @@ func _setup_by_type():
 			attack_cooldown_time = 1.2
 			sprite.modulate = Color(0.8, 0.3, 1)  # Purple
 
+		EnemyType.BRUISER:
+			# Mid-speed frontline with heavy hits
+			max_health = 90
+			damage = 18
+			xp_value = 45
+			wander_speed = 24.0
+			chase_speed = 95.0
+			retreat_speed = 85.0
+			detection_range = 220.0
+			attack_range = 50.0
+			attack_cooldown_time = 1.1
+			sprite.modulate = Color(1.0, 0.55, 0.2)  # Orange
+
+		EnemyType.ASSASSIN:
+			# Fragile but very high pressure
+			max_health = 25
+			damage = 16
+			xp_value = 40
+			wander_speed = 55.0
+			chase_speed = 165.0
+			retreat_speed = 190.0
+			detection_range = 280.0
+			attack_range = 35.0
+			attack_cooldown_time = 0.55
+			sprite.modulate = Color(0.95, 0.95, 0.2)  # Yellow
+
 func _setup_detection_area():
 	detection_area = Area2D.new()
 	detection_area.name = "DetectionArea"
@@ -204,6 +230,8 @@ func get_type_color() -> Color:
 		EnemyType.FAST: return Color(0.3, 1, 0.3)
 		EnemyType.TANK: return Color(0.4, 0.4, 0.4)
 		EnemyType.RANGED: return Color(0.8, 0.3, 1)
+		EnemyType.BRUISER: return Color(1.0, 0.55, 0.2)
+		EnemyType.ASSASSIN: return Color(0.95, 0.95, 0.2)
 	return Color.WHITE
 
 func _update_health_bar():
@@ -232,4 +260,6 @@ func get_type_name() -> String:
 		EnemyType.FAST: return "Fast"
 		EnemyType.TANK: return "Tank"
 		EnemyType.RANGED: return "Ranged"
+		EnemyType.BRUISER: return "Bruiser"
+		EnemyType.ASSASSIN: return "Assassin"
 	return "Unknown"

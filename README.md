@@ -28,7 +28,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 
 ### Enemy AI
 - **State Machine** — Idle, Chase, Attack, Retreat states
-- **Enemy Types** — Grunt, Fast, Tank, Ranged (varied stats and behaviors)
+- **Enemy Types** — Grunt, Fast, Tank, Ranged, Bruiser, Assassin (varied stats and behaviors)
 - **Smart Behavior** — Enemies detect player, chase when in range, attack when close
 - **Visual Feedback** — Alert indicators when enemies spot player
 
@@ -143,6 +143,7 @@ arpg-game/
 - ✅ Added data-driven 3D player tuning resource + Shift sprint in prototype
 - ✅ Added data-driven 3D dash (Q) with duration/cooldown tuning
 - ✅ Added data-driven 3D stamina system (sprint + dash costs, regen delay/rate)
+- ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 
 ## License
 
