@@ -164,6 +164,10 @@ show_percentage = false
 layout_mode = 2
 text = "Regen Active"
 
+[node name="StaminaRegenBoostLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Regen Surge Ready"
+
 [node name="DashInvulnerabilityBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 0.12

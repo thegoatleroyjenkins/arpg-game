@@ -15,6 +15,7 @@ extends CanvasLayer
 @onready var landing_recovery_label: Label = $MarginContainer/VBoxContainer/LandingRecoveryLabel
 @onready var stamina_regen_delay_bar: ProgressBar = $MarginContainer/VBoxContainer/StaminaRegenDelayBar
 @onready var stamina_regen_delay_label: Label = $MarginContainer/VBoxContainer/StaminaRegenDelayLabel
+@onready var stamina_regen_boost_label: Label = $MarginContainer/VBoxContainer/StaminaRegenBoostLabel
 @onready var dash_invulnerability_bar: ProgressBar = $MarginContainer/VBoxContainer/DashInvulnerabilityBar
 @onready var dash_invulnerability_label: Label = $MarginContainer/VBoxContainer/DashInvulnerabilityLabel
 @onready var stamina_warning_label: Label = $MarginContainer/VBoxContainer/StaminaWarningLabel
@@ -67,6 +68,9 @@ func _ready() -> void:
 	if not player.has_signal("dash_invulnerability_changed"):
 		push_warning("StaminaHud3D target does not expose dash_invulnerability_changed signal")
 		return
+	if not player.has_signal("stamina_regen_boost_changed"):
+		push_warning("StaminaHud3D target does not expose stamina_regen_boost_changed signal")
+		return
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
@@ -79,6 +83,7 @@ func _ready() -> void:
 	player.stamina_regen_delay_changed.connect(_on_stamina_regen_delay_changed)
 	player.stamina_action_failed.connect(_on_stamina_action_failed)
 	player.dash_invulnerability_changed.connect(_on_dash_invulnerability_changed)
+	player.stamina_regen_boost_changed.connect(_on_stamina_regen_boost_changed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_charge_recharge := float(player.get("dash_charge_recharge_left"))
@@ -88,6 +93,9 @@ func _ready() -> void:
 	var current_landing_recovery := float(player.get("landing_recovery_left"))
 	var current_stamina_regen_delay := float(player.get("stamina_regen_delay_left"))
 	var current_dash_invulnerability := float(player.get("dash_invulnerability_left"))
+	var current_stamina_regen_boost := float(player.get("stamina_regen_boost_left"))
+	var current_stamina_regen_boost_max := float(player.get("stamina_regen_boost_max"))
+	var current_stamina_regen_boost_multiplier := float(player.get("stamina_regen_boost_multiplier"))
 	var tuning_resource: Resource = player.get("tuning")
 	var max_stamina := 100.0
 	var max_dash_cooldown := 1.0
@@ -124,6 +132,7 @@ func _ready() -> void:
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
 	_on_stamina_regen_delay_changed(current_stamina_regen_delay, max_stamina_regen_delay)
+	_on_stamina_regen_boost_changed(current_stamina_regen_boost, max(0.01, current_stamina_regen_boost_max), max(1.0, current_stamina_regen_boost_multiplier))
 	_on_dash_invulnerability_changed(current_dash_invulnerability, max_dash_invulnerability)
 
 func _process(delta: float) -> void:
@@ -228,6 +237,15 @@ func _on_stamina_action_failed(reason: String, duration: float) -> void:
 		return
 	stamina_warning_label.text = "%s failed: low stamina" % reason
 	stamina_warning_label.visible = true
+
+func _on_stamina_regen_boost_changed(remaining: float, _max_value: float, multiplier: float) -> void:
+	var clamped_remaining: float = max(0.0, remaining)
+	if clamped_remaining > 0.01:
+		stamina_regen_boost_label.text = "Regen Surge x%.2f (%.2fs)" % [max(1.0, multiplier), clamped_remaining]
+		stamina_regen_boost_label.modulate = Color(0.62, 1.0, 0.72)
+	else:
+		stamina_regen_boost_label.text = "Regen Surge Ready"
+		stamina_regen_boost_label.modulate = Color(0.7, 0.9, 0.75)
 
 func _on_dash_invulnerability_changed(remaining: float, max_value: float) -> void:
 	dash_invulnerability_bar.max_value = max(0.01, max_value)

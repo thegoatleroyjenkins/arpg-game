@@ -25,6 +25,10 @@ extends Area3D
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_air_jump_ratio: float = 0.34
 @export_range(0.0, 1.0, 0.01) var magnet_missing_air_jump_ratio: float = 0.5
 
+@export_group("Regen Surge")
+@export var regen_boost_duration: float = 1.6
+@export_range(1.0, 4.0, 0.05) var regen_boost_multiplier: float = 1.35
+
 @export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
@@ -96,7 +100,11 @@ func _try_collect(body: Node) -> void:
 	if air_jump_recovery_count > 0 and target.has_method("restore_air_jumps") and wants_air_jump_recovery:
 		air_jumps_recovered = int(target.call("restore_air_jumps", air_jump_recovery_count))
 
-	if restored <= 0.0 and dash_recovered <= 0.0 and air_jumps_recovered <= 0:
+	var regen_boost_applied: float = 0.0
+	if regen_boost_duration > 0.0 and regen_boost_multiplier > 1.0 and target.has_method("apply_stamina_regen_boost"):
+		regen_boost_applied = float(target.call("apply_stamina_regen_boost", regen_boost_duration, regen_boost_multiplier))
+
+	if restored <= 0.0 and dash_recovered <= 0.0 and air_jumps_recovered <= 0 and regen_boost_applied <= 0.0:
 		return
 	_deactivate()
 

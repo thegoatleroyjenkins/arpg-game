@@ -20,6 +20,7 @@ signal landing_recovery_changed(remaining: float, max_value: float)
 signal stamina_regen_delay_changed(remaining: float, max_value: float)
 signal stamina_action_failed(reason: String, remaining: float)
 signal dash_invulnerability_changed(remaining: float, max_value: float)
+signal stamina_regen_boost_changed(remaining: float, max_value: float, multiplier: float)
 
 var look_target: Vector3
 var respawn_position: Vector3
@@ -45,6 +46,9 @@ var recent_move_direction: Vector3 = Vector3.ZERO
 var recent_move_direction_left: float = 0.0
 var stamina_action_warning_cooldown_left: float = 0.0
 var dash_invulnerability_left: float = 0.0
+var stamina_regen_boost_left: float = 0.0
+var stamina_regen_boost_max: float = 0.0
+var stamina_regen_boost_multiplier: float = 1.0
 var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var camera_orbit_yaw: float = 0.0
@@ -78,6 +82,7 @@ func _ready() -> void:
 	_emit_landing_recovery_changed()
 	_emit_stamina_regen_delay_changed()
 	_emit_dash_invulnerability_changed()
+	_emit_stamina_regen_boost_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -105,6 +110,12 @@ func _physics_process(delta: float) -> void:
 	if dash_invulnerability_left > 0.0:
 		dash_invulnerability_left = max(0.0, dash_invulnerability_left - delta)
 		_emit_dash_invulnerability_changed()
+	if stamina_regen_boost_left > 0.0:
+		stamina_regen_boost_left = max(0.0, stamina_regen_boost_left - delta)
+		if stamina_regen_boost_left <= 0.0:
+			stamina_regen_boost_multiplier = 1.0
+			stamina_regen_boost_max = 0.0
+		_emit_stamina_regen_boost_changed()
 	_update_dash_invulnerability_visual(delta)
 
 	_handle_fall_reset_if_needed()
@@ -701,6 +712,8 @@ func _regen_stamina(delta: float, is_moving: bool) -> void:
 		regen_rate = tuning.stamina_regen_airborne_per_second
 	elif is_moving:
 		regen_rate = tuning.stamina_regen_moving_per_second
+	if stamina_regen_boost_left > 0.0:
+		regen_rate *= max(1.0, stamina_regen_boost_multiplier)
 	stamina = min(tuning.max_stamina, stamina + regen_rate * delta)
 	_emit_stamina_changed()
 
@@ -765,6 +778,18 @@ func restore_stamina(amount: float) -> float:
 		_emit_stamina_changed()
 		return stamina - previous_stamina
 	return 0.0
+
+func apply_stamina_regen_boost(duration: float, multiplier: float) -> float:
+	var clamped_duration: float = max(0.0, duration)
+	var clamped_multiplier: float = max(1.0, multiplier)
+	if clamped_duration <= 0.0 or clamped_multiplier <= 1.0:
+		return 0.0
+	var previous_remaining: float = stamina_regen_boost_left
+	stamina_regen_boost_left = max(stamina_regen_boost_left, clamped_duration)
+	stamina_regen_boost_max = max(stamina_regen_boost_max, stamina_regen_boost_left)
+	stamina_regen_boost_multiplier = max(stamina_regen_boost_multiplier, clamped_multiplier)
+	_emit_stamina_regen_boost_changed()
+	return max(0.0, stamina_regen_boost_left - previous_remaining)
 
 func restore_air_jumps(count: int) -> int:
 	var grant_count: int = max(0, count)
@@ -849,3 +874,6 @@ func has_dash_invulnerability() -> bool:
 
 func _emit_dash_invulnerability_changed() -> void:
 	dash_invulnerability_changed.emit(dash_invulnerability_left, _dash_invulnerability_max())
+
+func _emit_stamina_regen_boost_changed() -> void:
+	stamina_regen_boost_changed.emit(stamina_regen_boost_left, max(0.01, stamina_regen_boost_max), max(1.0, stamina_regen_boost_multiplier))
