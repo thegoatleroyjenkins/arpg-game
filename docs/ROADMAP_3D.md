@@ -211,3 +211,27 @@ The project already has movement feel and initial world-streaming stubs; a real 
 
 ### Why this order
 Combat is still the highest-risk missing contract. Locking it first unlocks AI encounter tuning and prevents costly rework when streamed open-world combat density increases.
+
+## Focused Planning Pass — 2026-02-15 11:31 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Replace the combat dummy with a real NavMesh enemy encounter slice**
+   - Implement `EnemyActor3D` + `EnemyBrain3D` (Idle/Chase/Attack/Leash) using `NavigationAgent3D`.
+   - Route enemy attack payloads through `DamageResolver.request_damage()` only.
+   - Validate bidirectional combat loop in `prototype3d/main_3d.tscn` (player↔enemy, death/retry).
+
+2. **Connect world streaming to actual sector lifecycle + spawn flow**
+   - Wire `WorldStreamer` load/unload signals into `WorldSector` activation/deactivation.
+   - Hook `SpawnDirector` into chunk load events with per-chunk spawn budgets.
+   - Keep chunk/biome configuration in data files so expansion is data-only.
+
+3. **Lock progression-facing data contracts before content expansion**
+   - Define first resources for `EnemyArchetype3D`, `SkillData`, and `AffixData` with stable fields.
+   - Add lightweight adapters so combat reads resource data, not hardcoded constants.
+   - Add simple combat breakdown debug output to preserve clarity while tuning.
+
+### Immediate Next Implementation Task
+**Implement now:** add `prototype3d/enemy_brain_3d.gd` + `prototype3d/enemy_actor_3d.gd` and replace `CombatDummy` in `main_3d.tscn` with one `NavigationAgent3D`-driven enemy that can chase and execute one resolver-based melee attack.
+
+### Why this order
+The core resolver now exists; the highest-leverage move is proving a full encounter loop, then binding it to streaming/spawn architecture so open-world scaling can happen without refactors.
