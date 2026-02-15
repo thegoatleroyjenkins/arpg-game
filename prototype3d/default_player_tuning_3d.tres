@@ -26,6 +26,7 @@ low_stamina_movement_threshold_ratio = 0.2
 low_stamina_movement_min_multiplier = 0.82
 stamina_regen_idle_per_second = 28.0
 stamina_regen_moving_per_second = 16.0
+stamina_regen_airborne_per_second = 10.0
 stamina_regen_delay = 0.7
 low_stamina_warning_ratio = 0.25
 low_stamina_pulse_speed = 7.0

@@ -356,7 +356,9 @@ func _regen_stamina(delta: float, is_moving: bool) -> void:
 	if stamina >= tuning.max_stamina:
 		return
 	var regen_rate := tuning.stamina_regen_idle_per_second
-	if is_moving:
+	if not is_on_floor():
+		regen_rate = tuning.stamina_regen_airborne_per_second
+	elif is_moving:
 		regen_rate = tuning.stamina_regen_moving_per_second
 	stamina = min(tuning.max_stamina, stamina + regen_rate * delta)
 	_emit_stamina_changed()

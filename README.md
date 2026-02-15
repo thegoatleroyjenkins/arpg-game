@@ -28,6 +28,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
 - **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
+- **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
 - **Dynamic Camera FOV (3D prototype)** — Data-driven FOV kick scales with movement speed and dash state, adding stronger sensation of momentum without hardcoding camera behavior
@@ -202,6 +203,7 @@ arpg-game/
 - ✅ Added data-driven 3D camera impulse feedback (dash + hard landing impulse, plus decay/max offset tuning) for clearer movement impact and stronger moment-to-moment game feel
 - ✅ Added data-driven low-stamina HUD warning pulse (threshold ratio + pulse speed tuning) to make critical stamina states more readable during combat movement decisions
 - ✅ Added data-driven low-stamina movement drag (threshold ratio + minimum movement multiplier) so critical stamina states carry a clear movement pacing tradeoff
+- ✅ Added data-driven airborne stamina regeneration tuning (separate in-air regen rate) to keep aerial mobility chains as a meaningful stamina commitment
 
 ## License
 
