@@ -14,6 +14,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 ### Player Systems
 - **Movement** — WASD/Arrow key movement with directional facing
 - **Camera-Relative Movement (3D prototype)** — Data-driven movement mapping now follows camera forward/right vectors (with a toggle in tuning), improving directional readability and future-proofing control feel for camera-driven combat spaces
+- **Input Deadzone Remapping (3D prototype)** — Data-driven movement input deadzone now filters analog drift and remaps post-deadzone strength, preserving fine control without hardcoded stick thresholds
 - **Sprint (3D prototype)** — Sprint now uses an input action (Shift / gamepad LB) for modular remapping and burst movement speed
 - **Dedicated Jump Input (3D prototype)** — Jump now uses its own `jump` action (Space / gamepad A) with fallback support, improving control clarity and input modularity
 - **Dash (3D prototype)** — Tap Q (or gamepad B) for a short directional dash with cooldown (data-driven tuning)
@@ -183,6 +184,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D movement input deadzone remapping (tunable deadzone with normalized post-threshold scaling) to reduce gamepad drift while preserving low-tilt precision
 - ✅ Added data-driven low-stamina pickup magnet tuning (radius/speed/missing-stamina threshold) so nearby stamina orbs pull toward resource-starved players for cleaner recovery routing under pressure
 - ✅ Added data-driven 3D camera-relative movement toggle (camera-forward/right mapping) so movement intent remains consistent with camera framing and is easier to tune per-scene
 - ✅ Added equipment system (weapons, armor, accessories)

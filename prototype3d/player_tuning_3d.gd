@@ -22,6 +22,7 @@ class_name PlayerTuning3D
 
 @export_group("Movement Controls")
 @export var movement_relative_to_camera: bool = true
+@export_range(0.0, 0.4, 0.01) var movement_input_deadzone: float = 0.15
 
 @export_group("Sprint Feel")
 @export var sprint_ramp_up_per_second: float = 8.0

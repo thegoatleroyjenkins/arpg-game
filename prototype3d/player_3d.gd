@@ -274,8 +274,13 @@ func _physics_process(delta: float) -> void:
 func _resolve_move_direction(input_vec: Vector2) -> Vector3:
 	if input_vec.length() > 1.0:
 		input_vec = input_vec.normalized()
-	if input_vec.length() <= 0.01:
+	var deadzone: float = clamp(tuning.movement_input_deadzone, 0.0, 0.95)
+	var input_strength: float = input_vec.length()
+	if input_strength <= deadzone:
 		return Vector3.ZERO
+	if input_strength > 0.001:
+		var remapped_strength: float = clamp((input_strength - deadzone) / max(0.001, 1.0 - deadzone), 0.0, 1.0)
+		input_vec = input_vec.normalized() * remapped_strength
 	if not tuning.movement_relative_to_camera or not is_instance_valid(camera):
 		return Vector3(input_vec.x, 0.0, input_vec.y)
 
