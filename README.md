@@ -47,6 +47,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Pickup Respawn Telegraphs (3D prototype)** — Data-driven pre-respawn telegraph timing + pulse/alpha tuning now make stamina orb re-entry visible before reactivation, improving resource timing readability during combat routing
 - **Stamina Orbs Grant Dash Recovery (3D prototype)** — Data-driven stamina pickups can now shave configurable time off dash readiness when dash resources are missing, allowing intentional sustain-or-routing plays even when stamina is near full
 - **Stamina Orbs Grant Air Jump Recovery (3D prototype)** — Data-driven stamina pickups can now restore configurable air-jump charges when missing-jump thresholds are met, improving vertical recovery routing without hardcoded pickup behavior
+- **Nearest-Need Pickup Magnet Targeting (3D prototype)** — Stamina orb magnet targeting now chooses the nearest player who currently needs stamina/dash/air-jump recovery (instead of first-in-group), improving co-op readiness while keeping pickup logic modular and threshold-driven
 - **Stamina Orb Regen Surge Buff (3D prototype)** — Data-driven stamina pickups can now apply a temporary stamina regeneration multiplier (duration + multiplier tuning) with HUD readout, enabling cleaner sustain windows after resource pickups
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
@@ -204,6 +205,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Updated stamina pickup magnet selection to target the nearest player who currently needs stamina/dash/air-jump recovery, improving multiplayer/co-op readiness while keeping the pickup decision flow modular and data-driven
 - ✅ Added data-driven stamina pickup regen-surge tuning (`regen_boost_duration`, `regen_boost_multiplier`) plus modular `apply_stamina_regen_boost()` player API and HUD timer/multiplier readout, so pickup routing can create brief high-recovery sustain windows without hardcoded logic
 - ✅ Added data-driven 3D camera follow-assist tuning (enable toggle, assist yaw speed, min movement speed, and mouse-look lockout duration) so camera orbit naturally recenters while moving without fighting manual orbit input
 - ✅ Added data-driven stamina pickup air-jump recovery tuning (`air_jump_recovery_count`, collect/magnet missing-air-jump thresholds) plus modular `restore_air_jumps()` player API, so pickups can restore vertical mobility when needed without hardcoded scene logic

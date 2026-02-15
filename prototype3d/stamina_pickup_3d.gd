@@ -174,9 +174,6 @@ func _update_magnet_motion(delta: float) -> void:
 	if distance <= 0.01 or distance > magnet_radius:
 		_move_toward_spawn(delta)
 		return
-	if not _target_needs_stamina(player) and not _target_needs_dash_recovery(player, magnet_missing_dash_ratio) and not _target_needs_air_jump_recovery(player, magnet_missing_air_jump_ratio):
-		_move_toward_spawn(delta)
-		return
 	if magnet_requires_line_of_sight and not _has_line_of_sight_to_target(player):
 		_move_toward_spawn(delta)
 		return
@@ -205,22 +202,40 @@ func _move_toward_spawn(delta: float) -> void:
 
 func _get_magnet_target() -> Node3D:
 	var players: Array[Node] = get_tree().get_nodes_in_group("player_3d")
+	var best_target: Node3D = null
+	var best_distance_sq: float = INF
 	for node in players:
-		if node is Node3D:
-			return node
-	return null
+		if not (node is Node3D):
+			continue
+		var player: Node3D = node as Node3D
+		if player == null:
+			continue
+		if not _target_needs_any_recovery(player, magnet_missing_stamina_ratio, magnet_missing_dash_ratio, magnet_missing_air_jump_ratio):
+			continue
+		var horizontal_delta: Vector3 = player.global_position - global_position
+		horizontal_delta.y = 0.0
+		var distance_sq: float = horizontal_delta.length_squared()
+		if distance_sq < best_distance_sq:
+			best_distance_sq = distance_sq
+			best_target = player
+	return best_target
+
+func _target_needs_any_recovery(player: Node3D, stamina_threshold: float, dash_threshold: float, air_jump_threshold: float) -> bool:
+	return _target_needs_stamina_with_threshold(player, stamina_threshold) \
+		or _target_needs_dash_recovery(player, dash_threshold) \
+		or _target_needs_air_jump_recovery(player, air_jump_threshold)
 
 func _target_needs_stamina(player: Node3D) -> bool:
-	if not player.has_method("restore_stamina"):
-		return false
-	var missing_ratio: float = _get_target_missing_stamina_ratio(player)
-	return missing_ratio >= clamp(magnet_missing_stamina_ratio, 0.0, 1.0)
+	return _target_needs_stamina_with_threshold(player, magnet_missing_stamina_ratio)
 
 func _target_needs_stamina_for_collection(player: Node3D) -> bool:
+	return _target_needs_stamina_with_threshold(player, min_collect_missing_stamina_ratio)
+
+func _target_needs_stamina_with_threshold(player: Node3D, threshold_ratio: float) -> bool:
 	if not player.has_method("restore_stamina"):
 		return false
 	var missing_ratio: float = _get_target_missing_stamina_ratio(player)
-	return missing_ratio >= clamp(min_collect_missing_stamina_ratio, 0.0, 1.0)
+	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
 
 func _target_needs_dash_recovery(player: Node3D, threshold_ratio: float) -> bool:
 	if dash_recovery_bonus_seconds <= 0.0:
