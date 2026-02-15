@@ -354,10 +354,12 @@ arpg-game/
 - ✅ Added data-driven 3D fall recovery safety reset (height + stamina/recovery penalties) so out-of-bounds falls respawn cleanly at the start anchor instead of risking softlocks
 - ✅ Added data-driven airborne jump stamina scaling (tunable air-jump multiplier) so mid-air jump chains carry a clearer stamina tradeoff than grounded jumps
 - ✅ Added modular 3D stamina pickup orb nodes (contact restore + timed respawn) and wired player-side stamina restoration API so arena routing can support deliberate resource recovery without hardcoded scene logic
+- ✅ Sharpened HUD readability by theming the stats, objective, controls, and minimap panels with consistent translucent backplates, accent borders, and brighter label text, refreshed the objective progress bar, and layered a subtle grid, glow, and facing indicator on the minimap so positioning and movement cues remain clear at a glance.
 
 ## License
 
 MIT
+
 
 
 ### UI readability pass (2026-02-15)

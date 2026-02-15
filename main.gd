@@ -3,10 +3,16 @@ extends Node2D
 @onready var player = $Player
 @onready var camera = $Camera2D
 @onready var ui = $UI
+@onready var stats_panel = $UI/StatsPanel
+@onready var objective_panel = $UI/ObjectivePanel
+@onready var controls_panel = $UI/ControlsPanel
+@onready var minimap_panel = $UI/MinimapPanel
 @onready var stats_label = $UI/StatsPanel/StatsLabel
 @onready var minimap = $UI/MinimapPanel/MiniMap
 @onready var objective_label = $UI/ObjectivePanel/ObjectiveLabel
 @onready var objective_progress = $UI/ObjectivePanel/ObjectiveProgress
+@onready var controls_hint = $UI/ControlsPanel/ControlsHint
+@onready var minimap_legend = $UI/MinimapPanel/MinimapLegend
 
 var world_size = Vector2(2000, 2000)
 var enemies_remaining: int = 0
@@ -37,6 +43,7 @@ func _ready():
 	if player.has_signal("stats_changed"):
 		player.stats_changed.connect(update_stats)
 	
+	_apply_ui_style()
 	update_stats()
 
 func _process(_delta):
@@ -258,6 +265,68 @@ func _show_victory_message():
 	victory_label.add_theme_font_size_override("font_size", 32)
 	victory_label.modulate = Color.GOLD
 	ui.add_child(victory_label)
+
+func _apply_ui_style():
+	_style_panel(stats_panel, Color(0.38, 0.62, 0.9, 0.9))
+	_style_panel(objective_panel, Color(0.7, 0.9, 1.0, 0.9))
+	_style_panel(controls_panel, Color(0.6, 0.8, 1.0, 0.9))
+	_style_panel(minimap_panel, Color(0.55, 0.75, 0.9, 0.9))
+	_tint_label(stats_label, Color(0.94, 0.97, 1.0, 1.0))
+	_tint_label(objective_label, Color(0.78, 0.94, 1.0, 1.0), 18)
+	_tint_label(controls_hint, Color(0.88, 0.92, 1.0, 1.0))
+	_tint_label(minimap_legend, Color(0.8, 0.9, 1.0, 1.0))
+	_style_objective_progress()
+
+func _style_panel(panel: Panel, border_color: Color) -> void:
+	if panel == null:
+		return
+	panel.add_theme_stylebox_override("panel", _build_panel_style(border_color))
+
+func _build_panel_style(border_color: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.03, 0.05, 0.08, 0.9)
+	style.border_color = border_color
+	style.border_width_top = 2
+	style.border_width_bottom = 2
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_left = 10
+	style.corner_radius_bottom_right = 10
+	style.content_margin_left = 12
+	style.content_margin_top = 10
+	style.content_margin_right = 12
+	style.content_margin_bottom = 10
+	return style
+
+func _tint_label(label: Label, color: Color, font_size: int = 0) -> void:
+	if label == null:
+		return
+	label.add_theme_color_override("font_color", color)
+	if font_size > 0:
+		label.add_theme_font_size_override("font_size", font_size)
+
+func _style_objective_progress() -> void:
+	if objective_progress == null:
+		return
+	var fg := StyleBoxFlat.new()
+	fg.bg_color = Color(0.41, 0.75, 0.99, 0.95)
+	fg.corner_radius_top_left = 6
+	fg.corner_radius_top_right = 6
+	fg.corner_radius_bottom_left = 6
+	fg.corner_radius_bottom_right = 6
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.12, 0.16, 0.2, 0.9)
+	bg.corner_radius_top_left = 6
+	bg.corner_radius_top_right = 6
+	bg.corner_radius_bottom_left = 6
+	bg.corner_radius_bottom_right = 6
+	objective_progress.add_theme_stylebox_override("fg", fg)
+	objective_progress.add_theme_stylebox_override("fg_disabled", fg)
+	objective_progress.add_theme_stylebox_override("bg", bg)
+	objective_progress.add_theme_stylebox_override("bg_disabled", bg)
+	objective_progress.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
 
 func update_stats():
 	# Show equipment in stats
