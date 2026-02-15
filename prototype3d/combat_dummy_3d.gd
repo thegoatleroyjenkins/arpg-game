@@ -26,6 +26,12 @@ extends "res://systems/combat/combat_actor_3d.gd"
 @export var crit_popup_color: Color = Color(1.0, 0.88, 0.36, 1.0)
 @export_range(1.0, 2.5, 0.05) var crit_popup_scale_multiplier: float = 1.2
 @export var crit_popup_prefix: String = "CRIT"
+@export var weak_popup_color: Color = Color(1.0, 0.35, 0.35, 1.0)
+@export var resist_popup_color: Color = Color(0.55, 0.78, 1.0, 1.0)
+@export var weak_popup_suffix: String = "WEAK"
+@export var resist_popup_suffix: String = "RESIST"
+@export_range(0.0, 1.0, 0.01) var damage_multiplier_resist_threshold: float = 0.95
+@export_range(1.0, 2.5, 0.01) var damage_multiplier_weak_threshold: float = 1.05
 
 var _base_scale: Vector3 = Vector3.ONE
 var _hit_flash_left: float = 0.0
@@ -33,6 +39,7 @@ var _health_label_visible_left: float = 0.0
 var _health_label: Label3D = null
 var _damage_popups: Array[Dictionary] = []
 var _pending_popup_is_critical: bool = false
+var _pending_popup_damage_multiplier: float = 1.0
 
 func _ready() -> void:
 	super._ready()
@@ -51,6 +58,7 @@ func _process(delta: float) -> void:
 
 func apply_damage_result(result: Dictionary) -> Dictionary:
 	_pending_popup_is_critical = bool(result.get("is_critical", false))
+	_pending_popup_damage_multiplier = max(0.0, float(result.get("damage_multiplier", 1.0)))
 	return super.apply_damage_result(result)
 
 func _update_hit_flash(delta: float) -> void:
@@ -104,8 +112,9 @@ func _face_health_label_to_camera() -> void:
 func _on_damage_taken(amount: float, _current: float, _max_value: float) -> void:
 	_hit_flash_left = max(0.0, hit_flash_duration)
 	_health_label_visible_left = max(_health_label_visible_left, health_label_visible_time_on_hit)
-	_spawn_damage_popup(amount, _pending_popup_is_critical)
+	_spawn_damage_popup(amount, _pending_popup_is_critical, _pending_popup_damage_multiplier)
 	_pending_popup_is_critical = false
+	_pending_popup_damage_multiplier = 1.0
 
 func _on_health_changed(current: float, max_value: float) -> void:
 	_update_health_label(current, max_value)
@@ -123,7 +132,7 @@ func _update_health_label(current: float, max_value: float) -> void:
 	else:
 		_health_label.modulate = health_label_color_high
 
-func _spawn_damage_popup(amount: float, is_critical: bool = false) -> void:
+func _spawn_damage_popup(amount: float, is_critical: bool = false, damage_multiplier: float = 1.0) -> void:
 	if not damage_popup_enabled:
 		return
 	if damage_popup_duration <= 0.0:
@@ -131,11 +140,21 @@ func _spawn_damage_popup(amount: float, is_critical: bool = false) -> void:
 	var popup: Label3D = Label3D.new()
 	popup.name = "DamagePopup3D"
 	var amount_text: String = "-%d" % int(round(max(0.0, amount)))
+	var popup_state: String = _resolve_popup_state(damage_multiplier)
+	var prefix_parts: Array[String] = []
 	if is_critical:
-		var prefix: String = crit_popup_prefix.strip_edges()
-		popup.text = "%s %s" % [prefix, amount_text] if not prefix.is_empty() else amount_text
-	else:
-		popup.text = amount_text
+		var crit_prefix: String = crit_popup_prefix.strip_edges()
+		if not crit_prefix.is_empty():
+			prefix_parts.append(crit_prefix)
+	if popup_state == "weak":
+		var weak_suffix: String = weak_popup_suffix.strip_edges()
+		if not weak_suffix.is_empty():
+			prefix_parts.append(weak_suffix)
+	elif popup_state == "resist":
+		var resist_suffix: String = resist_popup_suffix.strip_edges()
+		if not resist_suffix.is_empty():
+			prefix_parts.append(resist_suffix)
+	popup.text = "%s %s" % [" ".join(prefix_parts), amount_text] if not prefix_parts.is_empty() else amount_text
 	popup.position = Vector3(0.0, damage_popup_height, 0.0)
 	popup.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	popup.font_size = max(12, damage_popup_text_size)
@@ -144,14 +163,29 @@ func _spawn_damage_popup(amount: float, is_critical: bool = false) -> void:
 	popup.pixel_size = max(0.001, damage_popup_pixel_size)
 	popup.outline_size = 6
 	popup.no_depth_test = true
-	popup.modulate = crit_popup_color if is_critical else damage_popup_color
+	popup.modulate = _resolve_popup_color(is_critical, popup_state)
 	add_child(popup)
 	_damage_popups.append({
 		"node": popup,
 		"time_left": damage_popup_duration,
 		"start_y": popup.position.y,
 		"is_critical": is_critical,
+		"state": popup_state,
 	})
+
+func _resolve_popup_state(damage_multiplier: float) -> String:
+	if damage_multiplier >= max(1.0, damage_multiplier_weak_threshold):
+		return "weak"
+	if damage_multiplier <= clamp(damage_multiplier_resist_threshold, 0.0, 1.0):
+		return "resist"
+	return "normal"
+
+func _resolve_popup_color(is_critical: bool, popup_state: String) -> Color:
+	if popup_state == "weak":
+		return weak_popup_color
+	if popup_state == "resist":
+		return resist_popup_color
+	return crit_popup_color if is_critical else damage_popup_color
 
 func _update_damage_popups(delta: float) -> void:
 	if _damage_popups.is_empty():
@@ -172,7 +206,8 @@ func _update_damage_popups(delta: float) -> void:
 		popup.position.y = start_y + (damage_popup_rise_distance * normalized)
 		var alpha: float = 1.0 - normalized
 		var is_critical: bool = bool(entry.get("is_critical", false))
-		var tint: Color = crit_popup_color if is_critical else damage_popup_color
+		var popup_state: String = String(entry.get("state", "normal"))
+		var tint: Color = _resolve_popup_color(is_critical, popup_state)
 		tint.a *= alpha
 		popup.modulate = tint
 		if camera != null:
