@@ -1,6 +1,8 @@
 name: Build + Release ARPG
 
 on:
+  push:
+    branches: [ master, main ]
   schedule:
     - cron: "0 * * * *" # every hour
   workflow_dispatch:
