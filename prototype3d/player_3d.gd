@@ -250,6 +250,7 @@ func _physics_process(delta: float) -> void:
 
 	var pre_move_vertical_velocity := velocity.y
 	move_and_slide()
+	_handle_dash_wall_collision()
 
 	if not was_on_floor and is_on_floor() and pre_move_vertical_velocity <= -absf(tuning.hard_landing_speed_threshold):
 		var landing_speed: float = absf(pre_move_vertical_velocity)
@@ -413,6 +414,32 @@ func _spawn_dash_trail() -> void:
 	var tween := create_tween()
 	tween.tween_property(trail_material, "albedo_color:a", clamp(tuning.dash_trail_end_alpha, 0.0, 1.0), max(0.01, tuning.dash_trail_lifetime))
 	tween.tween_callback(trail.queue_free)
+
+func _handle_dash_wall_collision() -> void:
+	if dash_time_left <= 0.0 or not tuning.dash_cancel_on_wall_collision:
+		return
+	var threshold: float = clamp(tuning.dash_wall_collision_dot_threshold, 0.0, 1.0)
+	var dash_heading: Vector3 = Vector3(dash_direction.x, 0.0, dash_direction.z)
+	if dash_heading.length() <= 0.01:
+		return
+	dash_heading = dash_heading.normalized()
+	for i in range(get_slide_collision_count()):
+		var collision: KinematicCollision3D = get_slide_collision(i)
+		if collision == null:
+			continue
+		var wall_normal: Vector3 = collision.get_normal()
+		wall_normal.y = 0.0
+		if wall_normal.length() <= 0.01:
+			continue
+		wall_normal = wall_normal.normalized()
+		var impact_alignment: float = dash_heading.dot(-wall_normal)
+		if impact_alignment < threshold:
+			continue
+		dash_time_left = 0.0
+		velocity.x = 0.0
+		velocity.z = 0.0
+		dash_trail_spawn_left = 0.0
+		break
 
 func _update_camera_fov(delta: float) -> void:
 	var horizontal_speed := Vector3(velocity.x, 0.0, velocity.z).length()

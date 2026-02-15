@@ -50,6 +50,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Charge Recharge HUD (3D prototype)** — Modular HUD now surfaces next-charge refill timing, improving dash resource planning in high-pressure movement chains
 - **Charge-Bypass Dash Chaining (3D prototype)** — Data-driven toggle now allows available dash charges to bypass cooldown gating, enabling cleaner back-to-back reposition bursts while depleted charges still recover on timer
 - **Dash Steering Control (3D prototype)** — Data-driven in-dash steering (control + responsiveness tuning) allows limited course correction for more skill-expressive repositioning
+- **Dash Wall-Collision Cancel (3D prototype)** — Data-driven wall-impact detection now ends dash travel when colliding head-on with level geometry, preventing awkward wall-grind movement and improving close-quarters control readability
 - **Dash Trail Afterimage VFX (3D prototype)** — Data-driven dash trail toggles/timing/alpha now spawn short-lived afterimages during dashes, improving burst readability and movement impact without hardcoded scene effects
 - **Dash Invulnerability Window (3D prototype)** — Data-driven dash i-frame duration now grants a short post-activation safety window, setting up cleaner combat integration without hardcoded timings
 - **Air Jump HUD Readout (3D prototype)** — Modular HUD now shows remaining air jumps in real time, improving vertical mobility clarity during combat and traversal

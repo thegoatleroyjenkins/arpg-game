@@ -79,6 +79,8 @@ class_name PlayerTuning3D
 @export var dash_recent_input_memory_time: float = 0.2
 @export_range(0.0, 1.0, 0.01) var dash_steer_control: float = 0.35
 @export var dash_steer_responsiveness: float = 14.0
+@export var dash_cancel_on_wall_collision: bool = true
+@export_range(0.0, 1.0, 0.01) var dash_wall_collision_dot_threshold: float = 0.45
 
 @export_group("Dash VFX")
 @export var dash_trail_enabled: bool = true
