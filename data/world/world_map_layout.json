@@ -51,7 +51,8 @@
     { "id": "poi_hollowmere_chapel", "chunk": "chunk_mire_02", "visibility_score": 0.78 },
     { "id": "poi_rimegate_pass_camp", "chunk": "chunk_tundra_20", "visibility_score": 0.66 },
     { "id": "poi_charred_mill_hamlet", "chunk": "chunk_ashwood_00", "visibility_score": 0.88 },
-    { "id": "poi_vault_of_thorns", "chunk": "chunk_ashwood_10", "visibility_score": 0.95 }
+    { "id": "poi_vault_of_thorns", "chunk": "chunk_ashwood_10", "visibility_score": 0.95 },
+    { "id": "poi_the_garden", "chunk": "chunk_ashwood_00", "visibility_score": 0.99 }
   ],
   "notes": "MVP map intentionally compact; scale by adding chunk records and biome spawn rows."
 }

@@ -15,3 +15,8 @@
   - [ ] Inventory UI grid + drag/drop + equip/unequip integration.
   - [ ] Item tooltip/stat comparison panel.
   - [ ] Save/load persistence and schema versioning for inventory data.
+
+- [ ] Build **The Garden** as a major city hub players can travel to.
+  - [ ] Create city scene + district layout (market, quest square, crafting quarter).
+  - [ ] Set fast-travel/entry routing from early frontier zones.
+  - [ ] Place NPC Gnome as a permanent resident and city guide/quest giver.

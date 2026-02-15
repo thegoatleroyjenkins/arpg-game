@@ -36,12 +36,14 @@ INSERT OR REPLACE INTO poi (id, chunk_id, biome_id, poi_type, display_name, x, y
 ('poi_hollowmere_chapel','chunk_mire_02','mire_of_glass','shrine','Hollowmere Chapel',40,6,210,0.78,'hidden','["optional","puzzle"]'),
 ('poi_rimegate_pass_camp','chunk_tundra_20','frostbreak_tundra','camp','Rimegate Pass Camp',240,16,35,0.66,'hidden','["faction","contested"]'),
 ('poi_charred_mill_hamlet','chunk_ashwood_00','ashwood_frontier','town','Charred Mill Hamlet',22,8,22,0.88,'discovered','["hub","vendors"]'),
-('poi_vault_of_thorns','chunk_ashwood_10','ashwood_frontier','dungeon','Vault of Thorns',75,-6,135,0.95,'hidden','["dungeon","boss"]');
+('poi_vault_of_thorns','chunk_ashwood_10','ashwood_frontier','dungeon','Vault of Thorns',75,-6,135,0.95,'hidden','["dungeon","boss"]'),
+('poi_the_garden','chunk_ashwood_00','ashwood_frontier','city','The Garden',138,10,118,0.99,'discovered','["major_city","hub","capital"]');
 
 INSERT OR REPLACE INTO npc (id, display_name, faction_id, home_poi_id, role, disposition, flags_json) VALUES
 ('npc_warden_elyra','Warden Elyra','march_wardens','poi_charred_mill_hamlet','captain',0.35,'["quest_giver"]'),
 ('npc_synod_veren','Adept Veren','ember_synod','poi_charred_mill_hamlet','researcher',0.10,'["vendor_arcane"]'),
-('npc_miller_hob','Miller Hob','free_clans','poi_charred_mill_hamlet','civilian',0.25,'[]');
+('npc_miller_hob','Miller Hob','free_clans','poi_charred_mill_hamlet','civilian',0.25,'[]'),
+('npc_gnome','Gnome','free_clans','poi_the_garden','garden_keeper',0.55,'["quest_giver","city_guide"]');
 
 INSERT INTO npc_routine (npc_id, day_mask, start_hour, end_hour, activity, target_poi_id, priority) VALUES
 ('npc_warden_elyra','all',0,6,'sleep','poi_charred_mill_hamlet',1),
@@ -53,7 +55,10 @@ INSERT INTO npc_routine (npc_id, day_mask, start_hour, end_hour, activity, targe
 ('npc_synod_veren','all',18,24,'social','poi_charred_mill_hamlet',1),
 ('npc_miller_hob','all',0,6,'sleep','poi_charred_mill_hamlet',1),
 ('npc_miller_hob','all',6,17,'work','poi_charred_mill_hamlet',2),
-('npc_miller_hob','all',17,24,'social','poi_charred_mill_hamlet',1);
+('npc_miller_hob','all',17,24,'social','poi_charred_mill_hamlet',1),
+('npc_gnome','all',0,7,'sleep','poi_the_garden',1),
+('npc_gnome','all',7,18,'tend_gardens','poi_the_garden',2),
+('npc_gnome','all',18,24,'social','poi_the_garden',1);
 
 INSERT OR REPLACE INTO spawn_table (id, biome_id, encounter_type, enemy_archetype_id, weight, min_level, max_level) VALUES
 ('spawn_ashwood_bandit_ambush','ashwood_frontier','wilderness','bandit_raider',60,1,5),
