@@ -114,7 +114,10 @@ func _physics_process(delta: float) -> void:
 
 	var can_ground_jump := coyote_time_left > 0.0
 	var can_air_jump := not was_on_floor and air_jumps_left > 0
-	if jump_buffer_left > 0.0 and (can_ground_jump or can_air_jump) and _try_spend_stamina(tuning.jump_stamina_cost, "Jump"):
+	var jump_stamina_cost: float = max(0.0, tuning.jump_stamina_cost)
+	if can_air_jump and not can_ground_jump:
+		jump_stamina_cost *= max(1.0, tuning.air_jump_stamina_multiplier)
+	if jump_buffer_left > 0.0 and (can_ground_jump or can_air_jump) and _try_spend_stamina(jump_stamina_cost, "Jump"):
 		velocity.y = tuning.jump_velocity
 		_apply_sprint_jump_momentum_boost()
 		jump_buffer_left = 0.0

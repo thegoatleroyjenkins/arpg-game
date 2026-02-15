@@ -22,6 +22,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability
 - **Air Jump (3D prototype)** — Data-driven extra mid-air jump count enables cleaner vertical repositioning and more expressive traversal/combat routing
+- **Air Jump Stamina Scaling (3D prototype)** — Data-driven airborne jump stamina multiplier now increases air-jump cost versus grounded jumps, improving vertical mobility tradeoff clarity
 - **Jump Apex Hang Time (3D prototype)** — Data-driven apex gravity tuning softens gravity near jump peak for cleaner aerial control and better mid-air repositioning readability
 - **Sprint Jump Momentum Carry (3D prototype)** — Data-driven sprint-jump momentum boost and speed cap preserve forward flow when jumping out of sprint, improving traversal/combat movement continuity without hardcoded values
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
@@ -230,6 +231,7 @@ arpg-game/
 - ✅ Added data-driven impact-scaled hard-landing penalties (max penalty speed + min penalty multiplier) so recovery lockout, stamina cost, and landing camera impulse scale by fall severity instead of using a binary full-penalty landing model
 - ✅ Added data-driven 3D dash invulnerability duration tuning plus modular HUD i-frame readout wired to a new player dash-invulnerability signal, improving defensive timing clarity and combat-system integration readiness
 - ✅ Added data-driven 3D fall recovery safety reset (height + stamina/recovery penalties) so out-of-bounds falls respawn cleanly at the start anchor instead of risking softlocks
+- ✅ Added data-driven airborne jump stamina scaling (tunable air-jump multiplier) so mid-air jump chains carry a clearer stamina tradeoff than grounded jumps
 
 ## License
 
