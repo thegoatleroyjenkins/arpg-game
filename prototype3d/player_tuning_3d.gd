@@ -28,6 +28,10 @@ class_name PlayerTuning3D
 @export var turn_speed_degrees_per_second: float = 720.0
 @export var min_turn_speed_threshold: float = 0.1
 
+@export_group("Landing Feel")
+@export var hard_landing_speed_threshold: float = 12.0
+@export var hard_landing_recovery_time: float = 0.18
+
 @export_group("Stamina")
 @export var max_stamina: float = 100.0
 @export var sprint_stamina_per_second: float = 28.0

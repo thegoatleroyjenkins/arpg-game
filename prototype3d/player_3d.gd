@@ -29,6 +29,7 @@ var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
 var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
+var landing_recovery_left: float = 0.0
 
 func _ready() -> void:
 	look_target = global_position
@@ -94,6 +95,9 @@ func _physics_process(delta: float) -> void:
 			air_jumps_left -= 1
 			_emit_air_jumps_changed()
 
+	if landing_recovery_left > 0.0:
+		landing_recovery_left = max(0.0, landing_recovery_left - delta)
+
 	# Movement input
 	var input_vec := Vector2(
 		Input.get_axis("move_left", "move_right"),
@@ -102,6 +106,8 @@ func _physics_process(delta: float) -> void:
 	var move_dir := Vector3(input_vec.x, 0.0, input_vec.y)
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
+	if landing_recovery_left > 0.0:
+		move_dir = Vector3.ZERO
 
 	var dash_state_changed := false
 	if dash_cooldown_left > 0.0:
@@ -124,7 +130,7 @@ func _physics_process(delta: float) -> void:
 	if dash_state_changed:
 		_emit_dash_cooldown_changed()
 
-	if Input.is_action_just_pressed("dash"):
+	if landing_recovery_left <= 0.0 and Input.is_action_just_pressed("dash"):
 		if _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 			_use_stamina(tuning.dash_stamina_cost)
 			_start_dash(move_dir)
@@ -132,7 +138,7 @@ func _physics_process(delta: float) -> void:
 			dash_buffer_left = tuning.dash_input_buffer_time
 			buffered_dash_direction = move_dir
 
-	if dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
+	if landing_recovery_left <= 0.0 and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 		_use_stamina(tuning.dash_stamina_cost)
 		_start_dash(buffered_dash_direction)
 		dash_buffer_left = 0.0
@@ -144,8 +150,9 @@ func _physics_process(delta: float) -> void:
 		velocity.x = dash_direction.x * tuning.dash_speed
 		velocity.z = dash_direction.z * tuning.dash_speed
 	else:
+		var is_recovering := landing_recovery_left > 0.0
 		var is_moving := move_dir.length() > 0.01
-		var is_trying_to_sprint := Input.is_action_pressed("sprint") and is_moving
+		var is_trying_to_sprint := Input.is_action_pressed("sprint") and is_moving and not is_recovering
 		var is_sprinting := false
 		var sprint_exhaust_threshold: float = max(0.0, tuning.sprint_exhaustion_threshold)
 		var sprint_resume_threshold: float = max(sprint_exhaust_threshold, tuning.sprint_resume_threshold)
@@ -157,7 +164,7 @@ func _physics_process(delta: float) -> void:
 			if stamina <= sprint_exhaust_threshold:
 				sprint_exhausted = true
 		else:
-			_regen_stamina(delta, is_moving)
+			_regen_stamina(delta, is_moving and not is_recovering)
 
 		var ramp_up: float = max(0.01, tuning.sprint_ramp_up_per_second)
 		var ramp_down: float = max(0.01, tuning.sprint_ramp_down_per_second)
@@ -174,11 +181,17 @@ func _physics_process(delta: float) -> void:
 		var decel := tuning.ground_deceleration * control_scale
 		var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
 		var rate := accel if move_dir.length() > 0.01 else decel
+		if is_recovering:
+			rate = decel
 		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, rate * delta)
 		velocity.x = horizontal_velocity.x
 		velocity.z = horizontal_velocity.z
 
+	var pre_move_vertical_velocity := velocity.y
 	move_and_slide()
+
+	if not was_on_floor and is_on_floor() and pre_move_vertical_velocity <= -absf(tuning.hard_landing_speed_threshold):
+		landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.hard_landing_recovery_time))
 
 	# Face movement direction with data-driven turn speed smoothing.
 	var horizontal_vel := Vector3(velocity.x, 0.0, velocity.z)
