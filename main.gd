@@ -1,0 +1,266 @@
+extends Node2D
+
+@onready var player = $Player
+@onready var camera = $Camera2D
+@onready var ui = $UI
+@onready var stats_label = $UI/StatsLabel
+
+var world_size = Vector2(2000, 2000)
+var enemies_remaining: int = 0
+
+# Loot drop chances
+var loot_chance_common: float = 0.4
+var loot_chance_uncommon: float = 0.25
+var loot_chance_rare: float = 0.1
+
+func _ready():
+	# Setup camera
+	camera.position = player.position
+	camera.limit_left = 0
+	camera.limit_top = 0
+	camera.limit_right = world_size.x
+	camera.limit_bottom = world_size.y
+	
+	# Generate world
+	_generate_floor()
+	_generate_enemies(20)  # More enemies for variety
+	_generate_items(10)
+	_generate_equipment(5)
+	
+	update_stats()
+
+func _process(_delta):
+	camera.position = camera.position.lerp(player.position, 0.1)
+
+func _generate_floor():
+	# Create tile map for floor
+	var tile_map = TileMapLayer.new()
+	tile_map.name = "Floor"
+	add_child(tile_map)
+	
+	# Use default tileset or create simple tiles
+	var terrain = TerrainTileSource.new()
+	tile_map.tile_set = terrain.create_tile_set()
+
+func _generate_enemies(count):
+	enemies_remaining = count
+	
+	for i in range(count):
+		var enemy = preload("res://enemy.tscn").instantiate()
+		
+		# Random enemy type with weighted distribution
+		var rand = randf()
+		if rand < 0.45:
+			enemy.enemy_type = Enemy.EnemyType.GRUNT
+		elif rand < 0.75:
+			enemy.enemy_type = Enemy.EnemyType.FAST
+		elif rand < 0.90:
+			enemy.enemy_type = Enemy.EnemyType.TANK
+		else:
+			enemy.enemy_type = Enemy.EnemyType.RANGED
+		
+		# Position away from player start
+		var valid_position = false
+		var pos = Vector2.ZERO
+		var attempts = 0
+		
+		while not valid_position and attempts < 50:
+			pos = Vector2(
+				randf_range(200, world_size.x - 200),
+				randf_range(200, world_size.y - 200)
+			)
+			# Don't spawn too close to player
+			if pos.distance_to(player.position) > 300:
+				valid_position = true
+			attempts += 1
+		
+		enemy.position = pos
+		enemy.set_player(player)
+		enemy.connect("died", _on_enemy_died)
+		add_child(enemy)
+
+func _generate_items(count):
+	for i in range(count):
+		var item = preload("res://item.tscn").instantiate()
+		
+		# Mix of health and XP items
+		if randf() < 0.7:
+			item.item_type = "health_potion"
+			item.value = randi_range(15, 40)
+		else:
+			item.item_type = "xp_orb"
+			item.value = randi_range(10, 30)
+		
+		item.position = Vector2(
+			randf_range(100, world_size.x - 100),
+			randf_range(100, world_size.y - 100)
+		)
+		add_child(item)
+
+func _generate_equipment(count):
+	var equipment_scene = preload("res://equipment.tscn")
+	
+	# Predefined equipment templates with rarity
+	var equipment_templates = [
+		# Common (white/gray)
+		{"type": 0, "name": "Rusty Sword", "dmg": 5, "def": 0, "hp": 0, "rarity": 0, "color": Color.GRAY},
+		{"type": 1, "name": "Tattered Cloth", "dmg": 0, "def": 5, "hp": 10, "rarity": 0, "color": Color.GRAY},
+		{"type": 2, "name": "Wooden Ring", "dmg": 0, "def": 2, "hp": 5, "rarity": 0, "color": Color.GRAY},
+		
+		# Uncommon (green)
+		{"type": 0, "name": "Iron Sword", "dmg": 10, "def": 0, "hp": 0, "rarity": 1, "color": Color.LIME_GREEN},
+		{"type": 0, "name": "Steel Blade", "dmg": 20, "def": 0, "hp": 0, "rarity": 1, "color": Color.LIME_GREEN},
+		{"type": 1, "name": "Leather Armor", "dmg": 0, "def": 10, "hp": 20, "rarity": 1, "color": Color.LIME_GREEN},
+		{"type": 1, "name": "Chain Mail", "dmg": 0, "def": 25, "hp": 30, "rarity": 1, "color": Color.LIME_GREEN},
+		{"type": 2, "name": "Ring of Health", "dmg": 0, "def": 5, "hp": 40, "rarity": 1, "color": Color.LIME_GREEN},
+		{"type": 2, "name": "Amulet of Power", "dmg": 15, "def": 0, "hp": 10, "rarity": 1, "color": Color.LIME_GREEN},
+		
+		# Rare (blue/purple)
+		{"type": 0, "name": "Flame Sword", "dmg": 35, "def": 0, "hp": 10, "rarity": 2, "color": Color.ORANGE_RED},
+		{"type": 0, "name": "Shadow Dagger", "dmg": 45, "def": 5, "hp": 5, "rarity": 2, "color": Color.PURPLE},
+		{"type": 1, "name": "Dragon Plate", "dmg": 5, "def": 50, "hp": 50, "rarity": 2, "color": Color.GOLD},
+		{"type": 1, "name": "Mithril Armor", "dmg": 10, "def": 40, "hp": 60, "rarity": 2, "color": Color.CYAN},
+		{"type": 2, "name": "Lucky Charm", "dmg": 5, "def": 5, "hp": 25, "rarity": 2, "color": Color.GOLD},
+		{"type": 2, "name": "Ring of the Gods", "dmg": 25, "def": 15, "hp": 30, "rarity": 2, "color": Color.PURPLE},
+	]
+	
+	for i in range(count):
+		var eq = equipment_scene.instantiate()
+		
+		# Pick based on rarity weighting
+		var rand = randf()
+		var rarity_filter = 0
+		if rand < loot_chance_common:
+			rarity_filter = 0  # Common
+		elif rand < loot_chance_common + loot_chance_uncommon:
+			rarity_filter = 1  # Uncommon
+		elif rand < loot_chance_common + loot_chance_uncommon + loot_chance_rare:
+			rarity_filter = 2  # Rare
+		else:
+			rarity_filter = 0  # Fallback to common
+		
+		# Filter templates by rarity
+		var valid_templates = []
+		for template in equipment_templates:
+			if template["rarity"] == rarity_filter:
+				valid_templates.append(template)
+		
+		# Pick random from valid templates
+		var template = equipment_templates[randi() % equipment_templates.size()]
+		if valid_templates.size() > 0:
+			template = valid_templates[randi() % valid_templates.size()]
+		
+		eq.equipment_type = template["type"]
+		eq.item_name = template["name"]
+		eq.damage_bonus = template["dmg"]
+		eq.defense_bonus = template["def"]
+		eq.health_bonus = template["hp"]
+		
+		# Color sprite by rarity
+		if eq.has_node("Sprite2D"):
+			eq.get_node("Sprite2D").modulate = template["color"]
+		
+		eq.position = Vector2(
+			randf_range(100, world_size.x - 100),
+			randf_range(100, world_size.y - 100)
+		)
+		add_child(eq)
+
+func _on_enemy_died(enemy, position):
+	enemies_remaining -= 1
+	player.gain_xp(enemy.xp_value)
+	
+	# Drop loot from enemy
+	_spawn_loot_drop(position, enemy.enemy_type)
+	
+	update_stats()
+	
+	# Check win condition
+	if enemies_remaining <= 0:
+		_show_victory_message()
+
+func _spawn_loot_drop(pos: Vector2, enemy_type: Enemy.EnemyType):
+	var rand = randf()
+	
+	# Higher chance for loot from better enemies
+	var drop_chance = 0.3
+	match enemy_type:
+		Enemy.EnemyType.FAST: drop_chance = 0.4
+		Enemy.EnemyType.TANK: drop_chance = 0.5
+		Enemy.EnemyType.RANGED: drop_chance = 0.45
+	
+	if rand > drop_chance:
+		return  # No drop
+	
+	# Determine what type of drop
+	var drop_type = randf()
+	
+	if drop_type < 0.5:
+		# Health potion
+		var item = preload("res://item.tscn").instantiate()
+		item.item_type = "health_potion"
+		item.value = randi_range(10, 30)
+		item.position = pos + Vector2(randi_range(-20, 20), randi_range(-20, 20))
+		add_child(item)
+	else:
+		# Equipment drop (rare from enemies)
+		var equipment_scene = preload("res://equipment.tscn")
+		var eq = equipment_scene.instantiate()
+		
+		# Generate scaled equipment based on enemy type
+		var rarity_boost = 0
+		match enemy_type:
+			Enemy.EnemyType.TANK: rarity_boost = 1
+			Enemy.EnemyType.RANGED: rarity_boost = 1
+		
+		var templates = [
+			{"type": 0, "name": "Iron Sword", "dmg": 10, "def": 0, "hp": 0},
+			{"type": 1, "name": "Leather Armor", "dmg": 0, "def": 10, "hp": 20},
+			{"type": 2, "name": "Health Ring", "dmg": 0, "def": 3, "hp": 25},
+		]
+		
+		var template = templates[randi() % templates.size()]
+		eq.equipment_type = template["type"]
+		eq.item_name = template["name"]
+		eq.damage_bonus = template["dmg"]
+		eq.defense_bonus = template["def"]
+		eq.health_bonus = template["hp"]
+		eq.position = pos + Vector2(randi_range(-20, 20), randi_range(-20, 20))
+		add_child(eq)
+
+func _show_victory_message():
+	var victory_label = Label.new()
+	victory_label.text = "VICTORY!\nAll Enemies Defeated!"
+	victory_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	victory_label.position = Vector2(540, 300)
+	victory_label.add_theme_font_size_override("font_size", 32)
+	victory_label.modulate = Color.GOLD
+	ui.add_child(victory_label)
+
+func update_stats():
+	# Show equipment in stats
+	var weapon_name = "None"
+	var armor_name = "None"
+	var accessory_name = "None"
+	
+	if player.weapon:
+		weapon_name = player.weapon.item_name
+	if player.armor:
+		armor_name = player.armor.item_name
+	if player.accessory:
+		accessory_name = player.accessory.item_name
+	
+	stats_label.text = "Level: %d\nXP: %d/%d\nHealth: %d/%d\nEnemies: %d\n\nEquipment:\n- Weapon: %s (+%d dmg)\n- Armor: %s (+%d def)\n- Accessory: %s (+%d hp)" % [
+		player.level,
+		player.xp,
+		player.xp_to_next_level,
+		player.current_health,
+		player.total_max_health,
+		enemies_remaining,
+		weapon_name,
+		player.damage_bonus,
+		armor_name,
+		player.defense_bonus,
+		accessory_name,
+		player.health_bonus
+	]
