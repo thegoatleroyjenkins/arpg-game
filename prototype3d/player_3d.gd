@@ -39,6 +39,8 @@ var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
 var camera_impulse_offset: Vector3 = Vector3.ZERO
 var landing_recovery_left: float = 0.0
+var recent_move_direction: Vector3 = Vector3.ZERO
+var recent_move_direction_left: float = 0.0
 var stamina_action_warning_cooldown_left: float = 0.0
 var dash_invulnerability_left: float = 0.0
 var sprinting_now: bool = false
@@ -138,6 +140,7 @@ func _physics_process(delta: float) -> void:
 		Input.get_axis("move_up", "move_down")
 	)
 	var move_dir := _resolve_move_direction(input_vec)
+	_update_recent_move_direction(move_dir, delta)
 	if landing_recovery_left > 0.0:
 		move_dir = Vector3.ZERO
 
@@ -301,6 +304,21 @@ func _resolve_move_direction(input_vec: Vector2) -> Vector3:
 		direction = direction.normalized()
 	return direction
 
+func _update_recent_move_direction(move_dir: Vector3, delta: float) -> void:
+	recent_move_direction_left = max(0.0, recent_move_direction_left - delta)
+	if move_dir.length() <= 0.01:
+		return
+	recent_move_direction = move_dir.normalized()
+	recent_move_direction.y = 0.0
+	recent_move_direction_left = max(0.0, tuning.dash_recent_input_memory_time)
+
+func _resolve_dash_start_direction(move_dir: Vector3) -> Vector3:
+	if move_dir.length() > 0.01:
+		return move_dir.normalized()
+	if tuning.dash_use_recent_input_direction and recent_move_direction_left > 0.0 and recent_move_direction.length() > 0.01:
+		return recent_move_direction.normalized()
+	return move_dir
+
 func _is_jump_just_pressed() -> bool:
 	if InputMap.has_action(ACTION_JUMP):
 		return Input.is_action_just_pressed(ACTION_JUMP)
@@ -331,7 +349,7 @@ func _start_dash(move_dir: Vector3) -> void:
 	if landing_recovery_left > 0.0:
 		landing_recovery_left = 0.0
 		_emit_landing_recovery_changed()
-	dash_direction = move_dir
+	dash_direction = _resolve_dash_start_direction(move_dir)
 	if dash_direction.length() <= 0.01:
 		dash_direction = -global_transform.basis.z
 	dash_direction.y = 0.0

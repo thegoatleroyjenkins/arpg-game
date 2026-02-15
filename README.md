@@ -32,6 +32,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Low-Stamina Action Feedback (3D prototype)** — Data-driven warning timing/cooldown now surface short HUD alerts when jump or dash fails from low stamina, improving input clarity during high-pressure movement chains
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
 - **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
+- **Recent Input Dash Direction Memory (3D prototype)** — Data-driven dash direction memory now uses your most recent movement input for a short window when dashing from neutral, preserving intended reposition direction during stop-and-go combat movement
 - **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
@@ -185,6 +186,7 @@ arpg-game/
 ## Recent Updates
 
 - ✅ Added data-driven 3D movement input deadzone remapping (tunable deadzone with normalized post-threshold scaling) to reduce gamepad drift while preserving low-tilt precision
+- ✅ Added data-driven dash recent-input direction memory (toggle + memory window tuning) so neutral-position dashes can still follow your latest movement intent for cleaner stop-and-go repositioning
 - ✅ Added data-driven low-stamina pickup magnet tuning (radius/speed/missing-stamina threshold) so nearby stamina orbs pull toward resource-starved players for cleaner recovery routing under pressure
 - ✅ Added data-driven 3D camera-relative movement toggle (camera-forward/right mapping) so movement intent remains consistent with camera framing and is easier to tune per-scene
 - ✅ Added equipment system (weapons, armor, accessories)
