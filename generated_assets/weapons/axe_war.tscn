@@ -1,17 +1,17 @@
 [gd_scene load_steps=6 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4uqfu"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vexo4"]
 albedo_color = Color(0.368627, 0.27451, 0.192157, 1)
 metallic = 0.15
 roughness = 0.65
 emission_energy_multiplier = 0.0
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_f8iow"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_3iby0"]
 top_radius = 0.04
 bottom_radius = 0.045
 height = 0.9
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_egqup"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d6of1"]
 albedo_color = Color(0.431373, 0.811765, 0.478431, 1)
 metallic = 0.15
 roughness = 0.2
@@ -19,24 +19,24 @@ emission_enabled = true
 emission = Color(0.180392, 0.490196, 0.196078, 1)
 emission_energy_multiplier = 0.2
 
-[sub_resource type="BoxMesh" id="BoxMesh_astcv"]
+[sub_resource type="BoxMesh" id="BoxMesh_dcduo"]
 size = Vector3(0.2, 0.05, 0.1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_5opxr"]
+[sub_resource type="BoxMesh" id="BoxMesh_ycr7k"]
 size = Vector3(0.62, 0.4725, 0.08)
 
 [node name="AxeWar" type="Node3D"]
 
 [node name="Handle" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_4uqfu")
-mesh = SubResource("CylinderMesh_f8iow")
+material_override = SubResource("StandardMaterial3D_vexo4")
+mesh = SubResource("CylinderMesh_3iby0")
 
 [node name="Guard" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
-material_override = SubResource("StandardMaterial3D_egqup")
-mesh = SubResource("BoxMesh_astcv")
+material_override = SubResource("StandardMaterial3D_d6of1")
+mesh = SubResource("BoxMesh_dcduo")
 
 [node name="Blade" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.279, 0.405, 0)
-material_override = SubResource("StandardMaterial3D_egqup")
-mesh = SubResource("BoxMesh_5opxr")
+material_override = SubResource("StandardMaterial3D_d6of1")
+mesh = SubResource("BoxMesh_ycr7k")

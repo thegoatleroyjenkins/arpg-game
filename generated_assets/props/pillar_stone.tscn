@@ -1,17 +1,17 @@
 [gd_scene load_steps=4 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6foqy"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r2avg"]
 albedo_color = Color(0.452941, 0.479412, 0.508824, 1)
 metallic = 0.15
 roughness = 0.85
 emission_energy_multiplier = 0.0
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_0kjmg"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_ccfrg"]
 top_radius = 0.28
 bottom_radius = 0.3024
 height = 2.1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_m2fdg"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_rsoux"]
 top_radius = 0.336
 bottom_radius = 0.336
 height = 0.16
@@ -20,10 +20,10 @@ height = 0.16
 
 [node name="@MeshInstance3D@8" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
-material_override = SubResource("StandardMaterial3D_6foqy")
-mesh = SubResource("CylinderMesh_0kjmg")
+material_override = SubResource("StandardMaterial3D_r2avg")
+mesh = SubResource("CylinderMesh_ccfrg")
 
 [node name="@MeshInstance3D@9" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.18, 0)
-material_override = SubResource("StandardMaterial3D_6foqy")
-mesh = SubResource("CylinderMesh_m2fdg")
+material_override = SubResource("StandardMaterial3D_r2avg")
+mesh = SubResource("CylinderMesh_rsoux")

@@ -1,17 +1,17 @@
 [gd_scene load_steps=6 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_12h5l"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4uawb"]
 albedo_color = Color(0.368627, 0.27451, 0.192157, 1)
 metallic = 0.15
 roughness = 0.65
 emission_energy_multiplier = 0.0
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_l862o"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_cjekf"]
 top_radius = 0.04
 bottom_radius = 0.045
 height = 0.58
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l714r"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x0sym"]
 albedo_color = Color(0.431373, 0.811765, 0.478431, 1)
 metallic = 0.15
 roughness = 0.2
@@ -19,24 +19,24 @@ emission_enabled = true
 emission = Color(0.180392, 0.490196, 0.196078, 1)
 emission_energy_multiplier = 0.2
 
-[sub_resource type="BoxMesh" id="BoxMesh_ew57x"]
+[sub_resource type="BoxMesh" id="BoxMesh_y6nf0"]
 size = Vector3(0.42, 0.05, 0.1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ye00s"]
+[sub_resource type="BoxMesh" id="BoxMesh_sdmc5"]
 size = Vector3(0.13, 1.45, 0.06)
 
 [node name="SwordKnight" type="Node3D"]
 
 [node name="Handle" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_12h5l")
-mesh = SubResource("CylinderMesh_l862o")
+material_override = SubResource("StandardMaterial3D_4uawb")
+mesh = SubResource("CylinderMesh_cjekf")
 
 [node name="Guard" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.24, 0)
-material_override = SubResource("StandardMaterial3D_l714r")
-mesh = SubResource("BoxMesh_ew57x")
+material_override = SubResource("StandardMaterial3D_x0sym")
+mesh = SubResource("BoxMesh_y6nf0")
 
 [node name="Blade" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.985, 0)
-material_override = SubResource("StandardMaterial3D_l714r")
-mesh = SubResource("BoxMesh_ye00s")
+material_override = SubResource("StandardMaterial3D_x0sym")
+mesh = SubResource("BoxMesh_sdmc5")

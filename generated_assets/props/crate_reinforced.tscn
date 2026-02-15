@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ajwxe"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qq3w3"]
 albedo_color = Color(0.323529, 0.608824, 0.358824, 1)
 metallic = 0.15
 roughness = 0.85
@@ -8,39 +8,39 @@ emission_enabled = true
 emission = Color(0.180392, 0.490196, 0.196078, 1)
 emission_energy_multiplier = 0.04
 
-[sub_resource type="BoxMesh" id="BoxMesh_38unu"]
+[sub_resource type="BoxMesh" id="BoxMesh_cd8j0"]
 size = Vector3(1.2, 1.1, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4ngev"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5pos8"]
 albedo_color = Color(0.227451, 0.247059, 0.27451, 1)
 metallic = 0.15
 roughness = 0.3
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_lolwk"]
+[sub_resource type="BoxMesh" id="BoxMesh_o5yd8"]
 size = Vector3(1.22, 0.08, 0.08)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dqcvr"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mvt1a"]
 albedo_color = Color(0.227451, 0.247059, 0.27451, 1)
 metallic = 0.15
 roughness = 0.3
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_ew1nc"]
+[sub_resource type="BoxMesh" id="BoxMesh_vbdmv"]
 size = Vector3(1.22, 0.08, 0.08)
 
 [node name="CrateReinforced" type="Node3D"]
 
 [node name="@MeshInstance3D@5" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_ajwxe")
-mesh = SubResource("BoxMesh_38unu")
+material_override = SubResource("StandardMaterial3D_qq3w3")
+mesh = SubResource("BoxMesh_cd8j0")
 
 [node name="@MeshInstance3D@6" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.275, 0.45)
-material_override = SubResource("StandardMaterial3D_4ngev")
-mesh = SubResource("BoxMesh_lolwk")
+material_override = SubResource("StandardMaterial3D_5pos8")
+mesh = SubResource("BoxMesh_o5yd8")
 
 [node name="@MeshInstance3D@7" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.275, 0.45)
-material_override = SubResource("StandardMaterial3D_dqcvr")
-mesh = SubResource("BoxMesh_ew1nc")
+material_override = SubResource("StandardMaterial3D_mvt1a")
+mesh = SubResource("BoxMesh_vbdmv")

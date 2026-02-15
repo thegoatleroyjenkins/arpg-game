@@ -1,43 +1,43 @@
 [gd_scene load_steps=7 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i8t2w"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i57dq"]
 albedo_color = Color(0.452941, 0.479412, 0.508824, 1)
 metallic = 0.15
 roughness = 0.85
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_2dpym"]
+[sub_resource type="BoxMesh" id="BoxMesh_4l0i3"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3s6ds"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fi66f"]
 albedo_color = Color(0.227451, 0.247059, 0.27451, 1)
 metallic = 0.15
 roughness = 0.3
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_boyqx"]
+[sub_resource type="BoxMesh" id="BoxMesh_dluy4"]
 size = Vector3(1.02, 0.08, 0.08)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_80ncy"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xknil"]
 albedo_color = Color(0.227451, 0.247059, 0.27451, 1)
 metallic = 0.15
 roughness = 0.3
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_x6e0f"]
+[sub_resource type="BoxMesh" id="BoxMesh_p3a55"]
 size = Vector3(1.02, 0.08, 0.08)
 
 [node name="CrateOak" type="Node3D"]
 
 [node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_i8t2w")
-mesh = SubResource("BoxMesh_2dpym")
+material_override = SubResource("StandardMaterial3D_i57dq")
+mesh = SubResource("BoxMesh_4l0i3")
 
 [node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0.45)
-material_override = SubResource("StandardMaterial3D_3s6ds")
-mesh = SubResource("BoxMesh_boyqx")
+material_override = SubResource("StandardMaterial3D_fi66f")
+mesh = SubResource("BoxMesh_dluy4")
 
 [node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0.45)
-material_override = SubResource("StandardMaterial3D_80ncy")
-mesh = SubResource("BoxMesh_x6e0f")
+material_override = SubResource("StandardMaterial3D_xknil")
+mesh = SubResource("BoxMesh_p3a55")

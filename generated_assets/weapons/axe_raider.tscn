@@ -1,40 +1,40 @@
 [gd_scene load_steps=6 format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_auvds"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_un1u6"]
 albedo_color = Color(0.368627, 0.27451, 0.192157, 1)
 metallic = 0.15
 roughness = 0.65
 emission_energy_multiplier = 0.0
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_fpjoj"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_2adyc"]
 top_radius = 0.04
 bottom_radius = 0.045
 height = 0.82
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5w2gx"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eshce"]
 albedo_color = Color(0.603922, 0.639216, 0.678431, 1)
 metallic = 0.15
 roughness = 0.2
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_tdj3u"]
+[sub_resource type="BoxMesh" id="BoxMesh_8jiya"]
 size = Vector3(0.18, 0.05, 0.1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ag3ue"]
+[sub_resource type="BoxMesh" id="BoxMesh_6gk8k"]
 size = Vector3(0.55, 0.4275, 0.08)
 
 [node name="AxeRaider" type="Node3D"]
 
 [node name="Handle" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_auvds")
-mesh = SubResource("CylinderMesh_fpjoj")
+material_override = SubResource("StandardMaterial3D_un1u6")
+mesh = SubResource("CylinderMesh_2adyc")
 
 [node name="Guard" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36, 0)
-material_override = SubResource("StandardMaterial3D_5w2gx")
-mesh = SubResource("BoxMesh_tdj3u")
+material_override = SubResource("StandardMaterial3D_eshce")
+mesh = SubResource("BoxMesh_8jiya")
 
 [node name="Blade" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2475, 0.369, 0)
-material_override = SubResource("StandardMaterial3D_5w2gx")
-mesh = SubResource("BoxMesh_ag3ue")
+material_override = SubResource("StandardMaterial3D_eshce")
+mesh = SubResource("BoxMesh_6gk8k")

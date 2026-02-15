@@ -21,6 +21,8 @@ This project now includes an **offline procedural asset generator** for rapid, c
   - 6 environment props (crates, pillars, rocks)
 - `generated_assets/pickups/`
   - 3 pickup orbs (common/uncommon/rare)
+- `generated_assets/characters/`
+  - 1 player placeholder mesh (`player_knight.tscn`)
 
 ## Run
 

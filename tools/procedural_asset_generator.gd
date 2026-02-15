@@ -4,6 +4,7 @@ const OUTPUT_ROOT := "res://generated_assets"
 const WEAPON_DIR := OUTPUT_ROOT + "/weapons"
 const PROP_DIR := OUTPUT_ROOT + "/props"
 const PICKUP_DIR := OUTPUT_ROOT + "/pickups"
+const CHARACTER_DIR := OUTPUT_ROOT + "/characters"
 
 const RARITY_STYLE := {
 	"common": {
@@ -29,10 +30,12 @@ func _init() -> void:
 	_ensure_dir(WEAPON_DIR)
 	_ensure_dir(PROP_DIR)
 	_ensure_dir(PICKUP_DIR)
+	_ensure_dir(CHARACTER_DIR)
 
 	_generate_weapons()
 	_generate_props()
 	_generate_pickups()
+	_generate_characters()
 
 	print("[procgen] Done.")
 	quit()
@@ -187,6 +190,74 @@ func _generate_pickups() -> void:
 
 		_assign_owners(root, root)
 		_save_scene(root, "%s/%s.tscn" % [PICKUP_DIR, def["name"]])
+
+func _generate_characters() -> void:
+	# Phase-1 hero placeholder: readable silhouette, simple materials, game-ready scene file.
+	var root := Node3D.new()
+	root.name = "PlayerKnight"
+
+	var armor_mat := _make_material(Color("#4F5D75"), Color("#223047"), 0.1, 0.5)
+	var cloth_mat := _make_material(Color("#9A3E5A"), Color.BLACK, 0.0, 0.75)
+	var skin_mat := _make_material(Color("#E6C7A8"), Color.BLACK, 0.0, 0.9)
+	var accent_mat := _make_material(Color("#7AB7FF"), Color("#2A6BFF"), 0.25, 0.25)
+
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	var body_mesh := CapsuleMesh.new()
+	body_mesh.radius = 0.33
+	body_mesh.height = 1.05
+	body.mesh = body_mesh
+	body.material_override = armor_mat
+	body.position = Vector3(0.0, 1.15, 0.0)
+	root.add_child(body)
+
+	var head := MeshInstance3D.new()
+	head.name = "Head"
+	var head_mesh := SphereMesh.new()
+	head_mesh.radius = 0.24
+	head_mesh.height = 0.48
+	head.mesh = head_mesh
+	head.material_override = skin_mat
+	head.position = Vector3(0.0, 1.95, 0.0)
+	root.add_child(head)
+
+	var shoulder_left := MeshInstance3D.new()
+	shoulder_left.name = "ShoulderLeft"
+	var shoulder_mesh := SphereMesh.new()
+	shoulder_mesh.radius = 0.17
+	shoulder_mesh.height = 0.34
+	shoulder_left.mesh = shoulder_mesh
+	shoulder_left.material_override = armor_mat
+	shoulder_left.position = Vector3(-0.33, 1.45, 0.0)
+	root.add_child(shoulder_left)
+
+	var shoulder_right := MeshInstance3D.new()
+	shoulder_right.name = "ShoulderRight"
+	shoulder_right.mesh = shoulder_mesh.duplicate()
+	shoulder_right.material_override = armor_mat
+	shoulder_right.position = Vector3(0.33, 1.45, 0.0)
+	root.add_child(shoulder_right)
+
+	var cape := MeshInstance3D.new()
+	cape.name = "Cape"
+	var cape_mesh := BoxMesh.new()
+	cape_mesh.size = Vector3(0.62, 0.9, 0.06)
+	cape.mesh = cape_mesh
+	cape.material_override = cloth_mat
+	cape.position = Vector3(0.0, 1.2, 0.24)
+	root.add_child(cape)
+
+	var chest_accent := MeshInstance3D.new()
+	chest_accent.name = "ChestAccent"
+	var accent_mesh := BoxMesh.new()
+	accent_mesh.size = Vector3(0.2, 0.22, 0.06)
+	chest_accent.mesh = accent_mesh
+	chest_accent.material_override = accent_mat
+	chest_accent.position = Vector3(0.0, 1.25, -0.22)
+	root.add_child(chest_accent)
+
+	_assign_owners(root, root)
+	_save_scene(root, "%s/player_knight.tscn" % CHARACTER_DIR)
 
 func _make_material(albedo: Color, emission: Color, emission_energy: float, roughness: float) -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
