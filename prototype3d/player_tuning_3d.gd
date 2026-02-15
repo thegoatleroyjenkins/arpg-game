@@ -84,6 +84,9 @@ class_name PlayerTuning3D
 @export_range(0.0, 1.0, 0.01) var light_attack_lunge_control_multiplier: float = 0.35
 @export_range(0.0, 1.0, 0.01) var light_attack_cleave_falloff_per_target: float = 0.2
 @export_range(0.1, 1.0, 0.01) var light_attack_cleave_min_multiplier: float = 0.5
+@export var light_attack_backstab_enabled: bool = true
+@export_range(0.0, 1.0, 0.01) var light_attack_backstab_dot_threshold: float = 0.35
+@export_range(1.0, 3.0, 0.01) var light_attack_backstab_damage_multiplier: float = 1.25
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0

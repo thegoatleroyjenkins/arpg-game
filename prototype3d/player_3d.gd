@@ -1086,16 +1086,37 @@ func _try_light_attack() -> bool:
 	for i in range(targets.size()):
 		var target: Node3D = targets[i]
 		var cleave_multiplier: float = max(cleave_min_multiplier, 1.0 - (cleave_falloff * float(i)))
+		var positional_multiplier: float = _get_light_attack_positional_multiplier(target)
 		damage_resolver.request_damage({
 			"source": self,
 			"target": target,
-			"base_damage": max(0.0, light_attack_damage * cleave_multiplier),
+			"base_damage": max(0.0, light_attack_damage * cleave_multiplier * positional_multiplier),
 			"damage_type": "physical",
 			"crit_chance": clamp(light_attack_crit_chance, 0.0, 1.0),
 			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
-			"tags": PackedStringArray(["player", "light_attack"]),
+			"tags": PackedStringArray(["player", "light_attack", "backstab"] if positional_multiplier > 1.0 else ["player", "light_attack"]),
 		})
 	return true
+
+func _get_light_attack_positional_multiplier(target: Node3D) -> float:
+	if not tuning.light_attack_backstab_enabled:
+		return 1.0
+	if not is_instance_valid(target):
+		return 1.0
+	var to_attacker: Vector3 = global_position - target.global_position
+	to_attacker.y = 0.0
+	if to_attacker.length() <= 0.01:
+		return 1.0
+	to_attacker = to_attacker.normalized()
+	var target_forward: Vector3 = -target.global_transform.basis.z
+	target_forward.y = 0.0
+	if target_forward.length() <= 0.01:
+		return 1.0
+	target_forward = target_forward.normalized()
+	var backstab_alignment: float = target_forward.dot(to_attacker)
+	if backstab_alignment > -clamp(tuning.light_attack_backstab_dot_threshold, 0.0, 1.0):
+		return 1.0
+	return max(1.0, tuning.light_attack_backstab_damage_multiplier)
 
 func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 	var candidates: Array[Dictionary] = []
