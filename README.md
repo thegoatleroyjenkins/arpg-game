@@ -50,6 +50,7 @@ This repo uses a single GitHub Action (`Build + Release ARPG`) that now runs **e
 - Auto-increments version tags in this format: `v0.0.02`, `v0.0.03`, ...
 - Supports legacy previous version format `v0.0.0.1` (next becomes `v0.0.02`)
 - Runs preflight checks (Godot binary, export presets, headless smoke test) to troubleshoot failures faster
+- Bootstraps Godot export templates in CI to prevent missing-template export failures
 
 You can also trigger it manually (with `gh` authenticated):
 

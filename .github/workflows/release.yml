@@ -60,6 +60,28 @@ jobs:
           grep -q 'name="Linux"' export_presets.cfg
           echo "Export presets look good."
 
+      - name: Install export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          GODOT_VERSION="4.2.1"
+          TEMPLATE_VERSION="4.2.1.stable"
+          TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
+          mkdir -p "$TEMPLATES_DIR"
+
+          curl -fsSL -o /tmp/godot_templates.tpz \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+
+          unzip -o -q /tmp/godot_templates.tpz -d "$TEMPLATES_DIR"
+
+          # Godot may look either in .../4.2.1.stable/templates/* or directly in .../4.2.1.stable/*
+          if [ -d "$TEMPLATES_DIR/templates" ]; then
+            cp -f "$TEMPLATES_DIR"/templates/* "$TEMPLATES_DIR"/
+          fi
+
+          ls -1 "$TEMPLATES_DIR" | grep -E 'windows_(debug|release)_x86_64\.exe' > /dev/null
+          echo "Export templates installed at $TEMPLATES_DIR"
+
       - name: Engine smoke test
         shell: bash
         run: |
