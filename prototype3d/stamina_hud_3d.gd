@@ -17,6 +17,7 @@ extends CanvasLayer
 @onready var stamina_regen_delay_label: Label = $MarginContainer/VBoxContainer/StaminaRegenDelayLabel
 @onready var stamina_regen_boost_label: Label = $MarginContainer/VBoxContainer/StaminaRegenBoostLabel
 @onready var sprint_efficiency_boost_label: Label = $MarginContainer/VBoxContainer/SprintEfficiencyBoostLabel
+@onready var move_speed_boost_label: Label = get_node_or_null("MarginContainer/VBoxContainer/MoveSpeedBoostLabel") as Label
 @onready var dash_invulnerability_bar: ProgressBar = $MarginContainer/VBoxContainer/DashInvulnerabilityBar
 @onready var dash_invulnerability_label: Label = $MarginContainer/VBoxContainer/DashInvulnerabilityLabel
 @onready var stamina_warning_label: Label = $MarginContainer/VBoxContainer/StaminaWarningLabel
@@ -75,6 +76,9 @@ func _ready() -> void:
 	if not player.has_signal("sprint_efficiency_boost_changed"):
 		push_warning("StaminaHud3D target does not expose sprint_efficiency_boost_changed signal")
 		return
+	if not player.has_signal("move_speed_boost_changed"):
+		push_warning("StaminaHud3D target does not expose move_speed_boost_changed signal")
+		return
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
@@ -89,6 +93,7 @@ func _ready() -> void:
 	player.dash_invulnerability_changed.connect(_on_dash_invulnerability_changed)
 	player.stamina_regen_boost_changed.connect(_on_stamina_regen_boost_changed)
 	player.sprint_efficiency_boost_changed.connect(_on_sprint_efficiency_boost_changed)
+	player.move_speed_boost_changed.connect(_on_move_speed_boost_changed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_charge_recharge := float(player.get("dash_charge_recharge_left"))
@@ -104,6 +109,9 @@ func _ready() -> void:
 	var current_sprint_efficiency_boost := float(player.get("sprint_efficiency_boost_left"))
 	var current_sprint_efficiency_boost_max := float(player.get("sprint_efficiency_boost_max"))
 	var current_sprint_efficiency_boost_multiplier := float(player.get("sprint_efficiency_boost_multiplier"))
+	var current_move_speed_boost := float(player.get("move_speed_boost_left"))
+	var current_move_speed_boost_max := float(player.get("move_speed_boost_max"))
+	var current_move_speed_boost_multiplier := float(player.get("move_speed_boost_multiplier"))
 	var tuning_resource: Resource = player.get("tuning")
 	var max_stamina := 100.0
 	var max_dash_cooldown := 1.0
@@ -128,6 +136,13 @@ func _ready() -> void:
 			low_stamina_warning_ratio = clamp(float(tuning_resource.get("low_stamina_warning_ratio")), 0.0, 1.0)
 			low_stamina_pulse_speed = max(0.01, float(tuning_resource.get("low_stamina_pulse_speed")))
 			hard_landing_dash_cancel_window = max(0.0, float(tuning_resource.get("hard_landing_dash_cancel_window")))
+	if move_speed_boost_label == null:
+		var vbox: VBoxContainer = $MarginContainer/VBoxContainer
+		move_speed_boost_label = Label.new()
+		move_speed_boost_label.name = "MoveSpeedBoostLabel"
+		move_speed_boost_label.text = "Momentum Boost Ready"
+		vbox.add_child(move_speed_boost_label)
+		vbox.move_child(move_speed_boost_label, sprint_efficiency_boost_label.get_index() + 1)
 	stamina_warning_label.visible = false
 	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
 	set_process(true)
@@ -142,6 +157,7 @@ func _ready() -> void:
 	_on_stamina_regen_delay_changed(current_stamina_regen_delay, max_stamina_regen_delay)
 	_on_stamina_regen_boost_changed(current_stamina_regen_boost, max(0.01, current_stamina_regen_boost_max), max(1.0, current_stamina_regen_boost_multiplier))
 	_on_sprint_efficiency_boost_changed(current_sprint_efficiency_boost, max(0.01, current_sprint_efficiency_boost_max), max(1.0, current_sprint_efficiency_boost_multiplier))
+	_on_move_speed_boost_changed(current_move_speed_boost, max(0.01, current_move_speed_boost_max), max(1.0, current_move_speed_boost_multiplier))
 	_on_dash_invulnerability_changed(current_dash_invulnerability, max_dash_invulnerability)
 
 func _process(delta: float) -> void:
@@ -264,6 +280,17 @@ func _on_sprint_efficiency_boost_changed(remaining: float, _max_value: float, mu
 	else:
 		sprint_efficiency_boost_label.text = "Sprint Efficiency Ready"
 		sprint_efficiency_boost_label.modulate = Color(0.72, 0.85, 0.95)
+
+func _on_move_speed_boost_changed(remaining: float, _max_value: float, multiplier: float) -> void:
+	if move_speed_boost_label == null:
+		return
+	var clamped_remaining: float = max(0.0, remaining)
+	if clamped_remaining > 0.01:
+		move_speed_boost_label.text = "Momentum Boost x%.2f (%.2fs)" % [max(1.0, multiplier), clamped_remaining]
+		move_speed_boost_label.modulate = Color(1.0, 0.86, 0.52)
+	else:
+		move_speed_boost_label.text = "Momentum Boost Ready"
+		move_speed_boost_label.modulate = Color(0.94, 0.86, 0.72)
 
 func _on_dash_invulnerability_changed(remaining: float, max_value: float) -> void:
 	dash_invulnerability_bar.max_value = max(0.01, max_value)

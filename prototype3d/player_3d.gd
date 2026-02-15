@@ -22,6 +22,7 @@ signal stamina_action_failed(reason: String, remaining: float)
 signal dash_invulnerability_changed(remaining: float, max_value: float)
 signal stamina_regen_boost_changed(remaining: float, max_value: float, multiplier: float)
 signal sprint_efficiency_boost_changed(remaining: float, max_value: float, multiplier: float)
+signal move_speed_boost_changed(remaining: float, max_value: float, multiplier: float)
 
 var look_target: Vector3
 var respawn_position: Vector3
@@ -53,6 +54,9 @@ var stamina_regen_boost_multiplier: float = 1.0
 var sprint_efficiency_boost_left: float = 0.0
 var sprint_efficiency_boost_max: float = 0.0
 var sprint_efficiency_boost_multiplier: float = 1.0
+var move_speed_boost_left: float = 0.0
+var move_speed_boost_max: float = 0.0
+var move_speed_boost_multiplier: float = 1.0
 var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var camera_orbit_yaw: float = 0.0
@@ -88,6 +92,7 @@ func _ready() -> void:
 	_emit_dash_invulnerability_changed()
 	_emit_stamina_regen_boost_changed()
 	_emit_sprint_efficiency_boost_changed()
+	_emit_move_speed_boost_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -127,6 +132,12 @@ func _physics_process(delta: float) -> void:
 			sprint_efficiency_boost_multiplier = 1.0
 			sprint_efficiency_boost_max = 0.0
 		_emit_sprint_efficiency_boost_changed()
+	if move_speed_boost_left > 0.0:
+		move_speed_boost_left = max(0.0, move_speed_boost_left - delta)
+		if move_speed_boost_left <= 0.0:
+			move_speed_boost_multiplier = 1.0
+			move_speed_boost_max = 0.0
+		_emit_move_speed_boost_changed()
 	_update_dash_invulnerability_visual(delta)
 
 	_handle_fall_reset_if_needed()
@@ -278,7 +289,8 @@ func _physics_process(delta: float) -> void:
 		if low_stamina_threshold > 0.0 and stamina_ratio < low_stamina_threshold and not is_sprinting:
 			var fatigue_t: float = (low_stamina_threshold - stamina_ratio) / low_stamina_threshold
 			low_stamina_move_multiplier = lerpf(1.0, low_stamina_min_multiplier, clamp(fatigue_t, 0.0, 1.0))
-		var speed := tuning.move_speed * sprint_multiplier * low_stamina_move_multiplier
+		var move_speed_multiplier: float = move_speed_boost_multiplier if move_speed_boost_left > 0.0 else 1.0
+		var speed := tuning.move_speed * sprint_multiplier * low_stamina_move_multiplier * move_speed_multiplier
 		var target_velocity := move_dir * speed
 		var control_scale := 1.0 if is_on_floor() else tuning.air_control
 		var accel := tuning.ground_acceleration * control_scale
@@ -839,6 +851,18 @@ func apply_sprint_efficiency_boost(duration: float, multiplier: float) -> float:
 	_emit_sprint_efficiency_boost_changed()
 	return max(0.0, sprint_efficiency_boost_left - previous_remaining)
 
+func apply_move_speed_boost(duration: float, multiplier: float) -> float:
+	var clamped_duration: float = max(0.0, duration)
+	var clamped_multiplier: float = max(1.0, multiplier)
+	if clamped_duration <= 0.0 or clamped_multiplier <= 1.0:
+		return 0.0
+	var previous_remaining: float = move_speed_boost_left
+	move_speed_boost_left = max(move_speed_boost_left, clamped_duration)
+	move_speed_boost_max = max(move_speed_boost_max, move_speed_boost_left)
+	move_speed_boost_multiplier = max(move_speed_boost_multiplier, clamped_multiplier)
+	_emit_move_speed_boost_changed()
+	return max(0.0, move_speed_boost_left - previous_remaining)
+
 func restore_air_jumps(count: int) -> int:
 	var grant_count: int = max(0, count)
 	if grant_count <= 0:
@@ -928,3 +952,6 @@ func _emit_stamina_regen_boost_changed() -> void:
 
 func _emit_sprint_efficiency_boost_changed() -> void:
 	sprint_efficiency_boost_changed.emit(sprint_efficiency_boost_left, max(0.01, sprint_efficiency_boost_max), max(1.0, sprint_efficiency_boost_multiplier))
+
+func _emit_move_speed_boost_changed() -> void:
+	move_speed_boost_changed.emit(move_speed_boost_left, max(0.01, move_speed_boost_max), max(1.0, move_speed_boost_multiplier))

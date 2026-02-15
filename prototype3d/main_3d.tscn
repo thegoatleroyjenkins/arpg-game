@@ -176,6 +176,10 @@ text = "Regen Surge Ready"
 layout_mode = 2
 text = "Sprint Efficiency Ready"
 
+[node name="MoveSpeedBoostLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Momentum Boost Ready"
+
 [node name="DashInvulnerabilityBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 0.12
