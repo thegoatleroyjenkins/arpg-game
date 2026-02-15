@@ -14,6 +14,14 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
   - `data/levels/starter_village_layout.json`
   - `data/sql/starter_level_schema.sql`
   - `data/sql/starter_level_seed.sql`
+- **Open-world design spec:** `docs/OPEN_WORLD_SPEC.md`
+- **Open-world data + systems scaffold:**
+  - `data/world/world_map_layout.json`
+  - `data/sql/open_world_schema.sql`
+  - `data/sql/open_world_seed.sql`
+  - `systems/world/world_streamer.gd`
+  - `systems/world/world_sector.gd`
+  - `systems/world/spawn_director.gd`
 
 ## Current Features
 

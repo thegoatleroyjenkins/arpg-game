@@ -1,0 +1,50 @@
+{
+  "world_id": "emberfall_marches",
+  "display_name": "Emberfall Marches",
+  "chunk_size_meters": 256,
+  "streaming": {
+    "active_radius_chunks": 1,
+    "preload_radius_chunks": 2,
+    "unload_hysteresis_seconds": 6.0
+  },
+  "biomes": [
+    {
+      "id": "ashwood_frontier",
+      "region": "west_ring",
+      "color_hint": "#4D6B54",
+      "danger_band": [1, 4]
+    },
+    {
+      "id": "frostbreak_tundra",
+      "region": "north_ring",
+      "color_hint": "#94A7C4",
+      "danger_band": [3, 6]
+    },
+    {
+      "id": "mire_of_glass",
+      "region": "south_ring",
+      "color_hint": "#5C6A64",
+      "danger_band": [4, 7]
+    },
+    {
+      "id": "crownspine_mountains",
+      "region": "east_ring",
+      "color_hint": "#7B7F8A",
+      "danger_band": [5, 8]
+    },
+    {
+      "id": "sunken_imperium",
+      "region": "inner_scar",
+      "color_hint": "#5D4A6E",
+      "danger_band": [7, 10]
+    }
+  ],
+  "landmarks": [
+    { "id": "poi_broken_bell_watch", "chunk": "chunk_ashwood_01", "visibility_score": 0.92 },
+    { "id": "poi_hollowmere_chapel", "chunk": "chunk_mire_02", "visibility_score": 0.78 },
+    { "id": "poi_rimegate_pass_camp", "chunk": "chunk_tundra_20", "visibility_score": 0.66 },
+    { "id": "poi_charred_mill_hamlet", "chunk": "chunk_ashwood_00", "visibility_score": 0.88 },
+    { "id": "poi_vault_of_thorns", "chunk": "chunk_ashwood_10", "visibility_score": 0.95 }
+  ],
+  "notes": "MVP map intentionally compact; scale by adding chunk records and biome spawn rows."
+}
