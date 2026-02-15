@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+const ACTION_JUMP := "jump"
+
 @export var tuning: PlayerTuning3D = preload("res://prototype3d/default_player_tuning_3d.tres")
 
 @onready var pivot: Node3D = $CameraPivot
@@ -43,7 +45,7 @@ func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
 
 	# Jump buffering gives more forgiving timing before landing.
-	if Input.is_action_just_pressed("ui_accept"):
+	if _is_jump_just_pressed():
 		jump_buffer_left = tuning.jump_buffer_time
 	else:
 		jump_buffer_left = max(0.0, jump_buffer_left - delta)
@@ -55,7 +57,7 @@ func _physics_process(delta: float) -> void:
 		coyote_time_left = max(0.0, coyote_time_left - delta)
 		var gravity_scale := 1.0
 		# Variable jump height: releasing jump early makes ascent fall off faster.
-		if velocity.y > 0.0 and not Input.is_action_pressed("ui_accept"):
+		if velocity.y > 0.0 and not _is_jump_pressed():
 			gravity_scale = tuning.jump_release_gravity_multiplier
 		velocity.y -= tuning.gravity * gravity_scale * delta
 		velocity.y = max(velocity.y, -tuning.max_fall_speed)
@@ -132,6 +134,16 @@ func _physics_process(delta: float) -> void:
 	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance)
 	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
 	camera.look_at(global_position + Vector3(0, 1.0, 0), Vector3.UP)
+
+func _is_jump_just_pressed() -> bool:
+	if InputMap.has_action(ACTION_JUMP):
+		return Input.is_action_just_pressed(ACTION_JUMP)
+	return Input.is_action_just_pressed("ui_accept")
+
+func _is_jump_pressed() -> bool:
+	if InputMap.has_action(ACTION_JUMP):
+		return Input.is_action_pressed(ACTION_JUMP)
+	return Input.is_action_pressed("ui_accept")
 
 func _start_dash(move_dir: Vector3) -> void:
 	dash_direction = move_dir

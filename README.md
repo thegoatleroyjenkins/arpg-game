@@ -14,6 +14,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 ### Player Systems
 - **Movement** — WASD/Arrow key movement with directional facing
 - **Sprint (3D prototype)** — Sprint now uses an input action (Shift / gamepad LB) for modular remapping and burst movement speed
+- **Dedicated Jump Input (3D prototype)** — Jump now uses its own `jump` action (Space / gamepad A) with fallback support, improving control clarity and input modularity
 - **Dash (3D prototype)** — Tap Q (or gamepad B) for a short directional dash with cooldown (data-driven tuning)
 - **Stamina (3D prototype)** — Sprint, dash, and jump now consume stamina with configurable regen/delay for better combat pacing
 - **Forgiving Jump Timing (3D prototype)** — Data-driven coyote time + jump buffering make jumps more responsive and reliable in moment-to-moment combat movement
@@ -89,6 +90,7 @@ Release assets uploaded:
 | Space | Attack |
 | Shift / Gamepad LB (in 3D prototype) | Sprint |
 | Q / Gamepad B (in 3D prototype) | Dash |
+| Space / Gamepad A (in 3D prototype) | Jump |
 | Mouse Wheel (in 3D prototype) | Camera Zoom In/Out |
 | Walk over items | Pick up / Equip |
 
@@ -167,6 +169,7 @@ arpg-game/
 - ✅ Added data-driven 3D jump stamina cost to curb spam-jumping and strengthen stamina tradeoff decisions
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 - ✅ Switched 3D sprint to a dedicated input action and added gamepad bindings for sprint (LB) + dash (B) to improve controller support and input modularity
+- ✅ Added a dedicated 3D jump input action (`jump`) with Space + gamepad A bindings and fallback support for cleaner, modular controls
 
 ## License
 
