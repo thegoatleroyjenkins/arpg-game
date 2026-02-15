@@ -1,0 +1,56 @@
+{
+  "level_id": "ashfall_outskirts",
+  "display_name": "Ashfall Outskirts",
+  "theme": "ruined_frontier_village",
+  "biome": "corrupted_forest_edge",
+  "estimated_minutes": 10,
+  "zones": [
+    {
+      "id": "starter_zone_1",
+      "label": "Entry Lane",
+      "scene_marker_prefix": "Zone1_",
+      "encounter": "tutorial_skirmish",
+      "optional": false
+    },
+    {
+      "id": "starter_zone_2",
+      "label": "Village Split",
+      "scene_marker_prefix": "Zone2_",
+      "encounter": "mixed_group",
+      "optional": false
+    },
+    {
+      "id": "starter_zone_3",
+      "label": "Corrupted Square",
+      "scene_marker_prefix": "Zone3_",
+      "encounter": "elite_intro",
+      "optional": false
+    },
+    {
+      "id": "starter_zone_4_boss",
+      "label": "Warden Arena",
+      "scene_marker_prefix": "Boss_",
+      "encounter": "rotbound_warden",
+      "optional": false
+    },
+    {
+      "id": "starter_zone_optional_chest",
+      "label": "Collapsed Shed",
+      "scene_marker_prefix": "Optional_",
+      "encounter": "hidden_chest",
+      "optional": true
+    }
+  ],
+  "tutorial_prompts": [
+    "prompt_move_attack",
+    "prompt_starter_ability",
+    "prompt_loot_pickup",
+    "prompt_potion"
+  ],
+  "boss": {
+    "id": "rotbound_warden",
+    "arena_marker": "Boss_ArenaCenter",
+    "enrage_hp_ratio": 0.3,
+    "guaranteed_rewards": ["RareItem", "PassivePoint"]
+  }
+}

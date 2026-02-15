@@ -1,0 +1,89 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://world/levels/starter_level_controller.gd" id="1_controller"]
+
+[sub_resource type="BoxShape3D" id="1_ground_shape"]
+size = Vector3(64, 1, 64)
+
+[sub_resource type="BoxMesh" id="2_ground_mesh"]
+size = Vector3(64, 1, 64)
+
+[node name="StarterVillage3D" type="Node3D"]
+
+[node name="EnvironmentRoot" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="EnvironmentRoot"]
+position = Vector3(0, 16, 0)
+rotation = Vector3(-0.9, -0.45, 0)
+light_energy = 1.25
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="EnvironmentRoot"]
+
+[node name="PathRoot" type="Node3D" parent="."]
+
+[node name="Ground" type="StaticBody3D" parent="PathRoot"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PathRoot/Ground"]
+shape = SubResource("1_ground_shape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PathRoot/Ground"]
+mesh = SubResource("2_ground_mesh")
+
+[node name="SpawnMarkers" type="Node3D" parent="."]
+
+[node name="Zone1_A" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-6, 0.5, -16)
+
+[node name="Zone1_B" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(3, 0.5, -14)
+
+[node name="Zone1_C" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-1, 0.5, -10)
+
+[node name="Zone2_A" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(10, 0.5, -4)
+
+[node name="Zone2_B" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-10, 0.5, -2)
+
+[node name="Zone2_C" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(6, 0.5, 2)
+
+[node name="Zone3_A" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-4, 0.5, 12)
+
+[node name="Zone3_B" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(5, 0.5, 14)
+
+[node name="Boss_ArenaCenter" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0.5, 24)
+
+[node name="Boss_SpawnA" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(2, 0.5, 21)
+
+[node name="Boss_SpawnB" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-2, 0.5, 21)
+
+[node name="Optional_Chest" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(14, 0.5, 8)
+
+[node name="Interactables" type="Node3D" parent="."]
+
+[node name="HiddenChestMarker" type="Marker3D" parent="Interactables"]
+position = Vector3(14, 0.5, 8)
+
+[node name="BreakableWallMarker" type="Marker3D" parent="Interactables"]
+position = Vector3(12, 0.5, 7)
+
+[node name="TutorialAnchors" type="Node3D" parent="."]
+
+[node name="PromptMoveAttack" type="Marker3D" parent="TutorialAnchors"]
+position = Vector3(0, 1.5, -18)
+
+[node name="PromptPotion" type="Marker3D" parent="TutorialAnchors"]
+position = Vector3(0, 1.5, -1)
+
+[node name="EncounterController" type="Node" parent="."]
+script = ExtResource("1_controller")
+layout_json_path = "res://data/levels/starter_village_layout.json"
+spawn_markers_root = NodePath("../SpawnMarkers")

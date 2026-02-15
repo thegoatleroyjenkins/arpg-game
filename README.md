@@ -8,6 +8,12 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Status:** Existing 2D systems remain playable while 3D foundations are being built in parallel.
 - **Prototype Scene:** `res://prototype3d/main_3d.tscn`
 - **Data-driven 3D tuning:** `res://prototype3d/default_player_tuning_3d.tres`
+- **Starter level scaffold:** `res://world/levels/starter_village_3d.tscn`
+- **Starter level design spec:** `docs/STARTER_LEVEL_SPEC.md`
+- **Starter level data pack:**
+  - `data/levels/starter_village_layout.json`
+  - `data/sql/starter_level_schema.sql`
+  - `data/sql/starter_level_seed.sql`
 
 ## Current Features
 
