@@ -91,3 +91,27 @@ A stable combat contract first avoids churn across AI, loot scaling, and streame
 
 ### Why this order
 A single combat contract + early world streaming interfaces prevents architecture churn and keeps the project aligned with a full 3D, open-world-ready ARPG trajectory.
+
+## Focused Planning Pass — 2026-02-15 05:33 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Deliver a playable 3D combat loop (player attack -> enemy hit -> death) through one combat pipeline**
+   - Add `CombatActor3D` + `DamageResolver` in `res://systems/combat/` and make them the only damage path.
+   - Introduce a tiny `Hitbox3D`/attack event contract so attacks emit payloads instead of mutating health directly.
+   - Validate with one measurable loop in `main_3d.tscn`: enemy can be killed, death signal fires, and loop is repeatable.
+
+2. **Add one NavMesh-ready enemy slice that uses combat contracts, not prototype shortcuts**
+   - Create `EnemyActor3D` + `EnemyBrain3D` (Idle/Chase/Attack/Leash) with `NavigationAgent3D` movement.
+   - Use a tuning resource (`EnemyArchetype3D.tres`) for speed/range/cooldown so scaling stays data-driven.
+   - Ensure enemy attacks also call `DamageResolver` to keep player/enemy parity for future balance tooling.
+
+3. **Lay minimal open-world architecture rails before expanding content**
+   - Define lightweight interfaces for `WorldSector`, `WorldStreamer`, and `SpawnDirector` under `res://systems/world/`.
+   - Start with sector activation radius, unload distance hysteresis, and spawn budget caps.
+   - Keep sector/spawn configuration in resources to support biome and endgame modifier layering later.
+
+### Immediate Next Implementation Task
+**Implement now:** create `res://systems/combat/damage_resolver.gd` + `res://systems/combat/combat_actor_3d.gd`, then wire a basic player light attack event in `player_3d.gd` through `request_damage()` (no direct HP writes).
+
+### Why this order
+The repo is currently movement-heavy; a real combat contract is the highest-leverage step to unlock AI, loot, progression, and open-world scaling without rework.
