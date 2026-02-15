@@ -71,3 +71,13 @@ show_percentage = false
 [node name="StaminaLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Stamina 100 / 100"
+
+[node name="DashCooldownBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 0.65
+value = 0.0
+show_percentage = false
+
+[node name="DashCooldownLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Dash Ready"

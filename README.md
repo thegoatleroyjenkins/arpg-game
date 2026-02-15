@@ -20,6 +20,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
+- **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases
@@ -153,6 +154,7 @@ arpg-game/
 - ✅ Added data-driven 3D movement smoothing (ground acceleration/deceleration + air control)
 - ✅ Added data-driven 3D variable jump height (jump-release gravity multiplier + terminal fall speed)
 - ✅ Added modular 3D stamina HUD wired to player stamina_changed signal for real-time stamina readability
+- ✅ Added modular 3D dash cooldown HUD wired to player dash_cooldown_changed signal for clearer dash timing windows
 - ✅ Added data-driven 3D jump stamina cost to curb spam-jumping and strengthen stamina tradeoff decisions
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 

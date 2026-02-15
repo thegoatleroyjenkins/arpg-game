@@ -6,6 +6,7 @@ extends CharacterBody3D
 @onready var camera: Camera3D = $CameraPivot/Camera3D
 
 signal stamina_changed(current: float, max_value: float)
+signal dash_cooldown_changed(remaining: float, max_value: float)
 
 var look_target: Vector3
 var dash_direction: Vector3 = Vector3.ZERO
@@ -20,6 +21,7 @@ func _ready() -> void:
 	look_target = global_position
 	stamina = tuning.max_stamina
 	_emit_stamina_changed()
+	_emit_dash_cooldown_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -66,6 +68,7 @@ func _physics_process(delta: float) -> void:
 
 	if dash_cooldown_left > 0.0:
 		dash_cooldown_left = max(0.0, dash_cooldown_left - delta)
+		_emit_dash_cooldown_changed()
 
 	if Input.is_action_just_pressed("dash") and dash_cooldown_left <= 0.0 and _can_pay_stamina(tuning.dash_stamina_cost):
 		_use_stamina(tuning.dash_stamina_cost)
@@ -115,6 +118,7 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_direction = dash_direction.normalized()
 	dash_time_left = tuning.dash_duration
 	dash_cooldown_left = tuning.dash_cooldown
+	_emit_dash_cooldown_changed()
 
 func _can_pay_stamina(cost: float) -> bool:
 	return stamina >= max(0.0, cost)
@@ -137,3 +141,6 @@ func _regen_stamina(delta: float) -> void:
 
 func _emit_stamina_changed() -> void:
 	stamina_changed.emit(stamina, tuning.max_stamina)
+
+func _emit_dash_cooldown_changed() -> void:
+	dash_cooldown_changed.emit(dash_cooldown_left, tuning.dash_cooldown)
