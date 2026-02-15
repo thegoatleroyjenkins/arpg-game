@@ -12,6 +12,9 @@ extends Area3D
 @export_range(0.5, 3.0, 0.05) var magnet_speed_curve_power: float = 1.4
 @export var magnet_auto_collect_radius: float = 0.75
 @export_range(0.0, 1.0, 0.01) var magnet_missing_stamina_ratio: float = 0.2
+@export var magnet_requires_line_of_sight: bool = true
+@export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
+@export var magnet_line_of_sight_height_offset: float = 0.5
 
 @onready var mesh: Node3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
@@ -84,6 +87,8 @@ func _update_magnet_motion(delta: float) -> void:
 		return
 	if not _target_needs_stamina(player):
 		return
+	if magnet_requires_line_of_sight and not _has_line_of_sight_to_target(player):
+		return
 	if distance <= max(0.05, magnet_auto_collect_radius):
 		_try_collect(player)
 		return
@@ -112,3 +117,18 @@ func _target_needs_stamina(player: Node3D) -> bool:
 		return false
 	var missing_ratio: float = clamp((max_stamina - current_stamina) / max_stamina, 0.0, 1.0)
 	return missing_ratio >= clamp(magnet_missing_stamina_ratio, 0.0, 1.0)
+
+func _has_line_of_sight_to_target(player: Node3D) -> bool:
+	var world := get_world_3d()
+	if world == null:
+		return true
+	var offset := Vector3.UP * max(0.0, magnet_line_of_sight_height_offset)
+	var from := global_position + offset
+	var to := player.global_position + offset
+	var query := PhysicsRayQueryParameters3D.create(from, to)
+	query.exclude = [self, player]
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.collision_mask = max(1, magnet_line_of_sight_collision_mask)
+	var hit := world.direct_space_state.intersect_ray(query)
+	return hit.is_empty()
