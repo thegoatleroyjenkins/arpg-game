@@ -12,32 +12,32 @@ This project is now explicitly targeting a full 3D ARPG with an open-world-ready
 - Added 3D player controller + tuning resource (`player_3d.gd`, `default_player_tuning_3d.tres`)
 - Added sprint/dash/stamina/jump-feel and basic 3D HUD telemetry
 
-## Focused Planning Pass — 2026-02-15 03:01 (America/Chicago)
+## Focused Planning Pass — 2026-02-15 03:16 (America/Chicago)
 
 ### Top 3 Priorities (ordered)
-1. **Implement a single 3D combat pipeline (foundation first)**
-   - Add `CombatActor3D`, `Hitbox3D`, `Hurtbox3D`, and `DamageResolver` under `res://systems/combat/`.
-   - Ensure all damage events route through one resolver for deterministic balancing, affixes, and future multiplayer-safe simulation.
-   - Keep attack metadata data-driven (base damage, tags, impulse, stamina cost).
+1. **Lock in the 3D combat contract (single source of truth)**
+   - Implement `CombatActor3D` and `DamageResolver` under `res://systems/combat/`.
+   - Route every outgoing hit through one resolver event (`request_damage`) and one apply path (`apply_damage_result`).
+   - Keep payloads data-driven (`damage_type`, `base_damage`, `tags`, `stamina_cost`, `poise_damage`) so loot/skills can extend without rewrites.
 
-2. **Build navigation-based enemy runtime for scalable encounters**
-   - Create `EnemyActor3D` + `EnemyBrain3D` split (decision layer vs movement/animation layer).
-   - Use `NavigationAgent3D` with explicit states: Idle / Investigate / Chase / Attack / Leash / Return.
-   - Add leash and timeout rules now so enemies behave correctly across future streamed world sectors.
+2. **Ship one vertical-slice enemy using NavAgent + combat hooks**
+   - Add `EnemyActor3D` + `EnemyBrain3D` with explicit states (Idle / Chase / Attack / Return).
+   - Use `NavigationAgent3D` now (no direct move-to-target hacks) to stay compatible with streamed world sectors.
+   - Connect enemy attacks to the same `DamageResolver` used by player attacks.
 
-3. **Define open-world sector contracts before content expansion**
-   - Introduce `WorldSector`, `WorldStreamer`, and `SpawnDirector` interfaces under `res://systems/world/`.
-   - Specify activation radius, load budget, despawn/persistence rules, and handoff points for AI + loot systems.
-   - Keep sector definitions in TRES/JSON for biome reuse and endgame modifier injection.
+3. **Create minimal world streaming interfaces before map scale-up**
+   - Define `WorldSector`, `WorldStreamer`, and `SpawnDirector` interfaces in `res://systems/world/`.
+   - Start with simple activation/deactivation + spawn budget settings.
+   - Store sector config in resources (`.tres`) so biomes and endgame modifiers can layer in later.
 
 ### Immediate Next Implementation Task
 **Do this next:**
-- Implement `res://systems/combat/damage_resolver.gd` and `res://systems/combat/combat_actor_3d.gd`.
-- Add `res://prototype3d/weapons/player_melee_hitbox_3d.gd`.
-- Wire one light melee action in `player_3d.gd` through `DamageResolver` (no direct HP mutation outside resolver).
+- Create `res://systems/combat/damage_resolver.gd` with a tiny request/resolve/apply pipeline.
+- Create `res://systems/combat/combat_actor_3d.gd` (health, armor placeholder, receive damage API).
+- Wire one light melee in `player_3d.gd` to call `DamageResolver` instead of mutating health directly.
 
 ### Why this order
-A clean combat contract prevents rewrites when AI scaling, affix math, and streamed-world encounters are introduced.
+A stable combat contract first prevents expensive rewrites when enemy scaling, affix systems, and streamed open-world sectors arrive.
 
 ## Rules During Migration
 - No fake complexity.
