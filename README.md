@@ -22,6 +22,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
+- **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
@@ -160,6 +161,7 @@ arpg-game/
 - ✅ Added modular 3D stamina HUD wired to player stamina_changed signal for real-time stamina readability
 - ✅ Added modular 3D dash cooldown HUD wired to player dash_cooldown_changed signal for clearer dash timing windows
 - ✅ Added data-driven 3D camera zoom controls (mouse wheel) with min/max/step tuning for better combat readability and scene awareness
+- ✅ Added data-driven 3D dash input buffering so near-ready dash presses queue cleanly and fire as cooldown ends
 - ✅ Added data-driven 3D jump stamina cost to curb spam-jumping and strengthen stamina tradeoff decisions
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 - ✅ Switched 3D sprint to a dedicated input action and added gamepad bindings for sprint (LB) + dash (B) to improve controller support and input modularity

@@ -13,6 +13,8 @@ var target_camera_distance: float = 0.0
 var dash_direction: Vector3 = Vector3.ZERO
 var dash_time_left: float = 0.0
 var dash_cooldown_left: float = 0.0
+var dash_buffer_left: float = 0.0
+var buffered_dash_direction: Vector3 = Vector3.ZERO
 var stamina: float = 0.0
 var stamina_regen_delay_left: float = 0.0
 var coyote_time_left: float = 0.0
@@ -77,9 +79,22 @@ func _physics_process(delta: float) -> void:
 		dash_cooldown_left = max(0.0, dash_cooldown_left - delta)
 		_emit_dash_cooldown_changed()
 
-	if Input.is_action_just_pressed("dash") and dash_cooldown_left <= 0.0 and _can_pay_stamina(tuning.dash_stamina_cost):
+	if dash_buffer_left > 0.0:
+		dash_buffer_left = max(0.0, dash_buffer_left - delta)
+
+	if Input.is_action_just_pressed("dash"):
+		if dash_cooldown_left <= 0.0 and _can_pay_stamina(tuning.dash_stamina_cost):
+			_use_stamina(tuning.dash_stamina_cost)
+			_start_dash(move_dir)
+		elif dash_cooldown_left <= tuning.dash_input_buffer_time:
+			dash_buffer_left = tuning.dash_input_buffer_time
+			buffered_dash_direction = move_dir
+
+	if dash_buffer_left > 0.0 and dash_cooldown_left <= 0.0 and dash_time_left <= 0.0 and _can_pay_stamina(tuning.dash_stamina_cost):
 		_use_stamina(tuning.dash_stamina_cost)
-		_start_dash(move_dir)
+		_start_dash(buffered_dash_direction)
+		dash_buffer_left = 0.0
+		buffered_dash_direction = Vector3.ZERO
 
 	if dash_time_left > 0.0:
 		dash_time_left = max(0.0, dash_time_left - delta)
@@ -126,6 +141,8 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_direction = dash_direction.normalized()
 	dash_time_left = tuning.dash_duration
 	dash_cooldown_left = tuning.dash_cooldown
+	dash_buffer_left = 0.0
+	buffered_dash_direction = Vector3.ZERO
 	_emit_dash_cooldown_changed()
 
 func _adjust_camera_zoom(amount: float) -> void:

@@ -24,6 +24,7 @@ stamina_regen_delay = 0.7
 dash_speed = 18.0
 dash_duration = 0.18
 dash_cooldown = 0.65
+dash_input_buffer_time = 0.15
 camera_smooth = 8.0
 camera_height = 7.0
 camera_distance = 8.5
