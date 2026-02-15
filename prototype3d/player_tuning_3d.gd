@@ -100,6 +100,10 @@ class_name PlayerTuning3D
 @export var light_attack_execute_enabled: bool = true
 @export_range(0.0, 1.0, 0.01) var light_attack_execute_health_ratio_threshold: float = 0.25
 @export_range(1.0, 3.0, 0.01) var light_attack_execute_damage_multiplier: float = 1.35
+@export var light_attack_combo_enabled: bool = true
+@export var light_attack_combo_reset_time: float = 1.2
+@export_range(0.0, 1.0, 0.01) var light_attack_combo_damage_per_stack: float = 0.08
+@export_range(1, 8, 1) var light_attack_combo_max_stacks: int = 4
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0

@@ -97,6 +97,8 @@ var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 var light_attack_cooldown_left: float = 0.0
 var light_attack_lunge_left: float = 0.0
 var light_attack_lunge_direction: Vector3 = Vector3.ZERO
+var light_attack_combo_stacks: int = 0
+var light_attack_combo_timer_left: float = 0.0
 
 func _ready() -> void:
 	add_to_group("player_3d")
@@ -165,6 +167,10 @@ func _physics_process(delta: float) -> void:
 	if light_attack_buffer_left > 0.0:
 		light_attack_buffer_left = max(0.0, light_attack_buffer_left - delta)
 		_emit_attack_buffer_changed()
+	if light_attack_combo_timer_left > 0.0:
+		light_attack_combo_timer_left = max(0.0, light_attack_combo_timer_left - delta)
+		if light_attack_combo_timer_left <= 0.0:
+			light_attack_combo_stacks = 0
 	if stamina_action_warning_cooldown_left > 0.0:
 		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
 	if camera_follow_assist_lock_left > 0.0:
@@ -1092,6 +1098,7 @@ func _try_light_attack() -> bool:
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
 	_emit_light_attack_cooldown_changed()
 	_start_light_attack_lunge(targets[0])
+	var combo_multiplier: float = _consume_light_attack_combo_multiplier()
 	var cleave_falloff: float = clamp(tuning.light_attack_cleave_falloff_per_target, 0.0, 1.0)
 	var cleave_min_multiplier: float = clamp(tuning.light_attack_cleave_min_multiplier, 0.1, 1.0)
 	for i in range(targets.size()):
@@ -1100,6 +1107,8 @@ func _try_light_attack() -> bool:
 		var positional_multiplier: float = _get_light_attack_positional_multiplier(target)
 		var execute_multiplier: float = _get_light_attack_execute_multiplier(target)
 		var attack_tags := PackedStringArray(["player", "light_attack"])
+		if combo_multiplier > 1.0:
+			attack_tags.append("combo")
 		if positional_multiplier > 1.0:
 			attack_tags.append("backstab")
 		if execute_multiplier > 1.0:
@@ -1107,13 +1116,27 @@ func _try_light_attack() -> bool:
 		damage_resolver.request_damage({
 			"source": self,
 			"target": target,
-			"base_damage": max(0.0, light_attack_damage * cleave_multiplier * positional_multiplier * execute_multiplier),
+			"base_damage": max(0.0, light_attack_damage * combo_multiplier * cleave_multiplier * positional_multiplier * execute_multiplier),
 			"damage_type": "physical",
 			"crit_chance": clamp(light_attack_crit_chance, 0.0, 1.0),
 			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
 			"tags": attack_tags,
 		})
 	return true
+
+func _consume_light_attack_combo_multiplier() -> float:
+	if not tuning.light_attack_combo_enabled:
+		light_attack_combo_stacks = 0
+		light_attack_combo_timer_left = 0.0
+		return 1.0
+	var max_stacks: int = max(1, tuning.light_attack_combo_max_stacks)
+	if light_attack_combo_timer_left > 0.0:
+		light_attack_combo_stacks = min(max_stacks, light_attack_combo_stacks + 1)
+	else:
+		light_attack_combo_stacks = 1
+	light_attack_combo_timer_left = max(0.0, tuning.light_attack_combo_reset_time)
+	var per_stack_bonus: float = max(0.0, tuning.light_attack_combo_damage_per_stack)
+	return 1.0 + (float(max(0, light_attack_combo_stacks - 1)) * per_stack_bonus)
 
 func _auto_face_light_attack_target(primary_target: Node3D) -> void:
 	if not tuning.light_attack_auto_face_enabled:
