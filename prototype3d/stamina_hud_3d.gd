@@ -37,6 +37,12 @@ var low_stamina_active: bool = false
 var stamina_warning_left: float = 0.0
 var base_stamina_modulate: Color = Color(1.0, 1.0, 1.0)
 var ui_outline_color: Color = Color(0.02, 0.03, 0.04, 0.95)
+var bar_background_color: Color = Color(0.08, 0.11, 0.14, 0.95)
+var stamina_color_high: Color = Color(0.35, 0.9, 0.5)
+var stamina_color_mid: Color = Color(0.92, 0.82, 0.34)
+var stamina_color_low: Color = Color(0.95, 0.36, 0.34)
+var ready_color: Color = Color(0.44, 0.84, 1.0)
+var active_color: Color = Color(0.98, 0.74, 0.34)
 
 func _ready() -> void:
 	var player := get_node_or_null(player_path)
@@ -304,6 +310,32 @@ func _apply_readability_theme() -> void:
 		bar.custom_minimum_size = Vector2(0.0, 14.0)
 
 	stamina_bar.custom_minimum_size = Vector2(0.0, 18.0)
+	for bar in bars:
+		_set_bar_background_color(bar, bar_background_color)
+
+
+func _set_bar_background_color(bar: ProgressBar, color: Color) -> void:
+	if bar == null:
+		return
+	var background := StyleBoxFlat.new()
+	background.bg_color = color
+	background.corner_radius_top_left = 3
+	background.corner_radius_top_right = 3
+	background.corner_radius_bottom_left = 3
+	background.corner_radius_bottom_right = 3
+	bar.add_theme_stylebox_override("background", background)
+
+
+func _set_bar_fill_color(bar: ProgressBar, color: Color) -> void:
+	if bar == null:
+		return
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = color
+	fill.corner_radius_top_left = 3
+	fill.corner_radius_top_right = 3
+	fill.corner_radius_bottom_left = 3
+	fill.corner_radius_bottom_right = 3
+	bar.add_theme_stylebox_override("fill", fill)
 
 
 func _on_stamina_changed(current: float, max_value: float) -> void:
@@ -313,6 +345,12 @@ func _on_stamina_changed(current: float, max_value: float) -> void:
 	var stamina_ratio := 0.0
 	if stamina_bar.max_value > 0.0:
 		stamina_ratio = stamina_bar.value / stamina_bar.max_value
+	var stamina_fill_color: Color = stamina_color_high
+	if stamina_ratio <= low_stamina_warning_ratio:
+		stamina_fill_color = stamina_color_low
+	elif stamina_ratio <= 0.55:
+		stamina_fill_color = stamina_color_mid
+	_set_bar_fill_color(stamina_bar, stamina_fill_color)
 	low_stamina_active = stamina_ratio <= low_stamina_warning_ratio and stamina_bar.value < stamina_bar.max_value
 	if not low_stamina_active:
 		stamina_label.modulate = base_stamina_modulate
@@ -327,8 +365,10 @@ func _on_dash_cooldown_changed(remaining: float, max_value: float) -> void:
 	dash_cooldown_bar.value = clamp(remaining, 0.0, dash_cooldown_bar.max_value)
 	if remaining <= 0.01 and dash_charges_current > 0:
 		dash_cooldown_label.text = "Dash Ready (%d/%d)" % [dash_charges_current, dash_charges_max]
+		_set_bar_fill_color(dash_cooldown_bar, ready_color)
 	else:
 		dash_cooldown_label.text = "Dash %.2fs (%d/%d)" % [remaining, dash_charges_current, dash_charges_max]
+		_set_bar_fill_color(dash_cooldown_bar, active_color)
 
 func _on_dash_charge_recharge_changed(remaining: float, max_value: float) -> void:
 	dash_charge_recharge_bar.max_value = max(0.01, max_value)
@@ -336,9 +376,11 @@ func _on_dash_charge_recharge_changed(remaining: float, max_value: float) -> voi
 	if remaining > 0.01 and dash_charges_current < dash_charges_max:
 		dash_charge_recharge_label.text = "Dash Charge +1 in %.2fs" % remaining
 		dash_charge_recharge_label.modulate = Color(0.92, 0.87, 0.55)
+		_set_bar_fill_color(dash_charge_recharge_bar, active_color)
 	else:
 		dash_charge_recharge_label.text = "Dash Charges Full"
 		dash_charge_recharge_label.modulate = Color(0.75, 0.9, 1.0)
+		_set_bar_fill_color(dash_charge_recharge_bar, ready_color)
 
 func _on_dash_buffer_changed(remaining: float, max_value: float) -> void:
 	var clamped_max: float = max(0.01, max_value)
@@ -382,9 +424,11 @@ func _on_light_attack_cooldown_changed(remaining: float, max_value: float) -> vo
 	if remaining > 0.01:
 		attack_cooldown_label.text = "Attack Cooldown %.2fs" % remaining
 		attack_cooldown_label.modulate = Color(1.0, 0.72, 0.55)
+		_set_bar_fill_color(attack_cooldown_bar, active_color)
 	else:
 		attack_cooldown_label.text = "Attack Ready"
 		attack_cooldown_label.modulate = Color(0.88, 0.96, 0.88)
+		_set_bar_fill_color(attack_cooldown_bar, ready_color)
 
 func _on_air_jumps_changed(current: int, max_value: int) -> void:
 	var clamped_max: int = max(0, max_value)
@@ -406,6 +450,7 @@ func _on_landing_recovery_changed(remaining: float, max_value: float) -> void:
 	landing_recovery_bar.max_value = max(0.01, max_value)
 	landing_recovery_bar.value = clamp(remaining, 0.0, landing_recovery_bar.max_value)
 	if remaining > 0.01:
+		_set_bar_fill_color(landing_recovery_bar, active_color)
 		if hard_landing_dash_cancel_window > 0.0 and remaining <= hard_landing_dash_cancel_window:
 			landing_recovery_label.text = "Landing Recovery %.2fs (Dash Cancel Ready)" % remaining
 			landing_recovery_label.modulate = Color(0.85, 0.95, 1.0)
@@ -415,6 +460,7 @@ func _on_landing_recovery_changed(remaining: float, max_value: float) -> void:
 	else:
 		landing_recovery_label.text = "Landing Recovery Ready"
 		landing_recovery_label.modulate = Color(0.8, 1.0, 0.8)
+		_set_bar_fill_color(landing_recovery_bar, ready_color)
 
 func _on_stamina_regen_delay_changed(remaining: float, max_value: float) -> void:
 	stamina_regen_delay_bar.max_value = max(0.01, max_value)
@@ -422,9 +468,11 @@ func _on_stamina_regen_delay_changed(remaining: float, max_value: float) -> void
 	if remaining > 0.01:
 		stamina_regen_delay_label.text = "Regen Delay %.2fs" % remaining
 		stamina_regen_delay_label.modulate = Color(1.0, 0.72, 0.4)
+		_set_bar_fill_color(stamina_regen_delay_bar, active_color)
 	else:
 		stamina_regen_delay_label.text = "Regen Active"
 		stamina_regen_delay_label.modulate = Color(0.72, 1.0, 0.72)
+		_set_bar_fill_color(stamina_regen_delay_bar, ready_color)
 
 func _on_stamina_action_failed(reason: String, duration: float) -> void:
 	stamina_warning_left = max(0.0, duration)
@@ -492,6 +540,8 @@ func _on_dash_invulnerability_changed(remaining: float, max_value: float) -> voi
 	if remaining > 0.01:
 		dash_invulnerability_label.text = "Dash I-Frames %.2fs" % remaining
 		dash_invulnerability_label.modulate = Color(0.72, 0.95, 1.0)
+		_set_bar_fill_color(dash_invulnerability_bar, active_color)
 	else:
 		dash_invulnerability_label.text = "Dash I-Frames Ready"
 		dash_invulnerability_label.modulate = Color(0.78, 0.86, 0.98)
+		_set_bar_fill_color(dash_invulnerability_bar, ready_color)

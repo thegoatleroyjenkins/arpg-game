@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
 [ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
@@ -34,12 +34,56 @@ radius = 0.45
 top_radius = 0.6
 nb_sides = 12
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
+sky_top_color = Color(0.27451, 0.490196, 0.737255, 1)
+sky_horizon_color = Color(0.717647, 0.831373, 0.94902, 1)
+ground_horizon_color = Color(0.380392, 0.341176, 0.317647, 1)
+ground_bottom_color = Color(0.156863, 0.145098, 0.141176, 1)
+
+[sub_resource type="Sky" id="Sky_main"]
+sky_material = SubResource("ProceduralSkyMaterial_main")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_main")
+ambient_light_source = 2
+ambient_light_energy = 0.8
+tonemap_mode = 2
+tonemap_exposure = 1.05
+ssao_enabled = true
+ssao_radius = 1.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.207843, 0.223529, 0.247059, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_player"]
+albedo_color = Color(0.341176, 0.643137, 0.92549, 1)
+metallic = 0.15
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dummy"]
+albedo_color = Color(0.878431, 0.360784, 0.341176, 1)
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pickup"]
+albedo_color = Color(0.45098, 0.929412, 0.67451, 1)
+emission_enabled = true
+emission = Color(0.282353, 0.780392, 0.568627, 1)
+emission_energy_multiplier = 0.7
+roughness = 0.2
+
 [node name="Main3D" type="Node3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 position = Vector3(0, 8, 0)
 rotation = Vector3(-0.8, -0.4, 0)
 light_energy = 1.3
+shadow_enabled = true
+shadow_blur = 1.6
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
 
 [node name="DamageResolver" type="Node" parent="."]
 script = ExtResource("7_damage_resolver_script")
@@ -55,6 +99,7 @@ damage_type_multipliers = {
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CombatDummy"]
 mesh = SubResource("CylinderMesh_combat_dummy")
+material_override = SubResource("StandardMaterial3D_dummy")
 
 [node name="Floor" type="StaticBody3D" parent="."]
 
@@ -63,6 +108,7 @@ shape = SubResource("BoxShape3D_floor")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
 mesh = SubResource("BoxMesh_floor")
+material_override = SubResource("StandardMaterial3D_floor")
 
 [node name="Player" type="CharacterBody3D" parent="."]
 position = Vector3(0, 2, 0)
@@ -75,6 +121,7 @@ shape = SubResource("CapsuleShape3D_player")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
 position = Vector3(0, 0.85, 0)
 mesh = SubResource("CapsuleMesh_player")
+material_override = SubResource("StandardMaterial3D_player")
 
 [node name="CameraPivot" type="Node3D" parent="Player"]
 position = Vector3(0, 6, 8)
@@ -92,6 +139,7 @@ shape = SubResource("SphereShape3D_stamina_pickup")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaminaPickupA"]
 mesh = SubResource("SphereMesh_stamina_pickup")
+material_override = SubResource("StandardMaterial3D_pickup")
 
 [node name="StaminaPickupB" type="Area3D" parent="."]
 position = Vector3(-5, 1.2, -2)
@@ -103,6 +151,7 @@ shape = SubResource("SphereShape3D_stamina_pickup")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaminaPickupB"]
 mesh = SubResource("SphereMesh_stamina_pickup")
+material_override = SubResource("StandardMaterial3D_pickup")
 
 [node name="StaminaPickupC" type="Area3D" parent="."]
 position = Vector3(1, 1.2, -6)
@@ -114,6 +163,7 @@ shape = SubResource("SphereShape3D_stamina_pickup")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaminaPickupC"]
 mesh = SubResource("SphereMesh_stamina_pickup")
+material_override = SubResource("StandardMaterial3D_pickup")
 
 [node name="StaminaHud" type="CanvasLayer" parent="."]
 script = ExtResource("2_stamina_hud_script")
