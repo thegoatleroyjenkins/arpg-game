@@ -108,6 +108,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Landing Recovery HUD (3D prototype)** — Modular HUD now tracks hard-landing recovery remaining time (data-driven duration), clarifying when movement lockout ends after heavy falls
 - **Camera Impulse Feedback (3D prototype)** — Data-driven camera impulse kick now reacts to dashes and hard landings (with tunable decay/max offset), improving movement impact without hardcoded camera behavior
 - **Air Dash Stamina Scaling (3D prototype)** — Data-driven airborne dash stamina multiplier now increases in-air dash cost versus grounded dashes, improving mobility tradeoff clarity in combat routing
+- **Light Melee Combat Contract (3D prototype)** — Added a modular `DamageResolver` + `CombatActor3D` pipeline and wired player `attack` input through `request_damage()` against a prototype combat dummy, establishing a reusable data-driven damage path for future enemy/skill integration
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases

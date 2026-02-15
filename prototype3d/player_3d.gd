@@ -2,12 +2,14 @@ extends CharacterBody3D
 
 const ACTION_JUMP := "jump"
 const ACTION_CAMERA_RECENTER := "camera_recenter"
+const ACTION_ATTACK := "attack"
 
 @export var tuning: PlayerTuning3D = preload("res://prototype3d/default_player_tuning_3d.tres")
 
 @onready var pivot: Node3D = $CameraPivot
 @onready var camera: Camera3D = $CameraPivot/Camera3D
 @onready var body_mesh: MeshInstance3D = $MeshInstance3D
+@onready var damage_resolver: Node = get_tree().get_first_node_in_group("damage_resolver")
 
 signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
@@ -77,6 +79,13 @@ var _body_visual_blend: float = 0.0
 var _body_material: StandardMaterial3D = null
 var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 
+@export var light_attack_range: float = 2.4
+@export var light_attack_arc_dot: float = 0.2
+@export var light_attack_damage: float = 24.0
+@export var light_attack_cooldown: float = 0.35
+
+var light_attack_cooldown_left: float = 0.0
+
 func _ready() -> void:
 	add_to_group("player_3d")
 	look_target = global_position
@@ -121,9 +130,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			_adjust_camera_zoom(tuning.camera_zoom_step)
 	if event.is_action_pressed(ACTION_CAMERA_RECENTER):
 		_recenter_camera_orbit(1.0)
+	if event.is_action_pressed(ACTION_ATTACK):
+		_try_light_attack()
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
+	light_attack_cooldown_left = max(0.0, light_attack_cooldown_left - delta)
 	if stamina_action_warning_cooldown_left > 0.0:
 		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
 	if camera_follow_assist_lock_left > 0.0:
@@ -991,6 +1003,49 @@ func refund_dash_recovery(seconds: float) -> float:
 		_emit_dash_cooldown_changed()
 		_emit_dash_charge_recharge_changed()
 	return applied
+
+func _try_light_attack() -> void:
+	if light_attack_cooldown_left > 0.0:
+		return
+	if damage_resolver == null:
+		damage_resolver = get_tree().get_first_node_in_group("damage_resolver")
+		if damage_resolver == null:
+			return
+
+	var target: Node3D = _find_attack_target()
+	if target == null:
+		return
+
+	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
+	damage_resolver.request_damage({
+		"source": self,
+		"target": target,
+		"base_damage": max(0.0, light_attack_damage),
+		"damage_type": "physical",
+		"tags": PackedStringArray(["player", "light_attack"]),
+	})
+
+func _find_attack_target() -> Node3D:
+	var nearest: Node3D = null
+	var nearest_distance_sq: float = light_attack_range * light_attack_range
+	var forward: Vector3 = -global_transform.basis.z
+	for candidate in get_tree().get_nodes_in_group("combat_actor_3d"):
+		if candidate == self or not (candidate is Node3D):
+			continue
+		var target := candidate as Node3D
+		var to_target: Vector3 = target.global_position - global_position
+		to_target.y = 0.0
+		var distance_sq := to_target.length_squared()
+		if distance_sq > nearest_distance_sq:
+			continue
+		var direction := to_target.normalized()
+		if direction.length_squared() <= 0.0:
+			continue
+		if forward.dot(direction) < light_attack_arc_dot:
+			continue
+		nearest = target
+		nearest_distance_sq = distance_sq
+	return nearest
 
 func _report_stamina_action_failed(reason: String) -> void:
 	if stamina_action_warning_cooldown_left > 0.0:
