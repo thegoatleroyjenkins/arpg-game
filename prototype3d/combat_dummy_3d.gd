@@ -1,4 +1,4 @@
-extends CombatActor3D
+extends "res://systems/combat/combat_actor_3d.gd"
 
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 
@@ -23,12 +23,16 @@ extends CombatActor3D
 @export var damage_popup_pixel_size: float = 0.006
 @export var damage_popup_text_size: int = 30
 @export var damage_popup_color: Color = Color(1.0, 0.52, 0.3, 1.0)
+@export var crit_popup_color: Color = Color(1.0, 0.88, 0.36, 1.0)
+@export_range(1.0, 2.5, 0.05) var crit_popup_scale_multiplier: float = 1.2
+@export var crit_popup_prefix: String = "CRIT"
 
 var _base_scale: Vector3 = Vector3.ONE
 var _hit_flash_left: float = 0.0
 var _health_label_visible_left: float = 0.0
 var _health_label: Label3D = null
 var _damage_popups: Array[Dictionary] = []
+var _pending_popup_is_critical: bool = false
 
 func _ready() -> void:
 	super._ready()
@@ -44,6 +48,10 @@ func _process(delta: float) -> void:
 	_update_health_label_visibility(delta)
 	_face_health_label_to_camera()
 	_update_damage_popups(delta)
+
+func apply_damage_result(result: Dictionary) -> Dictionary:
+	_pending_popup_is_critical = bool(result.get("is_critical", false))
+	return super.apply_damage_result(result)
 
 func _update_hit_flash(delta: float) -> void:
 	if _hit_flash_left > 0.0:
@@ -96,7 +104,8 @@ func _face_health_label_to_camera() -> void:
 func _on_damage_taken(amount: float, _current: float, _max_value: float) -> void:
 	_hit_flash_left = max(0.0, hit_flash_duration)
 	_health_label_visible_left = max(_health_label_visible_left, health_label_visible_time_on_hit)
-	_spawn_damage_popup(amount)
+	_spawn_damage_popup(amount, _pending_popup_is_critical)
+	_pending_popup_is_critical = false
 
 func _on_health_changed(current: float, max_value: float) -> void:
 	_update_health_label(current, max_value)
@@ -114,26 +123,34 @@ func _update_health_label(current: float, max_value: float) -> void:
 	else:
 		_health_label.modulate = health_label_color_high
 
-func _spawn_damage_popup(amount: float) -> void:
+func _spawn_damage_popup(amount: float, is_critical: bool = false) -> void:
 	if not damage_popup_enabled:
 		return
 	if damage_popup_duration <= 0.0:
 		return
 	var popup: Label3D = Label3D.new()
 	popup.name = "DamagePopup3D"
-	popup.text = "-%d" % int(round(max(0.0, amount)))
+	var amount_text: String = "-%d" % int(round(max(0.0, amount)))
+	if is_critical:
+		var prefix: String = crit_popup_prefix.strip_edges()
+		popup.text = "%s %s" % [prefix, amount_text] if not prefix.is_empty() else amount_text
+	else:
+		popup.text = amount_text
 	popup.position = Vector3(0.0, damage_popup_height, 0.0)
 	popup.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	popup.font_size = max(12, damage_popup_text_size)
+	if is_critical:
+		popup.font_size = int(round(float(popup.font_size) * max(1.0, crit_popup_scale_multiplier)))
 	popup.pixel_size = max(0.001, damage_popup_pixel_size)
 	popup.outline_size = 6
 	popup.no_depth_test = true
-	popup.modulate = damage_popup_color
+	popup.modulate = crit_popup_color if is_critical else damage_popup_color
 	add_child(popup)
 	_damage_popups.append({
 		"node": popup,
 		"time_left": damage_popup_duration,
 		"start_y": popup.position.y,
+		"is_critical": is_critical,
 	})
 
 func _update_damage_popups(delta: float) -> void:
@@ -154,7 +171,8 @@ func _update_damage_popups(delta: float) -> void:
 		var start_y: float = float(entry.get("start_y", damage_popup_height))
 		popup.position.y = start_y + (damage_popup_rise_distance * normalized)
 		var alpha: float = 1.0 - normalized
-		var tint: Color = damage_popup_color
+		var is_critical: bool = bool(entry.get("is_critical", false))
+		var tint: Color = crit_popup_color if is_critical else damage_popup_color
 		tint.a *= alpha
 		popup.modulate = tint
 		if camera != null:

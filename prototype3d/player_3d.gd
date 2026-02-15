@@ -86,6 +86,8 @@ var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 @export var light_attack_damage: float = 24.0
 @export var light_attack_cooldown: float = 0.35
 @export_range(1, 8, 1) var light_attack_max_targets: int = 1
+@export_range(0.0, 1.0, 0.01) var light_attack_crit_chance: float = 0.18
+@export_range(1.0, 5.0, 0.05) var light_attack_crit_multiplier: float = 1.75
 
 var light_attack_cooldown_left: float = 0.0
 
@@ -1046,6 +1048,8 @@ func _try_light_attack() -> void:
 			"target": target,
 			"base_damage": max(0.0, light_attack_damage),
 			"damage_type": "physical",
+			"crit_chance": clamp(light_attack_crit_chance, 0.0, 1.0),
+			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
 			"tags": PackedStringArray(["player", "light_attack"]),
 		})
 
