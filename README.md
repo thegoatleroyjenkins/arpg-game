@@ -102,7 +102,7 @@ Release assets uploaded:
 
 ## Development
 
-Built with **Godot 4.2**
+Built with **Godot 4.6**
 
 ### Run from source:
 ```bash

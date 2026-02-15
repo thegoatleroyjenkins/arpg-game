@@ -30,7 +30,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.2.1
+      image: barichello/godot-ci:4.6
 
     steps:
       - name: Checkout
@@ -64,8 +64,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          GODOT_VERSION="4.2.1"
-          TEMPLATE_VERSION="4.2.1.stable"
+          GODOT_VERSION="4.6"
+          TEMPLATE_VERSION="4.6.stable"
           TEMPLATES_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
           mkdir -p "$TEMPLATES_DIR"
 
