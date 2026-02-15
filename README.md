@@ -27,6 +27,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Low-Stamina Warning Pulse (3D prototype)** — Data-driven HUD warning ratio + pulse speed now drive a pulsing stamina alert when resources get critical, improving combat pacing readability
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
 - **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
+- **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
@@ -186,6 +187,7 @@ arpg-game/
 - ✅ Added data-driven 3D camera zoom controls (mouse wheel) with min/max/step tuning for better combat readability and scene awareness
 - ✅ Added data-driven dynamic camera FOV response (base/speed/dash/smoothing) to improve perceived movement and dash impact
 - ✅ Added data-driven 3D dash input buffering so near-ready dash presses queue cleanly and fire as cooldown ends
+- ✅ Added modular 3D dash queue HUD feedback (queue active vs empty + remaining queue time) wired to player dash-buffer signals for clearer clutch dash timing readability
 - ✅ Added data-driven contextual stamina regeneration (separate idle vs moving regen rates) to improve mobility/resource pacing
 - ✅ Added data-driven sprint ramp smoothing (separate ramp-up/ramp-down rates) for weightier transitions into and out of sprint movement
 - ✅ Added data-driven sprint exhaustion gating (exhaustion/resume stamina thresholds) to prevent near-empty stamina sprint flicker and improve movement pacing readability

@@ -82,6 +82,10 @@ show_percentage = false
 layout_mode = 2
 text = "Dash Ready"
 
+[node name="DashBufferLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Dash Queue Empty"
+
 [node name="AirJumpLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Air Jumps 1 / 1"

@@ -9,6 +9,7 @@ const ACTION_JUMP := "jump"
 
 signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
+signal dash_buffer_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal air_jumps_changed(current: int, max_value: int)
 signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
@@ -47,6 +48,7 @@ func _ready() -> void:
 	_emit_stamina_changed()
 	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
+	_emit_dash_buffer_changed()
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
@@ -135,6 +137,7 @@ func _physics_process(delta: float) -> void:
 
 	if dash_buffer_left > 0.0:
 		dash_buffer_left = max(0.0, dash_buffer_left - delta)
+		_emit_dash_buffer_changed()
 
 	if dash_state_changed:
 		_emit_dash_cooldown_changed()
@@ -146,12 +149,14 @@ func _physics_process(delta: float) -> void:
 		elif _dash_ready_within(tuning.dash_input_buffer_time):
 			dash_buffer_left = tuning.dash_input_buffer_time
 			buffered_dash_direction = move_dir
+			_emit_dash_buffer_changed()
 
 	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 		_use_stamina(tuning.dash_stamina_cost)
 		_start_dash(buffered_dash_direction)
 		dash_buffer_left = 0.0
 		buffered_dash_direction = Vector3.ZERO
+		_emit_dash_buffer_changed()
 
 	if dash_time_left > 0.0:
 		dash_time_left = max(0.0, dash_time_left - delta)
@@ -265,6 +270,7 @@ func _start_dash(move_dir: Vector3) -> void:
 	_add_camera_impulse(dash_impulse_direction, tuning.camera_dash_impulse_strength)
 	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
+	_emit_dash_buffer_changed()
 
 func _update_dash_direction(move_dir: Vector3, delta: float) -> void:
 	if move_dir.length() <= 0.01:
@@ -390,6 +396,9 @@ func _emit_dash_charges_changed() -> void:
 
 func _emit_dash_cooldown_changed() -> void:
 	dash_cooldown_changed.emit(_next_dash_ready_remaining(), _next_dash_ready_max())
+
+func _emit_dash_buffer_changed() -> void:
+	dash_buffer_changed.emit(dash_buffer_left, max(0.01, tuning.dash_input_buffer_time))
 
 func _emit_air_jumps_changed() -> void:
 	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))
