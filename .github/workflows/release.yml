@@ -79,9 +79,7 @@ jobs:
             wget -q -O /tmp/godot_templates.tpz "$TEMPLATE_URL"
           elif command -v python3 >/dev/null 2>&1; then
             python3 - <<PY
-import urllib.request
-urllib.request.urlretrieve("$TEMPLATE_URL", "/tmp/godot_templates.tpz")
-PY
+            python3 -c "import urllib.request; urllib.request.urlretrieve('$TEMPLATE_URL', '/tmp/godot_templates.tpz')"
           else
             echo "No downloader available (curl/wget/python3 missing)."
             exit 1
