@@ -22,6 +22,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability
 - **Air Jump (3D prototype)** — Data-driven extra mid-air jump count enables cleaner vertical repositioning and more expressive traversal/combat routing
 - **Jump Apex Hang Time (3D prototype)** — Data-driven apex gravity tuning softens gravity near jump peak for cleaner aerial control and better mid-air repositioning readability
+- **Sprint Jump Momentum Carry (3D prototype)** — Data-driven sprint-jump momentum boost and speed cap preserve forward flow when jumping out of sprint, improving traversal/combat movement continuity without hardcoded values
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
 - **Low-Stamina Warning Pulse (3D prototype)** — Data-driven HUD warning ratio + pulse speed now drive a pulsing stamina alert when resources get critical, improving combat pacing readability
@@ -211,6 +212,7 @@ arpg-game/
 - ✅ Added data-driven low-stamina HUD warning pulse (threshold ratio + pulse speed tuning) to make critical stamina states more readable during combat movement decisions
 - ✅ Added data-driven low-stamina movement drag (threshold ratio + minimum movement multiplier) so critical stamina states carry a clear movement pacing tradeoff
 - ✅ Added data-driven airborne stamina regeneration tuning (separate in-air regen rate) to keep aerial mobility chains as a meaningful stamina commitment
+- ✅ Added data-driven sprint-jump momentum carry tuning (momentum multiplier + speed cap) so jumping out of sprint preserves cleaner forward flow without hardcoded movement boosts
 
 ## License
 

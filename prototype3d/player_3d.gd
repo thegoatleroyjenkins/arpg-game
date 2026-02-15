@@ -98,6 +98,7 @@ func _physics_process(delta: float) -> void:
 	if jump_buffer_left > 0.0 and (can_ground_jump or can_air_jump) and _can_pay_stamina(tuning.jump_stamina_cost):
 		_use_stamina(tuning.jump_stamina_cost)
 		velocity.y = tuning.jump_velocity
+		_apply_sprint_jump_momentum_boost()
 		jump_buffer_left = 0.0
 		if can_ground_jump:
 			coyote_time_left = 0.0
@@ -249,6 +250,22 @@ func _is_jump_pressed() -> bool:
 	if InputMap.has_action(ACTION_JUMP):
 		return Input.is_action_pressed(ACTION_JUMP)
 	return Input.is_action_pressed("ui_accept")
+
+func _apply_sprint_jump_momentum_boost() -> void:
+	if not Input.is_action_pressed("sprint"):
+		return
+	var boost_multiplier: float = max(1.0, tuning.sprint_jump_momentum_multiplier)
+	if boost_multiplier <= 1.0:
+		return
+	var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+	var horizontal_speed := horizontal_velocity.length()
+	if horizontal_speed <= 0.01:
+		return
+	var speed_cap := tuning.move_speed * max(1.0, tuning.sprint_multiplier) * max(1.0, tuning.sprint_jump_speed_cap_multiplier)
+	var boosted_speed := min(horizontal_speed * boost_multiplier, speed_cap)
+	var boosted_velocity := horizontal_velocity.normalized() * boosted_speed
+	velocity.x = boosted_velocity.x
+	velocity.z = boosted_velocity.z
 
 func _start_dash(move_dir: Vector3) -> void:
 	if landing_recovery_left > 0.0:
