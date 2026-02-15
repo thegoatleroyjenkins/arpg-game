@@ -12,6 +12,8 @@ extends Area3D
 @export_range(0.5, 3.0, 0.05) var magnet_speed_curve_power: float = 1.4
 @export var magnet_auto_collect_radius: float = 0.75
 @export_range(0.0, 1.0, 0.01) var magnet_missing_stamina_ratio: float = 0.2
+@export_group("Collection")
+@export_range(0.0, 1.0, 0.01) var min_collect_missing_stamina_ratio: float = 0.05
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
 @export var magnet_line_of_sight_height_offset: float = 0.5
@@ -61,6 +63,10 @@ func _try_collect(body: Node) -> void:
 		return
 	if not body.has_method("restore_stamina"):
 		return
+	if body is Node3D:
+		var missing_ratio: float = _get_target_missing_stamina_ratio(body)
+		if missing_ratio < clamp(min_collect_missing_stamina_ratio, 0.0, 1.0):
+			return
 	var restored: float = float(body.call("restore_stamina", stamina_restore))
 	if restored <= 0.0:
 		return
@@ -171,15 +177,18 @@ func _get_magnet_target() -> Node3D:
 func _target_needs_stamina(player: Node3D) -> bool:
 	if not player.has_method("restore_stamina"):
 		return false
+	var missing_ratio: float = _get_target_missing_stamina_ratio(player)
+	return missing_ratio >= clamp(magnet_missing_stamina_ratio, 0.0, 1.0)
+
+func _get_target_missing_stamina_ratio(player: Node3D) -> float:
 	var current_stamina: float = float(player.get("stamina"))
 	var tuning: Resource = player.get("tuning")
 	if tuning == null:
-		return true
+		return 1.0
 	var max_stamina: float = float(tuning.get("max_stamina"))
 	if max_stamina <= 0.01:
-		return false
-	var missing_ratio: float = clamp((max_stamina - current_stamina) / max_stamina, 0.0, 1.0)
-	return missing_ratio >= clamp(magnet_missing_stamina_ratio, 0.0, 1.0)
+		return 0.0
+	return clamp((max_stamina - current_stamina) / max_stamina, 0.0, 1.0)
 
 func _has_line_of_sight_to_target(player: Node3D) -> bool:
 	var world := get_world_3d()

@@ -38,6 +38,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
 - **Dash I-Frame HUD Readout (3D prototype)** — Modular HUD now tracks remaining dash invulnerability time via player signals, making defensive timing windows readable during high-pressure movement chains
 - **Stamina Pickup Orbs (3D prototype)** — World pickup nodes now restore player stamina on contact and respawn on a timer, adding a readable, data-driven sustain loop to movement-heavy combat pacing
+- **Stamina Pickup Anti-Waste Threshold (3D prototype)** — Data-driven minimum missing-stamina ratio now prevents collecting stamina orbs when nearly full, preserving resource pickups for intentional routing during combat movement
 - **Low-Stamina Pickup Magnet (3D prototype)** — Data-driven stamina orb magnet radius/speed now gently pulls nearby orbs toward the player only when missing stamina crosses a tunable threshold, improving recovery readability during high-pressure movement chains
 - **Pickup Magnet Line-of-Sight Gating (3D prototype)** — Data-driven line-of-sight toggle + collision mask now prevent stamina orbs from magnetizing through walls, preserving clearer spatial routing and pickup readability in denser arenas
 - **Pickup Magnet Ease-In + Auto-Collect (3D prototype)** — Data-driven magnet minimum speed ratio, distance-based speed curve, and close-range auto-collect radius now make stamina orbs accelerate smoothly into the player instead of jittering near contact
@@ -192,6 +193,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven stamina pickup anti-waste collect threshold (minimum missing-stamina ratio) so near-full players do not accidentally consume orbs, preserving intentional resource routing
 - ✅ Added data-driven 3D stamina pickup respawn telegraph tuning (toggle + telegraph duration + pulse speed + alpha range) so depleted stamina orbs visibly pulse before becoming collectible again, improving pickup timing readability during movement-heavy combat routing
 - ✅ Added data-driven stamina pickup spawn-recovery drift correction (return speed + snap distance) so uncollected orbs slide back toward their spawn anchors when magnet pull conditions fail, preserving pickup location readability
 - ✅ Added data-driven stamina pickup magnet line-of-sight gating (toggle + collision mask + trace height offset) so pickup orbs no longer pull through walls, improving arena routing clarity and world-space readability
