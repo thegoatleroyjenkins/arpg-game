@@ -1,5 +1,8 @@
 extends Area2D
 
+const TEX_HEALTH := preload("res://assets/placeholders/item_health_potion.png")
+const TEX_XP := preload("res://assets/placeholders/item_xp_orb.png")
+
 @export var item_type: String = "health_potion"
 @export var value: int = 25
 
@@ -7,6 +10,14 @@ extends Area2D
 @onready var collision = $CollisionShape2D
 
 func _ready():
+	match item_type:
+		"xp_orb":
+			sprite.texture = TEX_XP
+			sprite.modulate = Color.WHITE
+		_:
+			sprite.texture = TEX_HEALTH
+			sprite.modulate = Color.WHITE
+
 	# Add floating animation
 	var tween = create_tween().set_loops()
 	tween.tween_property(sprite, "position:y", -5, 1.0).set_trans(Tween.TRANS_SINE)
