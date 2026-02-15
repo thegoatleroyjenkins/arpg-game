@@ -283,3 +283,27 @@ The project now has core combat and world streaming stubs; the highest-value ste
 
 ### Why this order
 This proves the first reusable combat encounter slice, then anchors it to streaming lifecycle so the architecture remains viable as world size and encounter density grow.
+
+## Focused Planning Pass — 2026-02-15 12:03 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Ship the first moving enemy encounter in the 3D prototype (highest leverage right now)**
+   - Implement `prototype3d/enemy_actor_3d.gd` and `prototype3d/enemy_brain_3d.gd` with explicit states (Idle/Chase/Attack/Leash).
+   - Use `NavigationAgent3D` for movement to stay compatible with streamed sectors and larger terrain.
+   - Route enemy melee through `DamageResolver.request_damage()` only, preserving one combat source of truth.
+
+2. **Connect chunk lifecycle to spawning behavior (open-world architecture step-up)**
+   - Wire `WorldStreamer` chunk activation/deactivation to `WorldSector` and `SpawnDirector` signals/callbacks.
+   - Enforce per-chunk active encounter caps and despawn-on-unload behavior.
+   - Keep chunk spawn metadata in `data/world/world_map_layout.json` so world scale-up remains data-driven.
+
+3. **Introduce first progression resource contracts consumed by combat/spawn systems**
+   - Define minimal `EnemyArchetype3D`, `SkillData`, and `AffixData` resources with stable core fields.
+   - Add adapters so resolver/spawn tuning reads data resources rather than hardcoded scene constants.
+   - Add a concise combat breakdown debug line (base, mitigation, crit, final) to keep tuning readable.
+
+### Immediate Next Implementation Task
+**Implement now:** replace `CombatDummy` in `prototype3d/main_3d.tscn` with a `NavigationAgent3D`-driven enemy (`enemy_actor_3d.gd` + `enemy_brain_3d.gd`) that chases and performs one resolver-based melee attack.
+
+### Why this order
+Combat already has a resolver contract; the biggest unblocker is proving a real moving encounter loop, then binding it to chunk lifecycle so open-world scaling stays additive instead of rewrite-heavy.
