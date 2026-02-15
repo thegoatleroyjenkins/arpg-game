@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var dash_cooldown_bar: ProgressBar = $MarginContainer/VBoxContainer/DashCooldownBar
 @onready var dash_cooldown_label: Label = $MarginContainer/VBoxContainer/DashCooldownLabel
 @onready var air_jump_label: Label = $MarginContainer/VBoxContainer/AirJumpLabel
+@onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
 
 var dash_charges_current: int = 0
 var dash_charges_max: int = 1
@@ -29,11 +30,15 @@ func _ready() -> void:
 	if not player.has_signal("air_jumps_changed"):
 		push_warning("StaminaHud3D target does not expose air_jumps_changed signal")
 		return
+	if not player.has_signal("sprint_state_changed"):
+		push_warning("StaminaHud3D target does not expose sprint_state_changed signal")
+		return
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
 	player.dash_charges_changed.connect(_on_dash_charges_changed)
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
+	player.sprint_state_changed.connect(_on_sprint_state_changed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_charges := int(player.get("dash_charges"))
@@ -52,6 +57,7 @@ func _ready() -> void:
 	_on_dash_charges_changed(current_dash_charges, max_dash_charges)
 	_on_dash_cooldown_changed(current_dash_cooldown, max_dash_cooldown)
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
+	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 
 func _on_stamina_changed(current: float, max_value: float) -> void:
 	stamina_bar.max_value = max(1.0, max_value)
@@ -74,3 +80,14 @@ func _on_air_jumps_changed(current: int, max_value: int) -> void:
 	var clamped_max: int = max(0, max_value)
 	var clamped_current: int = clampi(current, 0, clamped_max)
 	air_jump_label.text = "Air Jumps %d / %d" % [clamped_current, clamped_max]
+
+func _on_sprint_state_changed(is_sprinting: bool, is_exhausted: bool) -> void:
+	if is_exhausted:
+		sprint_state_label.text = "Sprint EXHAUSTED"
+		sprint_state_label.modulate = Color(1.0, 0.45, 0.35)
+	elif is_sprinting:
+		sprint_state_label.text = "Sprint ACTIVE"
+		sprint_state_label.modulate = Color(0.7, 1.0, 0.7)
+	else:
+		sprint_state_label.text = "Sprint READY"
+		sprint_state_label.modulate = Color(0.85, 0.9, 1.0)

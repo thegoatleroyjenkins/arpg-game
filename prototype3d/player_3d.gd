@@ -11,6 +11,7 @@ signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal air_jumps_changed(current: int, max_value: int)
+signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
 
 var look_target: Vector3
 var target_camera_distance: float = 0.0
@@ -31,6 +32,9 @@ var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
 var camera_impulse_offset: Vector3 = Vector3.ZERO
 var landing_recovery_left: float = 0.0
+var sprinting_now: bool = false
+var _last_emitted_sprinting: bool = false
+var _last_emitted_sprint_exhausted: bool = false
 
 func _ready() -> void:
 	look_target = global_position
@@ -43,6 +47,7 @@ func _ready() -> void:
 	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
 	_emit_air_jumps_changed()
+	_emit_sprint_state_changed(true)
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -150,6 +155,9 @@ func _physics_process(delta: float) -> void:
 		_update_dash_direction(move_dir, delta)
 		velocity.x = dash_direction.x * tuning.dash_speed
 		velocity.z = dash_direction.z * tuning.dash_speed
+		if sprinting_now:
+			sprinting_now = false
+			_emit_sprint_state_changed()
 	else:
 		var is_recovering := landing_recovery_left > 0.0
 		var is_moving := move_dir.length() > 0.01
@@ -166,6 +174,9 @@ func _physics_process(delta: float) -> void:
 				sprint_exhausted = true
 		else:
 			_regen_stamina(delta, is_moving and not is_recovering)
+
+		sprinting_now = is_sprinting
+		_emit_sprint_state_changed()
 
 		var ramp_up: float = max(0.01, tuning.sprint_ramp_up_per_second)
 		var ramp_down: float = max(0.01, tuning.sprint_ramp_down_per_second)
@@ -347,3 +358,10 @@ func _emit_dash_cooldown_changed() -> void:
 
 func _emit_air_jumps_changed() -> void:
 	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))
+
+func _emit_sprint_state_changed(force: bool = false) -> void:
+	if not force and sprinting_now == _last_emitted_sprinting and sprint_exhausted == _last_emitted_sprint_exhausted:
+		return
+	_last_emitted_sprinting = sprinting_now
+	_last_emitted_sprint_exhausted = sprint_exhausted
+	sprint_state_changed.emit(sprinting_now, sprint_exhausted)

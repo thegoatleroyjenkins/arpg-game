@@ -85,3 +85,7 @@ text = "Dash Ready"
 [node name="AirJumpLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Air Jumps 1 / 1"
+
+[node name="SprintStateLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Sprint READY"
