@@ -1075,11 +1075,15 @@ func _try_light_attack() -> bool:
 
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
 	_start_light_attack_lunge(targets[0])
-	for target in targets:
+	var cleave_falloff: float = clamp(tuning.light_attack_cleave_falloff_per_target, 0.0, 1.0)
+	var cleave_min_multiplier: float = clamp(tuning.light_attack_cleave_min_multiplier, 0.1, 1.0)
+	for i in range(targets.size()):
+		var target: Node3D = targets[i]
+		var cleave_multiplier: float = max(cleave_min_multiplier, 1.0 - (cleave_falloff * float(i)))
 		damage_resolver.request_damage({
 			"source": self,
 			"target": target,
-			"base_damage": max(0.0, light_attack_damage),
+			"base_damage": max(0.0, light_attack_damage * cleave_multiplier),
 			"damage_type": "physical",
 			"crit_chance": clamp(light_attack_crit_chance, 0.0, 1.0),
 			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
