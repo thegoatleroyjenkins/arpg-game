@@ -24,14 +24,33 @@ func request_damage(payload: Dictionary) -> Dictionary:
 	if target.has_method("get_mitigation_for"):
 		mitigation = max(0.0, float(target.get_mitigation_for(payload)))
 
-	var final_damage: float = max(0.0, requested_damage - mitigation)
+	# Optional payload knobs keep damage math data-driven across skills/items:
+	# - armor_penetration_flat: subtracts flat mitigation before damage
+	# - armor_penetration_ratio: ignores a % of mitigation (0.0 - 1.0)
+	# - minimum_damage: absolute final-damage floor
+	# - minimum_damage_ratio: floor based on requested damage (0.0 - 1.0)
+	var armor_penetration_flat: float = max(0.0, float(payload.get("armor_penetration_flat", 0.0)))
+	var armor_penetration_ratio: float = clamp(float(payload.get("armor_penetration_ratio", 0.0)), 0.0, 1.0)
+	var effective_mitigation: float = mitigation
+	effective_mitigation *= max(0.0, 1.0 - armor_penetration_ratio)
+	effective_mitigation = max(0.0, effective_mitigation - armor_penetration_flat)
+
+	var minimum_damage: float = max(0.0, float(payload.get("minimum_damage", 0.0)))
+	var minimum_damage_ratio: float = clamp(float(payload.get("minimum_damage_ratio", 0.0)), 0.0, 1.0)
+	minimum_damage = max(minimum_damage, requested_damage * minimum_damage_ratio)
+
+	var final_damage: float = max(minimum_damage, requested_damage - effective_mitigation)
 	var result := {
 		"source": payload.get("source", null),
 		"target": target,
 		"damage_type": payload.get("damage_type", "physical"),
 		"tags": payload.get("tags", PackedStringArray()),
 		"requested_damage": requested_damage,
-		"mitigated_damage": mitigation,
+		"mitigated_damage": effective_mitigation,
+		"raw_mitigation": mitigation,
+		"armor_penetration_flat": armor_penetration_flat,
+		"armor_penetration_ratio": armor_penetration_ratio,
+		"minimum_damage": minimum_damage,
 		"final_damage": final_damage,
 		"is_critical": is_critical,
 		"critical_multiplier": crit_multiplier if is_critical else 1.0,
