@@ -110,6 +110,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Camera Impulse Feedback (3D prototype)** — Data-driven camera impulse kick now reacts to dashes and hard landings (with tunable decay/max offset), improving movement impact without hardcoded camera behavior
 - **Air Dash Stamina Scaling (3D prototype)** — Data-driven airborne dash stamina multiplier now increases in-air dash cost versus grounded dashes, improving mobility tradeoff clarity in combat routing
 - **Light Melee Combat Contract (3D prototype)** — Added a modular `DamageResolver` + `CombatActor3D` pipeline and wired player `attack` input through `request_damage()` against a prototype combat dummy, establishing a reusable data-driven damage path for future enemy/skill integration
+- **Combat Dummy Damage Popups (3D prototype)** — Data-driven world-space damage popup tuning (`damage_popup_*`) now spawns rising/fading hit numbers over the combat dummy, improving impact readability while keeping combat feedback modular and script-configurable
 - **Light Attack Cleave Targets (3D prototype)** — Data-driven light attack target count (`light_attack_max_targets`) now allows each swing to hit multiple nearby enemies in-arc (nearest-first), improving crowd-control readability while preserving modular combat-resolver flow
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
@@ -240,6 +241,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven combat dummy damage popup tuning (`damage_popup_enabled`, `damage_popup_duration`, `damage_popup_rise_distance`, `damage_popup_color`) that spawns rising/fading world-space hit numbers, improving per-hit combat readability without hardcoded scene effects
 - ✅ Added a modular combat-dummy world-space health readout with data-driven timing/color tuning (`health_label_visible_time_on_hit`, `health_label_color_*`, `health_label_show_when_full`) to improve 3D combat clarity while keeping feedback behavior script-configurable
 - ✅ Added data-driven light-attack cleave targeting (`light_attack_max_targets`) so each swing can hit multiple nearest enemies in front arc without hardcoded scene logic, improving crowd-combat readability while keeping combat resolution modular
 - ✅ Added data-driven sprint turn responsiveness tuning (`sprint_turn_speed_multiplier`) so sprinting carries intentional steering weight while preserving modular facing controls for non-sprint movement
