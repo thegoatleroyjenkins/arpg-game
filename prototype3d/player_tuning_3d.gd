@@ -46,6 +46,7 @@ class_name PlayerTuning3D
 @export var hard_landing_recovery_time: float = 0.18
 @export var hard_landing_stamina_cost: float = 14.0
 @export var hard_landing_dash_cancel_window: float = 0.07
+@export var hard_landing_dash_input_buffer_window: float = 0.12
 
 @export_group("Safety")
 @export var fall_reset_height: float = -12.0

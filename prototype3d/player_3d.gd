@@ -222,13 +222,19 @@ func _physics_process(delta: float) -> void:
 		_emit_dash_cooldown_changed()
 
 	var dash_stamina_cost := _current_dash_stamina_cost()
-	if _can_dash_now() and Input.is_action_just_pressed("dash"):
-		if _can_start_dash() and _try_spend_stamina(dash_stamina_cost, "Dash"):
+	if Input.is_action_just_pressed("dash"):
+		if _can_dash_now() and _can_start_dash() and _try_spend_stamina(dash_stamina_cost, "Dash"):
 			_start_dash(move_dir)
-		elif _dash_ready_within(tuning.dash_input_buffer_time):
-			dash_buffer_left = tuning.dash_input_buffer_time
-			buffered_dash_direction = move_dir
-			_emit_dash_buffer_changed()
+		else:
+			var should_buffer_dash: bool = false
+			if _can_dash_now() and _dash_ready_within(tuning.dash_input_buffer_time):
+				should_buffer_dash = true
+			elif _can_start_dash() and _dash_recovery_ready_within(tuning.hard_landing_dash_input_buffer_window):
+				should_buffer_dash = true
+			if should_buffer_dash:
+				dash_buffer_left = max(dash_buffer_left, tuning.dash_input_buffer_time)
+				buffered_dash_direction = move_dir
+				_emit_dash_buffer_changed()
 
 	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _try_spend_stamina(dash_stamina_cost, "Dash"):
 		_start_dash(buffered_dash_direction)
@@ -706,6 +712,11 @@ func _dash_ready_within(window: float) -> bool:
 		return false
 	var remaining := _next_dash_ready_remaining()
 	return remaining > 0.0 and remaining <= window
+
+func _dash_recovery_ready_within(window: float) -> bool:
+	if window <= 0.0:
+		return false
+	return landing_recovery_left > 0.0 and landing_recovery_left <= window
 
 func _next_dash_ready_remaining() -> float:
 	if dash_charges > 0:
