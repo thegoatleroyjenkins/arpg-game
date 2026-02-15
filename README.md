@@ -51,6 +51,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Recent Input Dash Direction Memory (3D prototype)** — Data-driven dash direction memory now uses your most recent movement input for a short window when dashing from neutral, preserving intended reposition direction during stop-and-go combat movement
 - **Camera-Forward Neutral Dash Fallback (3D prototype)** — Data-driven neutral dash fallback can now use camera forward when no movement input/recent input exists, preserving camera-framed reposition intent instead of forcing character-facing dashes
 - **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
+- **Jump Queue HUD Feedback (3D prototype)** — Modular HUD now also surfaces jump input buffer state and remaining queue time from player signals, making coyote-time jump timing windows clearer during fast movement chains
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
 - **Dash I-Frame HUD Readout (3D prototype)** — Modular HUD now tracks remaining dash invulnerability time via player signals, making defensive timing windows readable during high-pressure movement chains

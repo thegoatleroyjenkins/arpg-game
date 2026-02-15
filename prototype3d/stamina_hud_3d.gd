@@ -9,6 +9,7 @@ extends CanvasLayer
 @onready var dash_charge_recharge_bar: ProgressBar = $MarginContainer/VBoxContainer/DashChargeRechargeBar
 @onready var dash_charge_recharge_label: Label = $MarginContainer/VBoxContainer/DashChargeRechargeLabel
 @onready var dash_buffer_label: Label = $MarginContainer/VBoxContainer/DashBufferLabel
+@onready var jump_buffer_label: Label = get_node_or_null("MarginContainer/VBoxContainer/JumpBufferLabel") as Label
 @onready var air_jump_label: Label = $MarginContainer/VBoxContainer/AirJumpLabel
 @onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
 @onready var landing_recovery_bar: ProgressBar = $MarginContainer/VBoxContainer/LandingRecoveryBar
@@ -48,6 +49,9 @@ func _ready() -> void:
 		return
 	if not player.has_signal("dash_buffer_changed"):
 		push_warning("StaminaHud3D target does not expose dash_buffer_changed signal")
+		return
+	if not player.has_signal("jump_buffer_changed"):
+		push_warning("StaminaHud3D target does not expose jump_buffer_changed signal")
 		return
 	if not player.has_signal("dash_charges_changed"):
 		push_warning("StaminaHud3D target does not expose dash_charges_changed signal")
@@ -93,6 +97,7 @@ func _ready() -> void:
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
 	player.dash_charge_recharge_changed.connect(_on_dash_charge_recharge_changed)
 	player.dash_buffer_changed.connect(_on_dash_buffer_changed)
+	player.jump_buffer_changed.connect(_on_jump_buffer_changed)
 	player.dash_charges_changed.connect(_on_dash_charges_changed)
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
 	player.sprint_state_changed.connect(_on_sprint_state_changed)
@@ -109,6 +114,7 @@ func _ready() -> void:
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_charge_recharge := float(player.get("dash_charge_recharge_left"))
 	var current_dash_buffer := float(player.get("dash_buffer_left"))
+	var current_jump_buffer := float(player.get("jump_buffer_left"))
 	var current_dash_charges := int(player.get("dash_charges"))
 	var current_air_jumps := int(player.get("air_jumps_left"))
 	var current_landing_recovery := float(player.get("landing_recovery_left"))
@@ -134,6 +140,7 @@ func _ready() -> void:
 	var max_dash_cooldown := 1.0
 	var max_dash_charge_recharge := 1.25
 	var max_dash_buffer := 0.15
+	var max_jump_buffer := 0.12
 	var max_dash_charges := 1
 	var max_air_jumps := 0
 	var max_landing_recovery := 0.18
@@ -144,6 +151,7 @@ func _ready() -> void:
 		max_dash_cooldown = max(0.01, float(player.call("_next_dash_ready_max")))
 		max_dash_charge_recharge = max(0.01, float(tuning_resource.get("dash_charge_recovery_time")))
 		max_dash_buffer = max(0.01, float(tuning_resource.get("dash_input_buffer_time")))
+		max_jump_buffer = max(0.01, float(tuning_resource.get("jump_buffer_time")) + max(0.0, float(tuning_resource.get("jump_buffer_dash_bonus_time"))))
 		max_dash_charges = max(1, int(tuning_resource.get("dash_max_charges")))
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
 		max_landing_recovery = max(0.01, float(tuning_resource.get("hard_landing_recovery_time")))
@@ -174,6 +182,13 @@ func _ready() -> void:
 		dash_charge_recovery_boost_label.text = "Dash Recharge Boost Ready"
 		vbox.add_child(dash_charge_recovery_boost_label)
 		vbox.move_child(dash_charge_recovery_boost_label, dash_invulnerability_boost_label.get_index() + 1)
+	if jump_buffer_label == null:
+		var vbox: VBoxContainer = $MarginContainer/VBoxContainer
+		jump_buffer_label = Label.new()
+		jump_buffer_label.name = "JumpBufferLabel"
+		jump_buffer_label.text = "Jump Queue Empty"
+		vbox.add_child(jump_buffer_label)
+		vbox.move_child(jump_buffer_label, dash_buffer_label.get_index() + 1)
 	stamina_warning_label.visible = false
 	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
 	_apply_readability_theme()
@@ -183,6 +198,7 @@ func _ready() -> void:
 	_on_dash_cooldown_changed(current_dash_cooldown, max_dash_cooldown)
 	_on_dash_charge_recharge_changed(current_dash_charge_recharge, max_dash_charge_recharge)
 	_on_dash_buffer_changed(current_dash_buffer, max_dash_buffer)
+	_on_jump_buffer_changed(current_jump_buffer, max_jump_buffer)
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
@@ -211,6 +227,7 @@ func _apply_readability_theme() -> void:
 		dash_cooldown_label,
 		dash_charge_recharge_label,
 		dash_buffer_label,
+		jump_buffer_label,
 		air_jump_label,
 		sprint_state_label,
 		landing_recovery_label,
@@ -287,6 +304,18 @@ func _on_dash_buffer_changed(remaining: float, max_value: float) -> void:
 	else:
 		dash_buffer_label.text = "Dash Queue Empty"
 		dash_buffer_label.modulate = Color(0.75, 0.8, 0.9)
+
+func _on_jump_buffer_changed(remaining: float, max_value: float) -> void:
+	if jump_buffer_label == null:
+		return
+	var clamped_max: float = max(0.01, max_value)
+	var clamped_remaining: float = clamp(remaining, 0.0, clamped_max)
+	if clamped_remaining > 0.0:
+		jump_buffer_label.text = "Jump Queue %.2fs" % clamped_remaining
+		jump_buffer_label.modulate = Color(0.8, 0.92, 1.0)
+	else:
+		jump_buffer_label.text = "Jump Queue Empty"
+		jump_buffer_label.modulate = Color(0.72, 0.82, 0.94)
 
 func _on_air_jumps_changed(current: int, max_value: int) -> void:
 	var clamped_max: int = max(0, max_value)

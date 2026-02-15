@@ -12,6 +12,7 @@ const ACTION_CAMERA_RECENTER := "camera_recenter"
 signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_buffer_changed(remaining: float, max_value: float)
+signal jump_buffer_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal dash_charge_recharge_changed(remaining: float, max_value: float)
 signal air_jumps_changed(current: int, max_value: int)
@@ -93,6 +94,7 @@ func _ready() -> void:
 	_emit_dash_charge_recharge_changed()
 	_emit_dash_cooldown_changed()
 	_emit_dash_buffer_changed()
+	_emit_jump_buffer_changed()
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
@@ -170,8 +172,12 @@ func _physics_process(delta: float) -> void:
 		if dash_time_left > 0.0:
 			jump_buffer_window += min(dash_time_left, max(0.0, tuning.jump_buffer_dash_bonus_time))
 		jump_buffer_left = jump_buffer_window
+		_emit_jump_buffer_changed()
 	else:
+		var previous_jump_buffer_left: float = jump_buffer_left
 		jump_buffer_left = max(0.0, jump_buffer_left - delta)
+		if absf(previous_jump_buffer_left - jump_buffer_left) > 0.0001:
+			_emit_jump_buffer_changed()
 
 	# Gravity + coyote time for forgiving jumps after stepping off ledges.
 	if was_on_floor:
@@ -201,6 +207,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y = tuning.jump_velocity
 		_apply_sprint_jump_momentum_boost()
 		jump_buffer_left = 0.0
+		_emit_jump_buffer_changed()
 		if can_ground_jump:
 			coyote_time_left = 0.0
 		elif can_air_jump:
@@ -1005,6 +1012,13 @@ func _emit_dash_cooldown_changed() -> void:
 
 func _emit_dash_buffer_changed() -> void:
 	dash_buffer_changed.emit(dash_buffer_left, max(0.01, tuning.dash_input_buffer_time))
+
+func _jump_buffer_max() -> float:
+	var dash_bonus_window: float = max(0.0, tuning.jump_buffer_dash_bonus_time)
+	return max(0.01, max(0.0, tuning.jump_buffer_time) + dash_bonus_window)
+
+func _emit_jump_buffer_changed() -> void:
+	jump_buffer_changed.emit(jump_buffer_left, _jump_buffer_max())
 
 func _emit_air_jumps_changed() -> void:
 	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))
