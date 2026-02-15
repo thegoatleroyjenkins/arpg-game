@@ -88,6 +88,8 @@ var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 @export_range(1, 8, 1) var light_attack_max_targets: int = 1
 @export_range(0.0, 1.0, 0.01) var light_attack_crit_chance: float = 0.18
 @export_range(1.0, 5.0, 0.05) var light_attack_crit_multiplier: float = 1.75
+@export var light_attack_crit_camera_impulse_strength: float = 0.12
+@export var light_attack_crit_camera_impulse_vertical: float = 0.15
 
 var light_attack_cooldown_left: float = 0.0
 
@@ -119,6 +121,8 @@ func _ready() -> void:
 	_emit_move_speed_boost_changed()
 	_emit_dash_invulnerability_boost_changed()
 	_emit_dash_charge_recovery_boost_changed()
+	if damage_resolver != null and damage_resolver.has_signal("damage_applied") and not damage_resolver.damage_applied.is_connected(_on_damage_applied):
+		damage_resolver.damage_applied.connect(_on_damage_applied)
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1086,6 +1090,18 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 		if results.size() >= max_targets:
 			break
 	return results
+
+func _on_damage_applied(result: Dictionary) -> void:
+	if result.get("source", null) != self:
+		return
+	if not bool(result.get("is_critical", false)):
+		return
+	var crit_impulse_strength: float = max(0.0, light_attack_crit_camera_impulse_strength)
+	if crit_impulse_strength <= 0.0:
+		return
+	var direction: Vector3 = -global_transform.basis.z
+	direction.y = light_attack_crit_camera_impulse_vertical
+	_add_camera_impulse(direction, crit_impulse_strength)
 
 func _report_stamina_action_failed(reason: String) -> void:
 	if stamina_action_warning_cooldown_left > 0.0:
