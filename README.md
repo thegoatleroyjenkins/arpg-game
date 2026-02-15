@@ -52,6 +52,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
 - **Mouse Orbit Camera (3D prototype)** — Data-driven camera orbit yaw/pitch (sensitivity, pitch clamp, invert-Y toggle) now lets players rotate the combat camera while keeping movement camera-relative and modular
 - **Hold-to-Recenter Camera (3D prototype)** — Data-driven camera recenter action (R by default) smoothly aligns orbit yaw behind player facing, reducing camera drift after heavy orbit usage while keeping controls modular
+- **Camera Follow Assist (3D prototype)** — Data-driven follow-assist yaw gently realigns orbit behind movement direction while traversing, with tunable speed/min-move threshold and a post-mouse-look lockout window to preserve manual camera control
 - **Dynamic Camera FOV (3D prototype)** — Data-driven FOV kick scales with movement speed and dash state, adding stronger sensation of momentum without hardcoding camera behavior
 - **Sprint Ramp Smoothing (3D prototype)** — Data-driven sprint ramp-up/ramp-down blends acceleration into and out of sprint for weightier, cleaner movement transitions
 - **Sprint Exhaustion Gate (3D prototype)** — Data-driven stamina thresholds now gate sprint re-engage after exhaustion, preventing rapid on/off sprint jitter at near-zero stamina
@@ -202,6 +203,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven 3D camera follow-assist tuning (enable toggle, assist yaw speed, min movement speed, and mouse-look lockout duration) so camera orbit naturally recenters while moving without fighting manual orbit input
 - ✅ Added data-driven stamina pickup air-jump recovery tuning (`air_jump_recovery_count`, collect/magnet missing-air-jump thresholds) plus modular `restore_air_jumps()` player API, so pickups can restore vertical mobility when needed without hardcoded scene logic
 - ✅ Added data-driven 3D air-jump directional boost tuning (`air_jump_horizontal_boost`, `air_jump_horizontal_speed_cap`) so mid-air jumps carry movement intent and preserve cleaner aerial repositioning without hardcoded impulses
 - ✅ Added data-driven 3D hold-to-recenter camera behavior (enable toggle, recenter speed, snap-angle threshold + `camera_recenter` input action) so players can quickly realign camera orbit behind facing direction after manual orbit adjustments

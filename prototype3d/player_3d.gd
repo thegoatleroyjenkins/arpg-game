@@ -49,6 +49,7 @@ var dash_trail_spawn_left: float = 0.0
 var sprinting_now: bool = false
 var camera_orbit_yaw: float = 0.0
 var camera_orbit_pitch: float = 0.0
+var camera_follow_assist_lock_left: float = 0.0
 var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
 var _body_visual_blend: float = 0.0
@@ -98,6 +99,8 @@ func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
 	if stamina_action_warning_cooldown_left > 0.0:
 		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
+	if camera_follow_assist_lock_left > 0.0:
+		camera_follow_assist_lock_left = max(0.0, camera_follow_assist_lock_left - delta)
 
 	if dash_invulnerability_left > 0.0:
 		dash_invulnerability_left = max(0.0, dash_invulnerability_left - delta)
@@ -292,6 +295,8 @@ func _physics_process(delta: float) -> void:
 	# Follow camera smoothly with scroll-wheel zoom and movement-aware look-ahead.
 	if Input.is_action_pressed(ACTION_CAMERA_RECENTER):
 		_recenter_camera_orbit(delta)
+	else:
+		_update_camera_follow_assist(horizontal_vel.length(), delta)
 	_update_camera_impulse(delta)
 	var target_cam_pos := _resolve_camera_pivot_target()
 	var camera_follow_smooth: float = tuning.camera_smooth
@@ -555,12 +560,28 @@ func _add_camera_impulse(direction: Vector3, strength: float) -> void:
 	if camera_impulse_offset.length() > max_offset and max_offset > 0.0:
 		camera_impulse_offset = camera_impulse_offset.normalized() * max_offset
 
+func _update_camera_follow_assist(horizontal_speed: float, delta: float) -> void:
+	if not tuning.camera_follow_assist_enabled:
+		return
+	if camera_follow_assist_lock_left > 0.0:
+		return
+	var min_speed: float = max(0.0, tuning.camera_follow_assist_min_move_speed)
+	if horizontal_speed < min_speed:
+		return
+	var assist_speed_rad: float = deg_to_rad(max(0.0, tuning.camera_follow_assist_speed_degrees_per_second))
+	if assist_speed_rad <= 0.0:
+		return
+	var yaw_difference: float = wrapf(rotation.y - camera_orbit_yaw, -PI, PI)
+	var yaw_step: float = assist_speed_rad * max(0.0, delta)
+	camera_orbit_yaw += clamp(yaw_difference, -yaw_step, yaw_step)
+
 func _adjust_camera_orbit(relative_motion: Vector2) -> void:
 	if not tuning.camera_orbit_enabled:
 		return
 	var sensitivity: float = max(0.0, tuning.camera_orbit_sensitivity)
 	if sensitivity <= 0.0:
 		return
+	camera_follow_assist_lock_left = max(camera_follow_assist_lock_left, max(0.0, tuning.camera_follow_assist_input_lock_time))
 	camera_orbit_yaw -= relative_motion.x * sensitivity * 0.01
 	var pitch_input: float = -relative_motion.y
 	if tuning.camera_orbit_invert_y:
