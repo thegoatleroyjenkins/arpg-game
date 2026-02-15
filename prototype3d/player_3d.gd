@@ -19,6 +19,7 @@ var dash_buffer_left: float = 0.0
 var buffered_dash_direction: Vector3 = Vector3.ZERO
 var stamina: float = 0.0
 var stamina_regen_delay_left: float = 0.0
+var sprint_blend: float = 0.0
 var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
 
@@ -104,14 +105,24 @@ func _physics_process(delta: float) -> void:
 		velocity.x = dash_direction.x * tuning.dash_speed
 		velocity.z = dash_direction.z * tuning.dash_speed
 	else:
-		var speed := tuning.move_speed
-		var is_trying_to_sprint := Input.is_action_pressed("sprint") and move_dir.length() > 0.01
+		var is_moving := move_dir.length() > 0.01
+		var is_trying_to_sprint := Input.is_action_pressed("sprint") and is_moving
+		var is_sprinting := false
 		if is_trying_to_sprint and _can_pay_stamina(tuning.sprint_stamina_per_second * delta):
-			speed *= tuning.sprint_multiplier
+			is_sprinting = true
 			_use_stamina(tuning.sprint_stamina_per_second * delta)
 		else:
-			_regen_stamina(delta, move_dir.length() > 0.01)
+			_regen_stamina(delta, is_moving)
 
+		var ramp_up := max(0.01, tuning.sprint_ramp_up_per_second)
+		var ramp_down := max(0.01, tuning.sprint_ramp_down_per_second)
+		if is_sprinting:
+			sprint_blend = min(1.0, sprint_blend + ramp_up * delta)
+		else:
+			sprint_blend = max(0.0, sprint_blend - ramp_down * delta)
+
+		var sprint_multiplier := lerpf(1.0, tuning.sprint_multiplier, sprint_blend)
+		var speed := tuning.move_speed * sprint_multiplier
 		var target_velocity := move_dir * speed
 		var control_scale := 1.0 if is_on_floor() else tuning.air_control
 		var accel := tuning.ground_acceleration * control_scale
