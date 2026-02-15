@@ -13,6 +13,7 @@ extends CanvasLayer
 @onready var attack_buffer_label: Label = get_node_or_null("MarginContainer/VBoxContainer/AttackBufferLabel") as Label
 @onready var attack_cooldown_bar: ProgressBar = get_node_or_null("MarginContainer/VBoxContainer/AttackCooldownBar") as ProgressBar
 @onready var attack_cooldown_label: Label = get_node_or_null("MarginContainer/VBoxContainer/AttackCooldownLabel") as Label
+@onready var attack_combo_label: Label = get_node_or_null("MarginContainer/VBoxContainer/AttackComboLabel") as Label
 @onready var air_jump_label: Label = $MarginContainer/VBoxContainer/AirJumpLabel
 @onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
 @onready var landing_recovery_bar: ProgressBar = $MarginContainer/VBoxContainer/LandingRecoveryBar
@@ -68,6 +69,9 @@ func _ready() -> void:
 	if not player.has_signal("light_attack_cooldown_changed"):
 		push_warning("StaminaHud3D target does not expose light_attack_cooldown_changed signal")
 		return
+	if not player.has_signal("light_attack_combo_changed"):
+		push_warning("StaminaHud3D target does not expose light_attack_combo_changed signal")
+		return
 	if not player.has_signal("dash_charges_changed"):
 		push_warning("StaminaHud3D target does not expose dash_charges_changed signal")
 		return
@@ -115,6 +119,7 @@ func _ready() -> void:
 	player.jump_buffer_changed.connect(_on_jump_buffer_changed)
 	player.attack_buffer_changed.connect(_on_attack_buffer_changed)
 	player.light_attack_cooldown_changed.connect(_on_light_attack_cooldown_changed)
+	player.light_attack_combo_changed.connect(_on_light_attack_combo_changed)
 	player.dash_charges_changed.connect(_on_dash_charges_changed)
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
 	player.sprint_state_changed.connect(_on_sprint_state_changed)
@@ -134,6 +139,8 @@ func _ready() -> void:
 	var current_jump_buffer := float(player.get("jump_buffer_left"))
 	var current_attack_buffer := float(player.get("light_attack_buffer_left"))
 	var current_attack_cooldown := float(player.get("light_attack_cooldown_left"))
+	var current_attack_combo_stacks := int(player.get("light_attack_combo_stacks"))
+	var current_attack_combo_time := float(player.get("light_attack_combo_timer_left"))
 	var current_dash_charges := int(player.get("dash_charges"))
 	var current_air_jumps := int(player.get("air_jumps_left"))
 	var current_landing_recovery := float(player.get("landing_recovery_left"))
@@ -162,6 +169,8 @@ func _ready() -> void:
 	var max_jump_buffer := 0.12
 	var max_attack_buffer := 0.14
 	var max_attack_cooldown := 0.35
+	var max_attack_combo_stacks := 1
+	var max_attack_combo_time := 1.2
 	var max_dash_charges := 1
 	var max_air_jumps := 0
 	var max_landing_recovery := 0.18
@@ -175,6 +184,8 @@ func _ready() -> void:
 		max_jump_buffer = max(0.01, float(tuning_resource.get("jump_buffer_time")) + max(0.0, float(tuning_resource.get("jump_buffer_dash_bonus_time"))))
 		max_attack_buffer = max(0.01, float(tuning_resource.get("light_attack_input_buffer_time")))
 		max_attack_cooldown = max(0.01, float(player.call("_light_attack_cooldown_max")))
+		max_attack_combo_stacks = max(1, int(tuning_resource.get("light_attack_combo_max_stacks")))
+		max_attack_combo_time = max(0.01, float(tuning_resource.get("light_attack_combo_reset_time")))
 		max_dash_charges = max(1, int(tuning_resource.get("dash_max_charges")))
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
 		max_landing_recovery = max(0.01, float(tuning_resource.get("hard_landing_recovery_time")))
@@ -235,6 +246,13 @@ func _ready() -> void:
 		attack_cooldown_label.text = "Attack Ready"
 		vbox.add_child(attack_cooldown_label)
 		vbox.move_child(attack_cooldown_label, attack_cooldown_bar.get_index() + 1)
+	if attack_combo_label == null:
+		var vbox: VBoxContainer = $MarginContainer/VBoxContainer
+		attack_combo_label = Label.new()
+		attack_combo_label.name = "AttackComboLabel"
+		attack_combo_label.text = "Combo 0/1 — Ready"
+		vbox.add_child(attack_combo_label)
+		vbox.move_child(attack_combo_label, attack_cooldown_label.get_index() + 1)
 	stamina_warning_label.visible = false
 	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
 	_apply_readability_theme()
@@ -247,6 +265,7 @@ func _ready() -> void:
 	_on_jump_buffer_changed(current_jump_buffer, max_jump_buffer)
 	_on_attack_buffer_changed(current_attack_buffer, max_attack_buffer)
 	_on_light_attack_cooldown_changed(current_attack_cooldown, max_attack_cooldown)
+	_on_light_attack_combo_changed(current_attack_combo_stacks, max_attack_combo_stacks, current_attack_combo_time, max_attack_combo_time)
 	_on_air_jumps_changed(current_air_jumps, max_air_jumps)
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
@@ -278,6 +297,7 @@ func _apply_readability_theme() -> void:
 		jump_buffer_label,
 		attack_buffer_label,
 		attack_cooldown_label,
+		attack_combo_label,
 		air_jump_label,
 		sprint_state_label,
 		landing_recovery_label,
@@ -429,6 +449,20 @@ func _on_light_attack_cooldown_changed(remaining: float, max_value: float) -> vo
 		attack_cooldown_label.text = "Attack Ready"
 		attack_cooldown_label.modulate = Color(0.88, 0.96, 0.88)
 		_set_bar_fill_color(attack_cooldown_bar, ready_color)
+
+func _on_light_attack_combo_changed(current: int, max_value: int, remaining: float, max_remaining: float) -> void:
+	if attack_combo_label == null:
+		return
+	var clamped_max: int = max(1, max_value)
+	var clamped_current: int = clampi(current, 0, clamped_max)
+	var clamped_remaining: float = clamp(remaining, 0.0, max(0.01, max_remaining))
+	if clamped_current <= 0 or clamped_remaining <= 0.01:
+		attack_combo_label.text = "Combo 0/%d — Ready" % clamped_max
+		attack_combo_label.modulate = Color(0.86, 0.88, 0.92)
+		return
+	var combo_progress: float = clamp(float(clamped_current) / float(clamped_max), 0.0, 1.0)
+	attack_combo_label.text = "Combo %d/%d — Reset in %.2fs" % [clamped_current, clamped_max, clamped_remaining]
+	attack_combo_label.modulate = Color(0.95, 0.72 + (0.2 * combo_progress), 0.42 + (0.3 * combo_progress))
 
 func _on_air_jumps_changed(current: int, max_value: int) -> void:
 	var clamped_max: int = max(0, max_value)

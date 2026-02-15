@@ -17,6 +17,7 @@ signal dash_buffer_changed(remaining: float, max_value: float)
 signal jump_buffer_changed(remaining: float, max_value: float)
 signal attack_buffer_changed(remaining: float, max_value: float)
 signal light_attack_cooldown_changed(remaining: float, max_value: float)
+signal light_attack_combo_changed(current: int, max_value: int, remaining: float, max_remaining: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal dash_charge_recharge_changed(remaining: float, max_value: float)
 signal air_jumps_changed(current: int, max_value: int)
@@ -120,6 +121,7 @@ func _ready() -> void:
 	_emit_jump_buffer_changed()
 	_emit_attack_buffer_changed()
 	_emit_light_attack_cooldown_changed()
+	_emit_light_attack_combo_changed()
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
@@ -168,9 +170,12 @@ func _physics_process(delta: float) -> void:
 		light_attack_buffer_left = max(0.0, light_attack_buffer_left - delta)
 		_emit_attack_buffer_changed()
 	if light_attack_combo_timer_left > 0.0:
+		var previous_combo_timer_left: float = light_attack_combo_timer_left
 		light_attack_combo_timer_left = max(0.0, light_attack_combo_timer_left - delta)
 		if light_attack_combo_timer_left <= 0.0:
 			light_attack_combo_stacks = 0
+		if absf(previous_combo_timer_left - light_attack_combo_timer_left) > 0.0001:
+			_emit_light_attack_combo_changed()
 	if stamina_action_warning_cooldown_left > 0.0:
 		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
 	if camera_follow_assist_lock_left > 0.0:
@@ -1128,6 +1133,7 @@ func _consume_light_attack_combo_multiplier() -> float:
 	if not tuning.light_attack_combo_enabled:
 		light_attack_combo_stacks = 0
 		light_attack_combo_timer_left = 0.0
+		_emit_light_attack_combo_changed()
 		return 1.0
 	var max_stacks: int = max(1, tuning.light_attack_combo_max_stacks)
 	if light_attack_combo_timer_left > 0.0:
@@ -1135,6 +1141,7 @@ func _consume_light_attack_combo_multiplier() -> float:
 	else:
 		light_attack_combo_stacks = 1
 	light_attack_combo_timer_left = max(0.0, tuning.light_attack_combo_reset_time)
+	_emit_light_attack_combo_changed()
 	var per_stack_bonus: float = max(0.0, tuning.light_attack_combo_damage_per_stack)
 	return 1.0 + (float(max(0, light_attack_combo_stacks - 1)) * per_stack_bonus)
 
@@ -1348,6 +1355,15 @@ func _light_attack_cooldown_max() -> float:
 
 func _emit_light_attack_cooldown_changed() -> void:
 	light_attack_cooldown_changed.emit(light_attack_cooldown_left, _light_attack_cooldown_max())
+
+func _light_attack_combo_max_stacks() -> int:
+	return max(1, tuning.light_attack_combo_max_stacks)
+
+func _light_attack_combo_reset_max() -> float:
+	return max(0.01, tuning.light_attack_combo_reset_time)
+
+func _emit_light_attack_combo_changed() -> void:
+	light_attack_combo_changed.emit(light_attack_combo_stacks, _light_attack_combo_max_stacks(), light_attack_combo_timer_left, _light_attack_combo_reset_max())
 
 func _emit_air_jumps_changed() -> void:
 	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))
