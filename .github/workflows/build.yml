@@ -7,6 +7,9 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,3 +46,12 @@ jobs:
         with:
           name: arpg-linux
           path: build/arpg-linux.zip
+
+      - name: Publish Windows Release Asset (master only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-windows-build
+          name: Latest Windows Build
+          make_latest: true
+          files: build/arpg-windows.zip

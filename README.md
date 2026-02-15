@@ -39,6 +39,8 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 
 Get the latest **Windows build** from [Releases](../../releases).
 
+- Push to `master` automatically builds and publishes `arpg-windows.zip` to the `latest-windows-build` release tag.
+
 ## Publish a Release (command-driven)
 
 This repo includes a manual GitHub Actions workflow that builds and publishes release assets to the GitHub Releases page.
