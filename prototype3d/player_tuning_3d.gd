@@ -38,6 +38,7 @@ class_name PlayerTuning3D
 
 @export_group("Facing")
 @export var turn_speed_degrees_per_second: float = 720.0
+@export_range(0.25, 2.5, 0.01) var sprint_turn_speed_multiplier: float = 0.82
 @export var min_turn_speed_threshold: float = 0.1
 
 @export_group("Landing Feel")

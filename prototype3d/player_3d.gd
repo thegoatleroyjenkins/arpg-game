@@ -359,7 +359,12 @@ func _physics_process(delta: float) -> void:
 	if horizontal_vel.length() > tuning.min_turn_speed_threshold:
 		look_target = global_position + horizontal_vel.normalized()
 		var desired_yaw := atan2(-horizontal_vel.x, -horizontal_vel.z)
-		rotation.y = lerp_angle(rotation.y, desired_yaw, deg_to_rad(tuning.turn_speed_degrees_per_second) * delta)
+		var turn_speed_multiplier: float = tuning.sprint_turn_speed_multiplier if sprinting_now else 1.0
+		rotation.y = lerp_angle(
+			rotation.y,
+			desired_yaw,
+			deg_to_rad(tuning.turn_speed_degrees_per_second * max(0.01, turn_speed_multiplier)) * delta
+		)
 
 	# Follow camera smoothly with scroll-wheel zoom and movement-aware look-ahead.
 	if Input.is_action_pressed(ACTION_CAMERA_RECENTER):

@@ -22,6 +22,7 @@ movement_input_deadzone = 0.15
 sprint_ramp_up_per_second = 8.0
 sprint_ramp_down_per_second = 10.0
 turn_speed_degrees_per_second = 720.0
+sprint_turn_speed_multiplier = 0.82
 min_turn_speed_threshold = 0.1
 hard_landing_stamina_cost = 14.0
 hard_landing_dash_cancel_window = 0.07
