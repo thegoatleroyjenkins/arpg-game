@@ -259,3 +259,27 @@ The core resolver now exists; the highest-leverage move is proving a full encoun
 
 ### Why this order
 The project now has core combat and world streaming stubs; the highest-value step is proving a full moving encounter slice, then binding it to chunk lifecycle so open-world scale-up is data-driven instead of rewrite-heavy.
+
+## Focused Planning Pass — 2026-02-15 11:49 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Finish one production-style 3D enemy encounter loop (not a prototype placeholder)**
+   - Land `enemy_actor_3d.gd` + `enemy_brain_3d.gd` with Idle/Chase/Attack/Leash using `NavigationAgent3D`.
+   - Keep all attack resolution on `DamageResolver.request_damage()` (no direct HP writes).
+   - Verify reset/retry behavior so this becomes the template encounter for future biomes.
+
+2. **Bind streaming events to encounter spawning for open-world behavior**
+   - Connect `WorldStreamer` chunk activation/deactivation signals to `WorldSector` + `SpawnDirector`.
+   - Enforce per-chunk active-enemy caps and despawn-on-unload behavior.
+   - Keep spawn definitions in data so scaling up to many chunks is additive, not rewrite-heavy.
+
+3. **Stabilize data contracts for progression-facing combat tuning**
+   - Define first-pass `EnemyArchetype3D`, `SkillData`, and `AffixData` resources with minimal required fields.
+   - Route combat/spawn tuning reads through adapters to remove hardcoded constants from scene scripts.
+   - Add one lightweight combat breakdown debug line to preserve tuning clarity.
+
+### Immediate Next Implementation Task
+**Implement now:** replace `CombatDummy` in `prototype3d/main_3d.tscn` with a `NavigationAgent3D`-driven enemy (`enemy_actor_3d.gd` + `enemy_brain_3d.gd`) that chases and performs one resolver-based melee attack.
+
+### Why this order
+This proves the first reusable combat encounter slice, then anchors it to streaming lifecycle so the architecture remains viable as world size and encounter density grow.
