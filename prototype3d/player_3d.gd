@@ -26,6 +26,7 @@ func _ready() -> void:
 	look_target = global_position
 	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
 	stamina = tuning.max_stamina
+	camera.fov = tuning.camera_base_fov
 	_emit_stamina_changed()
 	_emit_dash_cooldown_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -134,6 +135,7 @@ func _physics_process(delta: float) -> void:
 	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance)
 	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
 	camera.look_at(global_position + Vector3(0, 1.0, 0), Vector3.UP)
+	_update_camera_fov(delta)
 
 func _is_jump_just_pressed() -> bool:
 	if InputMap.has_action(ACTION_JUMP):
@@ -156,6 +158,15 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_buffer_left = 0.0
 	buffered_dash_direction = Vector3.ZERO
 	_emit_dash_cooldown_changed()
+
+func _update_camera_fov(delta: float) -> void:
+	var horizontal_speed := Vector3(velocity.x, 0.0, velocity.z).length()
+	var speed_ratio := 0.0
+	if tuning.move_speed > 0.01:
+		speed_ratio = clamp(horizontal_speed / (tuning.move_speed * max(1.0, tuning.sprint_multiplier)), 0.0, 1.0)
+	var dash_bonus := tuning.camera_fov_dash_bonus if dash_time_left > 0.0 else 0.0
+	var target_fov := tuning.camera_base_fov + tuning.camera_fov_speed_bonus * speed_ratio + dash_bonus
+	camera.fov = lerpf(camera.fov, target_fov, clamp(delta * tuning.camera_fov_smooth, 0.0, 1.0))
 
 func _adjust_camera_zoom(amount: float) -> void:
 	target_camera_distance = clamp(

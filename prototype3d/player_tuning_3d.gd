@@ -41,3 +41,7 @@ class_name PlayerTuning3D
 @export var camera_min_distance: float = 5.5
 @export var camera_max_distance: float = 12.0
 @export var camera_zoom_step: float = 1.0
+@export var camera_base_fov: float = 75.0
+@export var camera_fov_speed_bonus: float = 5.5
+@export var camera_fov_dash_bonus: float = 3.0
+@export var camera_fov_smooth: float = 10.0

@@ -32,3 +32,7 @@ camera_distance = 8.5
 camera_min_distance = 5.5
 camera_max_distance = 12.0
 camera_zoom_step = 1.0
+camera_base_fov = 75.0
+camera_fov_speed_bonus = 5.5
+camera_fov_dash_bonus = 3.0
+camera_fov_smooth = 10.0
