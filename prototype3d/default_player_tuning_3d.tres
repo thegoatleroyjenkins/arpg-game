@@ -27,3 +27,6 @@ dash_cooldown = 0.65
 camera_smooth = 8.0
 camera_height = 7.0
 camera_distance = 8.5
+camera_min_distance = 5.5
+camera_max_distance = 12.0
+camera_zoom_step = 1.0

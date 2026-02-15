@@ -36,3 +36,6 @@ class_name PlayerTuning3D
 @export var camera_smooth: float = 8.0
 @export var camera_height: float = 7.0
 @export var camera_distance: float = 8.5
+@export var camera_min_distance: float = 5.5
+@export var camera_max_distance: float = 12.0
+@export var camera_zoom_step: float = 1.0

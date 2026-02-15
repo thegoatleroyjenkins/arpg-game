@@ -22,6 +22,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
+- **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases
@@ -86,6 +87,7 @@ Release assets uploaded:
 | Space | Attack |
 | Shift (in 3D prototype) | Sprint |
 | Q (in 3D prototype) | Dash |
+| Mouse Wheel (in 3D prototype) | Camera Zoom In/Out |
 | Walk over items | Pick up / Equip |
 
 ## Equipment
@@ -157,6 +159,7 @@ arpg-game/
 - ✅ Added data-driven 3D directional turn smoothing (turn speed + minimum movement threshold)
 - ✅ Added modular 3D stamina HUD wired to player stamina_changed signal for real-time stamina readability
 - ✅ Added modular 3D dash cooldown HUD wired to player dash_cooldown_changed signal for clearer dash timing windows
+- ✅ Added data-driven 3D camera zoom controls (mouse wheel) with min/max/step tuning for better combat readability and scene awareness
 - ✅ Added data-driven 3D jump stamina cost to curb spam-jumping and strengthen stamina tradeoff decisions
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 

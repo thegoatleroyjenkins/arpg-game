@@ -9,6 +9,7 @@ signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
 
 var look_target: Vector3
+var target_camera_distance: float = 0.0
 var dash_direction: Vector3 = Vector3.ZERO
 var dash_time_left: float = 0.0
 var dash_cooldown_left: float = 0.0
@@ -19,6 +20,7 @@ var jump_buffer_left: float = 0.0
 
 func _ready() -> void:
 	look_target = global_position
+	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
 	stamina = tuning.max_stamina
 	_emit_stamina_changed()
 	_emit_dash_cooldown_changed()
@@ -27,8 +29,13 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	if event is InputEventMouseButton and event.pressed and Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if event is InputEventMouseButton and event.pressed:
+		if Input.get_mouse_mode() != Input.MOUSE_MODE_CAPTURED:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_adjust_camera_zoom(-tuning.camera_zoom_step)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_adjust_camera_zoom(tuning.camera_zoom_step)
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
@@ -106,8 +113,8 @@ func _physics_process(delta: float) -> void:
 		var desired_yaw := atan2(-horizontal_vel.x, -horizontal_vel.z)
 		rotation.y = lerp_angle(rotation.y, desired_yaw, deg_to_rad(tuning.turn_speed_degrees_per_second) * delta)
 
-	# Follow camera smoothly
-	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, tuning.camera_distance)
+	# Follow camera smoothly with scroll-wheel zoom.
+	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance)
 	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
 	camera.look_at(global_position + Vector3(0, 1.0, 0), Vector3.UP)
 
@@ -120,6 +127,13 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_time_left = tuning.dash_duration
 	dash_cooldown_left = tuning.dash_cooldown
 	_emit_dash_cooldown_changed()
+
+func _adjust_camera_zoom(amount: float) -> void:
+	target_camera_distance = clamp(
+		target_camera_distance + amount,
+		tuning.camera_min_distance,
+		tuning.camera_max_distance
+	)
 
 func _can_pay_stamina(cost: float) -> bool:
 	return stamina >= max(0.0, cost)
