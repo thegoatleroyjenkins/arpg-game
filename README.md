@@ -240,6 +240,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added a modular combat-dummy world-space health readout with data-driven timing/color tuning (`health_label_visible_time_on_hit`, `health_label_color_*`, `health_label_show_when_full`) to improve 3D combat clarity while keeping feedback behavior script-configurable
 - ✅ Added data-driven light-attack cleave targeting (`light_attack_max_targets`) so each swing can hit multiple nearest enemies in front arc without hardcoded scene logic, improving crowd-combat readability while keeping combat resolution modular
 - ✅ Added data-driven sprint turn responsiveness tuning (`sprint_turn_speed_multiplier`) so sprinting carries intentional steering weight while preserving modular facing controls for non-sprint movement
 - ✅ Added data-driven stamina pickup dash-charge recharge boost tuning (`dash_charge_recovery_boost_duration`, `dash_charge_recovery_boost_multiplier`) plus modular `apply_dash_charge_recovery_boost()` player API and HUD timer readout, so orb routing can temporarily accelerate dash charge refill windows without hardcoded scene logic
