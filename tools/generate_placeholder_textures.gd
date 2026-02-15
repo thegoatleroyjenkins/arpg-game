@@ -50,11 +50,57 @@ func _save_enemy_texture() -> void:
 
 func _save_player_texture() -> void:
 	var img := _new_image()
-	_draw_circle(img, 32, 22, 9, Color("#F1D0B3"))
-	_draw_rect(img, 20, 29, 44, 52, Color("#4A6EA8"))
-	_draw_rect(img, 16, 33, 20, 50, Color("#2B3E5F"))
-	_draw_rect(img, 44, 33, 48, 50, Color("#2B3E5F"))
-	_draw_rect(img, 28, 52, 36, 62, Color("#2B3E5F"))
+
+	var outline := Color("#151A24")
+	var steel_dark := Color("#2D3E56")
+	var steel_mid := Color("#4F6F97")
+	var steel_light := Color("#90B2DB")
+	var cloth := Color("#7E2F48")
+	var skin := Color("#F1D0B3")
+	var glow := Color("#BFE3FF")
+
+	# Helmet + head
+	_draw_circle(img, 32, 19, 10, steel_dark)
+	_draw_circle(img, 32, 22, 7, skin)
+	_draw_rect(img, 27, 14, 37, 18, steel_mid)
+	_draw_rect(img, 29, 22, 35, 24, outline) # eyes slit shadow
+	_draw_rect(img, 30, 22, 32, 23, glow)
+	_draw_rect(img, 33, 22, 35, 23, glow)
+
+	# Torso armor
+	_draw_rect(img, 19, 28, 45, 53, steel_dark)
+	_draw_rect(img, 22, 31, 42, 50, steel_mid)
+	_draw_rect(img, 29, 31, 35, 50, steel_light) # chest highlight
+	_draw_rect(img, 30, 39, 34, 43, glow) # chest gem
+
+	# Shoulder pauldrons
+	_draw_rect(img, 14, 30, 22, 38, steel_dark)
+	_draw_rect(img, 42, 30, 50, 38, steel_dark)
+	_draw_rect(img, 15, 31, 21, 35, steel_mid)
+	_draw_rect(img, 43, 31, 49, 35, steel_mid)
+
+	# Arms + gloves
+	_draw_rect(img, 15, 38, 21, 52, steel_mid)
+	_draw_rect(img, 43, 38, 49, 52, steel_mid)
+	_draw_rect(img, 15, 50, 21, 56, outline)
+	_draw_rect(img, 43, 50, 49, 56, outline)
+
+	# Cape
+	_draw_rect(img, 21, 33, 27, 58, cloth)
+	_draw_rect(img, 37, 33, 43, 58, cloth)
+
+	# Legs / boots
+	_draw_rect(img, 24, 53, 31, 63, steel_dark)
+	_draw_rect(img, 33, 53, 40, 63, steel_dark)
+	_draw_rect(img, 23, 61, 31, 64, outline)
+	_draw_rect(img, 33, 61, 41, 64, outline)
+
+	# Outer silhouette outline pass (simple frame hints)
+	_draw_rect(img, 18, 27, 46, 28, outline)
+	_draw_rect(img, 18, 53, 46, 54, outline)
+	_draw_rect(img, 18, 28, 19, 53, outline)
+	_draw_rect(img, 45, 28, 46, 53, outline)
+
 	_save(img, "player_knight.png")
 
 func _save_item_health_texture() -> void:
