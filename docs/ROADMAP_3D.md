@@ -235,3 +235,27 @@ Combat is still the highest-risk missing contract. Locking it first unlocks AI e
 
 ### Why this order
 The core resolver now exists; the highest-leverage move is proving a full encounter loop, then binding it to streaming/spawn architecture so open-world scaling can happen without refactors.
+
+## Focused Planning Pass — 2026-02-15 11:48 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Replace the stationary combat dummy with a true NavMesh enemy encounter**
+   - Add `prototype3d/enemy_actor_3d.gd` + `prototype3d/enemy_brain_3d.gd` with states (Idle/Chase/Attack/Leash).
+   - Use `NavigationAgent3D` and keep attack execution routed through `DamageResolver.request_damage()`.
+   - Validate one repeatable combat loop in `prototype3d/main_3d.tscn`: enemy pursues, attacks, can die, and cleanly resets.
+
+2. **Wire world-streaming scaffolding into scene lifecycle (from stubs to behavior)**
+   - Instantiate `WorldStreamer` + `WorldSector` in the 3D prototype and connect load/unload signals.
+   - Hook `SpawnDirector.request_wilderness_wave()` on chunk activation with strict per-chunk spawn caps.
+   - Keep all chunk metadata in `res://data/world/world_map_layout.json` so scaling stays data-first.
+
+3. **Lock first progression data contracts used by combat and spawning**
+   - Define minimal resource/data schemas for `EnemyArchetype3D`, `SkillData`, and `AffixData`.
+   - Introduce adapter reads in combat/spawn systems so tuning moves out of hardcoded script constants.
+   - Add a lightweight debug combat breakdown line for clarity while balancing.
+
+### Immediate Next Implementation Task
+**Implement now:** create `prototype3d/enemy_actor_3d.gd` and `prototype3d/enemy_brain_3d.gd`, then replace `CombatDummy` in `prototype3d/main_3d.tscn` with one `NavigationAgent3D`-driven enemy that performs resolver-based melee.
+
+### Why this order
+The project now has core combat and world streaming stubs; the highest-value step is proving a full moving encounter slice, then binding it to chunk lifecycle so open-world scale-up is data-driven instead of rewrite-heavy.
