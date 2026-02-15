@@ -92,6 +92,9 @@ class_name PlayerTuning3D
 @export var light_attack_require_line_of_sight: bool = true
 @export_flags_3d_physics var light_attack_line_of_sight_mask: int = 1
 @export var light_attack_line_of_sight_height: float = 1.0
+@export var light_attack_auto_face_enabled: bool = true
+@export_range(0.0, 180.0, 0.5) var light_attack_auto_face_max_angle_degrees: float = 70.0
+@export_range(0.0, 180.0, 0.5) var light_attack_auto_face_max_turn_per_attack_degrees: float = 55.0
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0

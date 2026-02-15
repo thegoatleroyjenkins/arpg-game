@@ -1083,6 +1083,8 @@ func _try_light_attack() -> bool:
 	if targets.is_empty():
 		return false
 
+	_auto_face_light_attack_target(targets[0])
+
 	var attack_stamina_cost: float = max(0.0, tuning.light_attack_stamina_cost)
 	if not _try_spend_stamina(attack_stamina_cost, "Attack"):
 		return false
@@ -1106,6 +1108,25 @@ func _try_light_attack() -> bool:
 			"tags": PackedStringArray(["player", "light_attack", "backstab"] if positional_multiplier > 1.0 else ["player", "light_attack"]),
 		})
 	return true
+
+func _auto_face_light_attack_target(primary_target: Node3D) -> void:
+	if not tuning.light_attack_auto_face_enabled:
+		return
+	if not is_instance_valid(primary_target):
+		return
+	var to_target: Vector3 = primary_target.global_position - global_position
+	to_target.y = 0.0
+	if to_target.length() <= 0.01:
+		return
+	var desired_yaw: float = atan2(-to_target.x, -to_target.z)
+	var yaw_delta: float = wrapf(desired_yaw - rotation.y, -PI, PI)
+	var max_alignment_angle: float = deg_to_rad(clamp(tuning.light_attack_auto_face_max_angle_degrees, 0.0, 180.0))
+	if absf(yaw_delta) > max_alignment_angle:
+		return
+	var max_turn_per_attack: float = deg_to_rad(clamp(tuning.light_attack_auto_face_max_turn_per_attack_degrees, 0.0, 180.0))
+	if max_turn_per_attack <= 0.0:
+		return
+	rotation.y += clamp(yaw_delta, -max_turn_per_attack, max_turn_per_attack)
 
 func _get_light_attack_positional_multiplier(target: Node3D) -> float:
 	if not tuning.light_attack_backstab_enabled:
