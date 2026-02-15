@@ -49,3 +49,5 @@ class_name PlayerTuning3D
 @export var camera_fov_speed_bonus: float = 5.5
 @export var camera_fov_dash_bonus: float = 3.0
 @export var camera_fov_smooth: float = 10.0
+@export var camera_look_ahead_distance: float = 2.25
+@export var camera_look_ahead_smooth: float = 8.0

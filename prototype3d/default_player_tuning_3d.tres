@@ -38,3 +38,5 @@ camera_base_fov = 75.0
 camera_fov_speed_bonus = 5.5
 camera_fov_dash_bonus = 3.0
 camera_fov_smooth = 10.0
+camera_look_ahead_distance = 2.25
+camera_look_ahead_smooth = 8.0

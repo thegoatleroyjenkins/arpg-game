@@ -22,6 +22,7 @@ var stamina_regen_delay_left: float = 0.0
 var sprint_blend: float = 0.0
 var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
+var camera_look_ahead: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	look_target = global_position
@@ -114,8 +115,8 @@ func _physics_process(delta: float) -> void:
 		else:
 			_regen_stamina(delta, is_moving)
 
-		var ramp_up := max(0.01, tuning.sprint_ramp_up_per_second)
-		var ramp_down := max(0.01, tuning.sprint_ramp_down_per_second)
+		var ramp_up: float = max(0.01, tuning.sprint_ramp_up_per_second)
+		var ramp_down: float = max(0.01, tuning.sprint_ramp_down_per_second)
 		if is_sprinting:
 			sprint_blend = min(1.0, sprint_blend + ramp_up * delta)
 		else:
@@ -142,10 +143,11 @@ func _physics_process(delta: float) -> void:
 		var desired_yaw := atan2(-horizontal_vel.x, -horizontal_vel.z)
 		rotation.y = lerp_angle(rotation.y, desired_yaw, deg_to_rad(tuning.turn_speed_degrees_per_second) * delta)
 
-	# Follow camera smoothly with scroll-wheel zoom.
+	# Follow camera smoothly with scroll-wheel zoom and movement-aware look-ahead.
 	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance)
 	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
-	camera.look_at(global_position + Vector3(0, 1.0, 0), Vector3.UP)
+	_update_camera_look_ahead(delta)
+	camera.look_at(global_position + Vector3(0, 1.0, 0) + camera_look_ahead, Vector3.UP)
 	_update_camera_fov(delta)
 
 func _is_jump_just_pressed() -> bool:
@@ -178,6 +180,17 @@ func _update_camera_fov(delta: float) -> void:
 	var dash_bonus := tuning.camera_fov_dash_bonus if dash_time_left > 0.0 else 0.0
 	var target_fov := tuning.camera_base_fov + tuning.camera_fov_speed_bonus * speed_ratio + dash_bonus
 	camera.fov = lerpf(camera.fov, target_fov, clamp(delta * tuning.camera_fov_smooth, 0.0, 1.0))
+
+func _update_camera_look_ahead(delta: float) -> void:
+	var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+	var target_look_ahead := Vector3.ZERO
+	if horizontal_velocity.length() > 0.01 and tuning.camera_look_ahead_distance > 0.0:
+		var speed_denominator: float = tuning.move_speed * max(1.0, tuning.sprint_multiplier)
+		var speed_ratio: float = 0.0
+		if speed_denominator > 0.01:
+			speed_ratio = clamp(horizontal_velocity.length() / speed_denominator, 0.0, 1.0)
+		target_look_ahead = horizontal_velocity.normalized() * tuning.camera_look_ahead_distance * speed_ratio
+	camera_look_ahead = camera_look_ahead.lerp(target_look_ahead, clamp(delta * tuning.camera_look_ahead_smooth, 0.0, 1.0))
 
 func _adjust_camera_zoom(amount: float) -> void:
 	target_camera_distance = clamp(
