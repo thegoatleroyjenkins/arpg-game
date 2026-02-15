@@ -8,3 +8,10 @@
   - [ ] Objective tracking + waypoint hooks.
   - [ ] Reward pipeline (XP, gold, items, reputation).
   - [ ] Data-driven quest definitions (JSON/SQL) with versioning.
+
+- [ ] Build out a full inventory system.
+  - [ ] Inventory data model (stacking rules, slot types, capacity).
+  - [ ] Pickup-to-inventory flow with overflow handling.
+  - [ ] Inventory UI grid + drag/drop + equip/unequip integration.
+  - [ ] Item tooltip/stat comparison panel.
+  - [ ] Save/load persistence and schema versioning for inventory data.
