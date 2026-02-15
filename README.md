@@ -224,6 +224,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added a Phase-1 offline procedural asset pipeline (`tools/procedural_asset_generator.gd`) that auto-generates modular weapons, props, and pickup scenes into `res://generated_assets/`; usage is documented in `docs/PROCEDURAL_ASSET_PIPELINE.md`
 - ✅ Added data-driven 3D dash trail visual identity tuning (`dash_trail_color`, `dash_trail_emission_energy`) so afterimage trail readability/style can be authored per tuning resource without hardcoded material values
 - ✅ Polished the 2D HUD for readability: split stats and controls into dedicated translucent panels, upgraded the stat readout to BBCode-rich color-coded text, and added an explicit objective line (`Defeat N enemies`) for clearer moment-to-moment UX
 - ✅ Added modular starter-level zone marker query helpers to `StarterLevelController` (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`) so encounter systems can consume JSON-authored zone IDs and scene marker nodes through a clean, data-driven API

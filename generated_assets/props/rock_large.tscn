@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rwtix"]
+albedo_color = Color(0.323529, 0.608824, 0.358824, 1)
+metallic = 0.15
+roughness = 0.85
+emission_enabled = true
+emission = Color(0.180392, 0.490196, 0.196078, 1)
+emission_energy_multiplier = 0.04
+
+[sub_resource type="SphereMesh" id="SphereMesh_rbli0"]
+radius = 0.55
+height = 1.1
+
+[node name="RockLarge" type="Node3D"]
+
+[node name="@MeshInstance3D@13" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.2, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_rwtix")
+mesh = SubResource("SphereMesh_rbli0")

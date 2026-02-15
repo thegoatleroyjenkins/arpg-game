@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_na0o0"]
+albedo_color = Color(0.452941, 0.479412, 0.508824, 1)
+metallic = 0.15
+roughness = 0.85
+emission_energy_multiplier = 0.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_3tsqu"]
+radius = 0.55
+height = 1.1
+
+[node name="RockSmall" type="Node3D"]
+
+[node name="@MeshInstance3D@12" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9, 0, 0, 0, 0.7, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_na0o0")
+mesh = SubResource("SphereMesh_3tsqu")
