@@ -133,9 +133,7 @@ func _physics_process(delta: float) -> void:
 		Input.get_axis("move_left", "move_right"),
 		Input.get_axis("move_up", "move_down")
 	)
-	var move_dir := Vector3(input_vec.x, 0.0, input_vec.y)
-	if move_dir.length() > 1.0:
-		move_dir = move_dir.normalized()
+	var move_dir := _resolve_move_direction(input_vec)
 	if landing_recovery_left > 0.0:
 		move_dir = Vector3.ZERO
 
@@ -268,6 +266,31 @@ func _physics_process(delta: float) -> void:
 	_update_camera_look_ahead(delta)
 	camera.look_at(global_position + Vector3(0, 1.0, 0) + camera_look_ahead, Vector3.UP)
 	_update_camera_fov(delta)
+
+func _resolve_move_direction(input_vec: Vector2) -> Vector3:
+	if input_vec.length() > 1.0:
+		input_vec = input_vec.normalized()
+	if input_vec.length() <= 0.01:
+		return Vector3.ZERO
+	if not tuning.movement_relative_to_camera or not is_instance_valid(camera):
+		return Vector3(input_vec.x, 0.0, input_vec.y)
+
+	var camera_forward := -camera.global_transform.basis.z
+	camera_forward.y = 0.0
+	if camera_forward.length() <= 0.001:
+		camera_forward = Vector3.FORWARD
+	camera_forward = camera_forward.normalized()
+
+	var camera_right := camera.global_transform.basis.x
+	camera_right.y = 0.0
+	if camera_right.length() <= 0.001:
+		camera_right = Vector3.RIGHT
+	camera_right = camera_right.normalized()
+
+	var direction := (camera_right * input_vec.x) + (camera_forward * input_vec.y)
+	if direction.length() > 1.0:
+		direction = direction.normalized()
+	return direction
 
 func _is_jump_just_pressed() -> bool:
 	if InputMap.has_action(ACTION_JUMP):
