@@ -36,14 +36,14 @@ func _process(_delta):
 	camera.position = camera.position.lerp(player.position, 0.1)
 
 func _generate_floor():
-	# Create tile map for floor
-	var tile_map = TileMapLayer.new()
-	tile_map.name = "Floor"
-	add_child(tile_map)
-	
-	# Use default tileset or create simple tiles
-	var terrain = TerrainTileSource.new()
-	tile_map.tile_set = terrain.create_tile_set()
+	# Simple floor placeholder (avoids editor-only tile setup requirements)
+	var floor = ColorRect.new()
+	floor.name = "Floor"
+	floor.color = Color(0.08, 0.08, 0.1)
+	floor.size = world_size
+	floor.position = Vector2.ZERO
+	floor.z_index = -10
+	add_child(floor)
 
 func _generate_enemies(count):
 	enemies_remaining = count

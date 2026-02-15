@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://equipment"]
+[gd_scene load_steps=3 format=3 uid="uid://equipment"]
 
 [ext_resource type="Script" path="res://equipment.gd" id="1_equipment"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 16.0
 
 [node name="Equipment" type="Area2D"]
 script = ExtResource("1_equipment")
@@ -9,7 +12,7 @@ script = ExtResource("1_equipment")
 modulate = Color(0.3, 0.8, 1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = CircleShape2D.new()
+shape = SubResource("CircleShape2D_1")
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 5

@@ -24,9 +24,7 @@ offset_left = 20.0
 offset_top = 20.0
 offset_right = 170.0
 offset_bottom = 90.0
-text = "Level: 1
-XP: 0/100
-Health: 100/100"
+text = "Level: 1\nXP: 0/100\nHealth: 100/100"
 
 [node name="ControlsHint" type="Label" parent="UI"]
 anchors_preset = 7
@@ -37,5 +35,4 @@ offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 80.0
 horizontal_alignment = 2
-text = "WASD - Move
-Click/Space - Attack"
+text = "WASD - Move\nClick/Space - Attack"

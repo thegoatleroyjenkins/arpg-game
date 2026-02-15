@@ -154,7 +154,7 @@ func _physics_process(delta):
 	
 	# Check for retreat condition (low health)
 	if current_health < max_health * 0.25 and enemy_type != EnemyType.TANK:
-		if state_machine.current_state is not RetreatState:
+		if not (state_machine.current_state is RetreatState):
 			state_machine.change_state("retreat")
 
 func can_see_player() -> bool:
