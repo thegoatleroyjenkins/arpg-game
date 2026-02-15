@@ -34,6 +34,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
 - **Buffered Dash Input (3D prototype)** — Press dash slightly before cooldown ends to queue it (data-driven timing window), making combat movement chains more responsive under pressure
 - **Recent Input Dash Direction Memory (3D prototype)** — Data-driven dash direction memory now uses your most recent movement input for a short window when dashing from neutral, preserving intended reposition direction during stop-and-go combat movement
+- **Camera-Forward Neutral Dash Fallback (3D prototype)** — Data-driven neutral dash fallback can now use camera forward when no movement input/recent input exists, preserving camera-framed reposition intent instead of forcing character-facing dashes
 - **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
@@ -207,6 +208,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven neutral dash direction fallback tuning (`dash_neutral_uses_camera_forward`) so neutral-input dashes can follow camera forward when no live/recent move input exists, preserving camera-framed reposition intent
 - ✅ Added data-driven stamina pickup profile visual identity tuning (`visual_albedo_color`, `visual_emission_color`, `visual_emission_energy`) so different pickup profile types are readable in-world at a glance without hardcoded scene materials
 - ✅ Updated stamina pickup magnet selection to target the nearest player who currently needs stamina/dash/air-jump recovery, improving multiplayer/co-op readiness while keeping the pickup decision flow modular and data-driven
 - ✅ Added data-driven stamina pickup regen-surge tuning (`regen_boost_duration`, `regen_boost_multiplier`) plus modular `apply_stamina_regen_boost()` player API and HUD timer/multiplier readout, so pickup routing can create brief high-recovery sustain windows without hardcoded logic

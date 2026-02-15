@@ -361,7 +361,19 @@ func _resolve_dash_start_direction(move_dir: Vector3) -> Vector3:
 		return move_dir.normalized()
 	if tuning.dash_use_recent_input_direction and recent_move_direction_left > 0.0 and recent_move_direction.length() > 0.01:
 		return recent_move_direction.normalized()
-	return move_dir
+	return _resolve_neutral_dash_direction()
+
+func _resolve_neutral_dash_direction() -> Vector3:
+	if tuning.dash_neutral_uses_camera_forward and is_instance_valid(camera):
+		var camera_forward: Vector3 = -camera.global_transform.basis.z
+		camera_forward.y = 0.0
+		if camera_forward.length() > 0.01:
+			return camera_forward.normalized()
+	var facing_forward: Vector3 = -global_transform.basis.z
+	facing_forward.y = 0.0
+	if facing_forward.length() > 0.01:
+		return facing_forward.normalized()
+	return Vector3.ZERO
 
 func _is_jump_just_pressed() -> bool:
 	if InputMap.has_action(ACTION_JUMP):
@@ -422,7 +434,9 @@ func _start_dash(move_dir: Vector3) -> void:
 		_emit_landing_recovery_changed()
 	dash_direction = _resolve_dash_start_direction(move_dir)
 	if dash_direction.length() <= 0.01:
-		dash_direction = -global_transform.basis.z
+		dash_direction = _resolve_neutral_dash_direction()
+	if dash_direction.length() <= 0.01:
+		dash_direction = Vector3.FORWARD
 	dash_direction.y = 0.0
 	dash_direction = dash_direction.normalized()
 	dash_time_left = tuning.dash_duration

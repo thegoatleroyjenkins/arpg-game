@@ -1,6 +1,6 @@
 extends Area3D
 
-@export var profile: StaminaPickupProfile3D
+@export var profile: Resource
 
 @export var stamina_restore: float = 24.0
 @export var respawn_time: float = 8.0

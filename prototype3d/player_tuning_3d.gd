@@ -82,6 +82,7 @@ class_name PlayerTuning3D
 @export var dash_allow_charge_bypass_cooldown: bool = true
 @export var dash_use_recent_input_direction: bool = true
 @export var dash_recent_input_memory_time: float = 0.2
+@export var dash_neutral_uses_camera_forward: bool = true
 @export_range(0.0, 1.0, 0.01) var dash_steer_control: float = 0.35
 @export var dash_steer_responsiveness: float = 14.0
 @export var dash_cancel_on_wall_collision: bool = true
