@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var sprint_state_label: Label = $MarginContainer/VBoxContainer/SprintStateLabel
 @onready var landing_recovery_bar: ProgressBar = $MarginContainer/VBoxContainer/LandingRecoveryBar
 @onready var landing_recovery_label: Label = $MarginContainer/VBoxContainer/LandingRecoveryLabel
+@onready var stamina_warning_label: Label = $MarginContainer/VBoxContainer/StaminaWarningLabel
 
 var dash_charges_current: int = 0
 var dash_charges_max: int = 1
@@ -18,6 +19,7 @@ var low_stamina_warning_ratio: float = 0.25
 var low_stamina_pulse_speed: float = 7.0
 var hard_landing_dash_cancel_window: float = 0.0
 var low_stamina_active: bool = false
+var stamina_warning_left: float = 0.0
 var base_stamina_modulate: Color = Color(1.0, 1.0, 1.0)
 
 func _ready() -> void:
@@ -47,6 +49,9 @@ func _ready() -> void:
 	if not player.has_signal("landing_recovery_changed"):
 		push_warning("StaminaHud3D target does not expose landing_recovery_changed signal")
 		return
+	if not player.has_signal("stamina_action_failed"):
+		push_warning("StaminaHud3D target does not expose stamina_action_failed signal")
+		return
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
@@ -55,6 +60,7 @@ func _ready() -> void:
 	player.air_jumps_changed.connect(_on_air_jumps_changed)
 	player.sprint_state_changed.connect(_on_sprint_state_changed)
 	player.landing_recovery_changed.connect(_on_landing_recovery_changed)
+	player.stamina_action_failed.connect(_on_stamina_action_failed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_buffer := float(player.get("dash_buffer_left"))
@@ -79,6 +85,8 @@ func _ready() -> void:
 			low_stamina_warning_ratio = clamp(float(tuning_resource.get("low_stamina_warning_ratio")), 0.0, 1.0)
 			low_stamina_pulse_speed = max(0.01, float(tuning_resource.get("low_stamina_pulse_speed")))
 			hard_landing_dash_cancel_window = max(0.0, float(tuning_resource.get("hard_landing_dash_cancel_window")))
+	stamina_warning_label.visible = false
+	stamina_warning_label.modulate = Color(1.0, 0.45, 0.35)
 	set_process(true)
 	_on_stamina_changed(current_stamina, max_stamina)
 	_on_dash_charges_changed(current_dash_charges, max_dash_charges)
@@ -88,14 +96,16 @@ func _ready() -> void:
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
 
-func _process(_delta: float) -> void:
-	if not low_stamina_active:
-		return
-	var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.001 * low_stamina_pulse_speed)
-	var warning_color := Color(1.0, 0.35, 0.35)
-	var pulse_strength := lerpf(0.35, 0.85, pulse)
-	stamina_label.modulate = base_stamina_modulate.lerp(warning_color, pulse_strength)
-	stamina_bar.modulate = base_stamina_modulate.lerp(warning_color, pulse_strength * 0.9)
+func _process(delta: float) -> void:
+	if low_stamina_active:
+		var pulse := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.001 * low_stamina_pulse_speed)
+		var warning_color := Color(1.0, 0.35, 0.35)
+		var pulse_strength := lerpf(0.35, 0.85, pulse)
+		stamina_label.modulate = base_stamina_modulate.lerp(warning_color, pulse_strength)
+		stamina_bar.modulate = base_stamina_modulate.lerp(warning_color, pulse_strength * 0.9)
+	if stamina_warning_left > 0.0:
+		stamina_warning_left = max(0.0, stamina_warning_left - delta)
+		stamina_warning_label.visible = stamina_warning_left > 0.0
 
 func _on_stamina_changed(current: float, max_value: float) -> void:
 	stamina_bar.max_value = max(1.0, max_value)
@@ -160,3 +170,11 @@ func _on_landing_recovery_changed(remaining: float, max_value: float) -> void:
 	else:
 		landing_recovery_label.text = "Landing Recovery Ready"
 		landing_recovery_label.modulate = Color(0.8, 1.0, 0.8)
+
+func _on_stamina_action_failed(reason: String, duration: float) -> void:
+	stamina_warning_left = max(0.0, duration)
+	if stamina_warning_left <= 0.0:
+		stamina_warning_label.visible = false
+		return
+	stamina_warning_label.text = "%s failed: low stamina" % reason
+	stamina_warning_label.visible = true

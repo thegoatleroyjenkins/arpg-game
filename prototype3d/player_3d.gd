@@ -14,6 +14,7 @@ signal dash_charges_changed(current: int, max_value: int)
 signal air_jumps_changed(current: int, max_value: int)
 signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
 signal landing_recovery_changed(remaining: float, max_value: float)
+signal stamina_action_failed(reason: String, remaining: float)
 
 var look_target: Vector3
 var target_camera_distance: float = 0.0
@@ -34,6 +35,7 @@ var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
 var camera_impulse_offset: Vector3 = Vector3.ZERO
 var landing_recovery_left: float = 0.0
+var stamina_action_warning_cooldown_left: float = 0.0
 var sprinting_now: bool = false
 var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
@@ -67,6 +69,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
+	if stamina_action_warning_cooldown_left > 0.0:
+		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
 
 	# Jump buffering gives more forgiving timing before landing.
 	if _is_jump_just_pressed():
@@ -95,8 +99,7 @@ func _physics_process(delta: float) -> void:
 
 	var can_ground_jump := coyote_time_left > 0.0
 	var can_air_jump := not was_on_floor and air_jumps_left > 0
-	if jump_buffer_left > 0.0 and (can_ground_jump or can_air_jump) and _can_pay_stamina(tuning.jump_stamina_cost):
-		_use_stamina(tuning.jump_stamina_cost)
+	if jump_buffer_left > 0.0 and (can_ground_jump or can_air_jump) and _try_spend_stamina(tuning.jump_stamina_cost, "Jump"):
 		velocity.y = tuning.jump_velocity
 		_apply_sprint_jump_momentum_boost()
 		jump_buffer_left = 0.0
@@ -145,16 +148,14 @@ func _physics_process(delta: float) -> void:
 
 	var dash_stamina_cost := _current_dash_stamina_cost()
 	if _can_dash_now() and Input.is_action_just_pressed("dash"):
-		if _can_start_dash() and _can_pay_stamina(dash_stamina_cost):
-			_use_stamina(dash_stamina_cost)
+		if _can_start_dash() and _try_spend_stamina(dash_stamina_cost, "Dash"):
 			_start_dash(move_dir)
 		elif _dash_ready_within(tuning.dash_input_buffer_time):
 			dash_buffer_left = tuning.dash_input_buffer_time
 			buffered_dash_direction = move_dir
 			_emit_dash_buffer_changed()
 
-	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(dash_stamina_cost):
-		_use_stamina(dash_stamina_cost)
+	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _try_spend_stamina(dash_stamina_cost, "Dash"):
 		_start_dash(buffered_dash_direction)
 		dash_buffer_left = 0.0
 		buffered_dash_direction = Vector3.ZERO
@@ -388,6 +389,14 @@ func _current_dash_stamina_cost() -> float:
 		return base_cost
 	return base_cost * max(1.0, tuning.dash_airborne_stamina_multiplier)
 
+func _try_spend_stamina(cost: float, reason: String) -> bool:
+	var clamped_cost: float = max(0.0, cost)
+	if _can_pay_stamina(clamped_cost):
+		_use_stamina(clamped_cost)
+		return true
+	_report_stamina_action_failed(reason)
+	return false
+
 func _can_pay_stamina(cost: float) -> bool:
 	return stamina >= max(0.0, cost)
 
@@ -414,6 +423,12 @@ func _regen_stamina(delta: float, is_moving: bool) -> void:
 
 func _emit_stamina_changed() -> void:
 	stamina_changed.emit(stamina, tuning.max_stamina)
+
+func _report_stamina_action_failed(reason: String) -> void:
+	if stamina_action_warning_cooldown_left > 0.0:
+		return
+	stamina_action_warning_cooldown_left = max(0.0, tuning.low_stamina_action_warning_cooldown)
+	stamina_action_failed.emit(reason, max(0.0, tuning.low_stamina_action_warning_time))
 
 func _emit_dash_charges_changed() -> void:
 	dash_charges_changed.emit(dash_charges, max(1, tuning.dash_max_charges))

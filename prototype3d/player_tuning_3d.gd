@@ -52,6 +52,8 @@ class_name PlayerTuning3D
 @export_group("HUD Feedback")
 @export_range(0.0, 1.0, 0.01) var low_stamina_warning_ratio: float = 0.25
 @export var low_stamina_pulse_speed: float = 7.0
+@export var low_stamina_action_warning_time: float = 0.65
+@export var low_stamina_action_warning_cooldown: float = 0.25
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0

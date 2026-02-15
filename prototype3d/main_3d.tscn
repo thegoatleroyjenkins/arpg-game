@@ -103,3 +103,8 @@ show_percentage = false
 [node name="LandingRecoveryLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Landing Recovery Ready"
+
+[node name="StaminaWarningLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Dash failed: low stamina"
