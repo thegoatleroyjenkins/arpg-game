@@ -204,6 +204,7 @@ func _physics_process(delta: float) -> void:
 
 	if not was_on_floor and is_on_floor() and pre_move_vertical_velocity <= -absf(tuning.hard_landing_speed_threshold):
 		landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.hard_landing_recovery_time))
+		_use_stamina(max(0.0, tuning.hard_landing_stamina_cost))
 		_add_camera_impulse(Vector3(0.0, -1.0, 0.0), tuning.camera_landing_impulse_strength)
 
 	# Face movement direction with data-driven turn speed smoothing.
