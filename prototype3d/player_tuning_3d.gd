@@ -8,6 +8,11 @@ class_name PlayerTuning3D
 @export var coyote_time: float = 0.12
 @export var jump_buffer_time: float = 0.12
 
+@export_group("Movement Feel")
+@export var ground_acceleration: float = 40.0
+@export var ground_deceleration: float = 48.0
+@export_range(0.0, 1.0, 0.01) var air_control: float = 0.5
+
 @export_group("Stamina")
 @export var max_stamina: float = 100.0
 @export var sprint_stamina_per_second: float = 28.0

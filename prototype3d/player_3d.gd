@@ -78,8 +78,15 @@ func _physics_process(delta: float) -> void:
 		else:
 			_regen_stamina(delta)
 
-		velocity.x = move_dir.x * speed
-		velocity.z = move_dir.z * speed
+		var target_velocity := move_dir * speed
+		var control_scale := 1.0 if is_on_floor() else tuning.air_control
+		var accel := tuning.ground_acceleration * control_scale
+		var decel := tuning.ground_deceleration * control_scale
+		var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+		var rate := accel if move_dir.length() > 0.01 else decel
+		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, rate * delta)
+		velocity.x = horizontal_velocity.x
+		velocity.z = horizontal_velocity.z
 
 	move_and_slide()
 
