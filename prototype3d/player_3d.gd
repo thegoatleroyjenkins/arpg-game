@@ -49,7 +49,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= tuning.gravity * gravity_scale * delta
 		velocity.y = max(velocity.y, -tuning.max_fall_speed)
 
-	if jump_buffer_left > 0.0 and coyote_time_left > 0.0:
+	if jump_buffer_left > 0.0 and coyote_time_left > 0.0 and _can_pay_stamina(tuning.jump_stamina_cost):
+		_use_stamina(tuning.jump_stamina_cost)
 		velocity.y = tuning.jump_velocity
 		jump_buffer_left = 0.0
 		coyote_time_left = 0.0

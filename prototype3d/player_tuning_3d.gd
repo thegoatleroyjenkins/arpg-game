@@ -19,6 +19,7 @@ class_name PlayerTuning3D
 @export var max_stamina: float = 100.0
 @export var sprint_stamina_per_second: float = 28.0
 @export var dash_stamina_cost: float = 35.0
+@export var jump_stamina_cost: float = 12.0
 @export var stamina_regen_per_second: float = 24.0
 @export var stamina_regen_delay: float = 0.7
 

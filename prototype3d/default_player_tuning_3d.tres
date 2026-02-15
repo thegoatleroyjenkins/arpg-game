@@ -16,6 +16,7 @@ air_control = 0.5
 max_stamina = 100.0
 sprint_stamina_per_second = 28.0
 dash_stamina_cost = 35.0
+jump_stamina_cost = 12.0
 stamina_regen_per_second = 24.0
 stamina_regen_delay = 0.7
 dash_speed = 18.0
