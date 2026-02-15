@@ -34,6 +34,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash (3D prototype)** — Tap Q (or gamepad B) for a short directional dash with cooldown (data-driven tuning)
 - **Dash Chain Fatigue (3D prototype)** — Data-driven dash-chain stamina scaling now increases dash cost when chaining dashes inside a short window, adding cleaner mobility tradeoffs without hardcoded limits
 - **Stamina (3D prototype)** — Sprint, dash, and jump now consume stamina with configurable regen/delay for better combat pacing
+- **Attack Stamina Gating (3D prototype)** — Light attacks now consume a data-driven stamina cost (`light_attack_stamina_cost`), reinforcing resource tradeoffs between mobility and offense while reusing existing low-stamina feedback
 - **Forgiving Jump Timing (3D prototype)** — Data-driven coyote time + jump buffering make jumps more responsive and reliable in moment-to-moment combat movement
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability

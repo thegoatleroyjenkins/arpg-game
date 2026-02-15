@@ -1045,6 +1045,10 @@ func _try_light_attack() -> void:
 	if targets.is_empty():
 		return
 
+	var attack_stamina_cost: float = max(0.0, tuning.light_attack_stamina_cost)
+	if not _try_spend_stamina(attack_stamina_cost, "Attack"):
+		return
+
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
 	for target in targets:
 		damage_resolver.request_damage({
