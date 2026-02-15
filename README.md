@@ -46,7 +46,7 @@ Get the latest builds from [Releases](../../releases).
 
 ## Release Automation
 
-This repo uses a single GitHub Action (`Build + Release ARPG`) that runs on **push to master/main**, **every hour**, and manual dispatch, and:
+This repo uses a single GitHub Action (`Build and Release ARPG`) that runs on **push to master/main**, **every hour**, and manual dispatch, and:
 - Builds Windows + Linux exports
 - Creates a GitHub Release with generated notes
 - Auto-increments version tags in this format: `v0.0.02`, `v0.0.03`, ...
@@ -57,7 +57,7 @@ This repo uses a single GitHub Action (`Build + Release ARPG`) that runs on **pu
 You can also trigger it manually (with `gh` authenticated):
 
 ```bash
-gh workflow run "Build + Release ARPG" --ref master
+gh workflow run "Build and Release ARPG" --ref master
 ```
 
 Optional manual overrides:

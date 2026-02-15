@@ -1,4 +1,4 @@
-name: Build + Release ARPG
+name: Build and Release ARPG
 
 on:
   push:
