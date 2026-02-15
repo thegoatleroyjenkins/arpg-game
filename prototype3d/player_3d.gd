@@ -332,7 +332,11 @@ func _can_dash_now() -> bool:
 	return landing_recovery_left <= cancel_window
 
 func _can_start_dash() -> bool:
-	return dash_time_left <= 0.0 and dash_cooldown_left <= 0.0 and dash_charges > 0
+	if dash_time_left > 0.0 or dash_charges <= 0:
+		return false
+	if tuning.dash_allow_charge_bypass_cooldown:
+		return true
+	return dash_cooldown_left <= 0.0
 
 func _dash_ready_within(window: float) -> bool:
 	if window <= 0.0:
@@ -342,11 +346,15 @@ func _dash_ready_within(window: float) -> bool:
 
 func _next_dash_ready_remaining() -> float:
 	if dash_charges > 0:
+		if tuning.dash_allow_charge_bypass_cooldown:
+			return 0.0
 		return dash_cooldown_left
 	return max(dash_cooldown_left, dash_charge_recharge_left)
 
 func _next_dash_ready_max() -> float:
 	if dash_charges > 0:
+		if tuning.dash_allow_charge_bypass_cooldown:
+			return max(0.01, tuning.dash_charge_recovery_time)
 		return max(0.01, tuning.dash_cooldown)
 	return max(0.01, max(tuning.dash_cooldown, tuning.dash_charge_recovery_time))
 

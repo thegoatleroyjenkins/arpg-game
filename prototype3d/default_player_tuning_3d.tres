@@ -37,6 +37,7 @@ dash_cooldown = 0.65
 dash_max_charges = 2
 dash_charge_recovery_time = 1.25
 dash_input_buffer_time = 0.15
+dash_allow_charge_bypass_cooldown = true
 dash_steer_control = 0.35
 dash_steer_responsiveness = 14.0
 camera_smooth = 8.0
