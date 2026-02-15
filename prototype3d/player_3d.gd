@@ -1151,7 +1151,10 @@ func _get_light_attack_positional_multiplier(target: Node3D) -> float:
 func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 	var candidates: Array[Dictionary] = []
 	var max_distance_sq: float = light_attack_range * light_attack_range
+	var max_distance: float = max(0.001, light_attack_range)
 	var forward: Vector3 = -global_transform.basis.z
+	var distance_weight: float = max(0.0, tuning.light_attack_targeting_distance_weight)
+	var alignment_weight: float = max(0.0, tuning.light_attack_targeting_alignment_weight)
 	for candidate in get_tree().get_nodes_in_group("combat_actor_3d"):
 		if candidate == self or not (candidate is Node3D):
 			continue
@@ -1164,17 +1167,31 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 		var direction := to_target.normalized()
 		if direction.length_squared() <= 0.0:
 			continue
-		if forward.dot(direction) < light_attack_arc_dot:
+		var alignment: float = forward.dot(direction)
+		if alignment < light_attack_arc_dot:
 			continue
 		if not _has_light_attack_line_of_sight(target):
 			continue
+		var normalized_distance: float = clamp(sqrt(distance_sq) / max_distance, 0.0, 1.0)
+		var alignment_penalty: float = clamp((1.0 - alignment) * 0.5, 0.0, 1.0)
+		var targeting_score: float = (normalized_distance * distance_weight) + (alignment_penalty * alignment_weight)
 		candidates.append({
 			"target": target,
 			"distance_sq": distance_sq,
+			"alignment": alignment,
+			"score": targeting_score,
 		})
 
 	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return float(a.get("distance_sq", INF)) < float(b.get("distance_sq", INF))
+		var a_score: float = float(a.get("score", INF))
+		var b_score: float = float(b.get("score", INF))
+		if !is_equal_approx(a_score, b_score):
+			return a_score < b_score
+		var a_distance: float = float(a.get("distance_sq", INF))
+		var b_distance: float = float(b.get("distance_sq", INF))
+		if !is_equal_approx(a_distance, b_distance):
+			return a_distance < b_distance
+		return float(a.get("alignment", -1.0)) > float(b.get("alignment", -1.0))
 	)
 
 	var results: Array[Node3D] = []

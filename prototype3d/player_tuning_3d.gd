@@ -95,6 +95,8 @@ class_name PlayerTuning3D
 @export var light_attack_auto_face_enabled: bool = true
 @export_range(0.0, 180.0, 0.5) var light_attack_auto_face_max_angle_degrees: float = 70.0
 @export_range(0.0, 180.0, 0.5) var light_attack_auto_face_max_turn_per_attack_degrees: float = 55.0
+@export_range(0.0, 3.0, 0.05) var light_attack_targeting_distance_weight: float = 1.0
+@export_range(0.0, 3.0, 0.05) var light_attack_targeting_alignment_weight: float = 0.7
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0
