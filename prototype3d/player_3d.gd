@@ -1098,14 +1098,20 @@ func _try_light_attack() -> bool:
 		var target: Node3D = targets[i]
 		var cleave_multiplier: float = max(cleave_min_multiplier, 1.0 - (cleave_falloff * float(i)))
 		var positional_multiplier: float = _get_light_attack_positional_multiplier(target)
+		var execute_multiplier: float = _get_light_attack_execute_multiplier(target)
+		var attack_tags := PackedStringArray(["player", "light_attack"])
+		if positional_multiplier > 1.0:
+			attack_tags.append("backstab")
+		if execute_multiplier > 1.0:
+			attack_tags.append("execute")
 		damage_resolver.request_damage({
 			"source": self,
 			"target": target,
-			"base_damage": max(0.0, light_attack_damage * cleave_multiplier * positional_multiplier),
+			"base_damage": max(0.0, light_attack_damage * cleave_multiplier * positional_multiplier * execute_multiplier),
 			"damage_type": "physical",
 			"crit_chance": clamp(light_attack_crit_chance, 0.0, 1.0),
 			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
-			"tags": PackedStringArray(["player", "light_attack", "backstab"] if positional_multiplier > 1.0 else ["player", "light_attack"]),
+			"tags": attack_tags,
 		})
 	return true
 
@@ -1147,6 +1153,23 @@ func _get_light_attack_positional_multiplier(target: Node3D) -> float:
 	if backstab_alignment > -clamp(tuning.light_attack_backstab_dot_threshold, 0.0, 1.0):
 		return 1.0
 	return max(1.0, tuning.light_attack_backstab_damage_multiplier)
+
+func _get_light_attack_execute_multiplier(target: Node3D) -> float:
+	if not tuning.light_attack_execute_enabled:
+		return 1.0
+	if not is_instance_valid(target):
+		return 1.0
+	if not target.has_method("apply_damage_result"):
+		return 1.0
+	var target_max_health: float = float(target.get("max_health"))
+	if target_max_health <= 0.0:
+		return 1.0
+	var target_current_health: float = float(target.get("current_health"))
+	var health_ratio: float = clamp(target_current_health / target_max_health, 0.0, 1.0)
+	var threshold: float = clamp(tuning.light_attack_execute_health_ratio_threshold, 0.0, 1.0)
+	if health_ratio > threshold:
+		return 1.0
+	return max(1.0, tuning.light_attack_execute_damage_multiplier)
 
 func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 	var candidates: Array[Dictionary] = []
