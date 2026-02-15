@@ -29,6 +29,7 @@ var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
 var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
+var camera_impulse_offset: Vector3 = Vector3.ZERO
 var landing_recovery_left: float = 0.0
 
 func _ready() -> void:
@@ -192,6 +193,7 @@ func _physics_process(delta: float) -> void:
 
 	if not was_on_floor and is_on_floor() and pre_move_vertical_velocity <= -absf(tuning.hard_landing_speed_threshold):
 		landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.hard_landing_recovery_time))
+		_add_camera_impulse(Vector3(0.0, -1.0, 0.0), tuning.camera_landing_impulse_strength)
 
 	# Face movement direction with data-driven turn speed smoothing.
 	var horizontal_vel := Vector3(velocity.x, 0.0, velocity.z)
@@ -201,7 +203,8 @@ func _physics_process(delta: float) -> void:
 		rotation.y = lerp_angle(rotation.y, desired_yaw, deg_to_rad(tuning.turn_speed_degrees_per_second) * delta)
 
 	# Follow camera smoothly with scroll-wheel zoom and movement-aware look-ahead.
-	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance)
+	_update_camera_impulse(delta)
+	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, target_camera_distance) + camera_impulse_offset
 	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
 	_update_camera_look_ahead(delta)
 	camera.look_at(global_position + Vector3(0, 1.0, 0) + camera_look_ahead, Vector3.UP)
@@ -230,6 +233,8 @@ func _start_dash(move_dir: Vector3) -> void:
 		dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
 	dash_buffer_left = 0.0
 	buffered_dash_direction = Vector3.ZERO
+	var dash_impulse_direction := Vector3(-dash_direction.x, tuning.camera_dash_impulse_vertical, -dash_direction.z)
+	_add_camera_impulse(dash_impulse_direction, tuning.camera_dash_impulse_strength)
 	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
 
@@ -266,6 +271,22 @@ func _update_camera_look_ahead(delta: float) -> void:
 			speed_ratio = clamp(horizontal_velocity.length() / speed_denominator, 0.0, 1.0)
 		target_look_ahead = horizontal_velocity.normalized() * tuning.camera_look_ahead_distance * speed_ratio
 	camera_look_ahead = camera_look_ahead.lerp(target_look_ahead, clamp(delta * tuning.camera_look_ahead_smooth, 0.0, 1.0))
+
+func _update_camera_impulse(delta: float) -> void:
+	var decay: float = max(0.01, tuning.camera_impulse_decay_per_second)
+	camera_impulse_offset = camera_impulse_offset.move_toward(Vector3.ZERO, decay * delta)
+
+func _add_camera_impulse(direction: Vector3, strength: float) -> void:
+	if strength <= 0.0:
+		return
+	var impulse_direction := direction
+	if impulse_direction.length() <= 0.001:
+		return
+	impulse_direction = impulse_direction.normalized()
+	camera_impulse_offset += impulse_direction * strength
+	var max_offset: float = max(0.0, tuning.camera_impulse_max_offset)
+	if camera_impulse_offset.length() > max_offset and max_offset > 0.0:
+		camera_impulse_offset = camera_impulse_offset.normalized() * max_offset
 
 func _adjust_camera_zoom(amount: float) -> void:
 	target_camera_distance = clamp(

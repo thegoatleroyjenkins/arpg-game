@@ -64,3 +64,10 @@ class_name PlayerTuning3D
 @export var camera_fov_smooth: float = 10.0
 @export var camera_look_ahead_distance: float = 2.25
 @export var camera_look_ahead_smooth: float = 8.0
+
+@export_group("Camera Impulse Feel")
+@export var camera_impulse_decay_per_second: float = 14.0
+@export var camera_impulse_max_offset: float = 0.85
+@export var camera_dash_impulse_strength: float = 0.3
+@export var camera_dash_impulse_vertical: float = 0.12
+@export var camera_landing_impulse_strength: float = 0.38

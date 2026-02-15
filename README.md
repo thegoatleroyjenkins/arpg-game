@@ -36,6 +36,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Steering Control (3D prototype)** — Data-driven in-dash steering (control + responsiveness tuning) allows limited course correction for more skill-expressive repositioning
 - **Air Jump HUD Readout (3D prototype)** — Modular HUD now shows remaining air jumps in real time, improving vertical mobility clarity during combat and traversal
 - **Hard Landing Recovery (3D prototype)** — Data-driven landing impact tuning adds a brief recovery after high-speed falls, making movement weightier and reducing bunny-hop style chaining
+- **Camera Impulse Feedback (3D prototype)** — Data-driven camera impulse kick now reacts to dashes and hard landings (with tunable decay/max offset), improving movement impact without hardcoded camera behavior
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases
@@ -190,6 +191,7 @@ arpg-game/
 - ✅ Added data-driven 3D dash steering control (tunable steer control + responsiveness) so dash routes allow limited skill-based course correction
 - ✅ Added modular 3D air jump HUD readout wired to player air-jump state for clearer vertical reposition planning
 - ✅ Added data-driven 3D hard landing recovery tuning (fall-speed threshold + recovery duration) to improve movement weight and curb hyperactive landing chains
+- ✅ Added data-driven 3D camera impulse feedback (dash + hard landing impulse, plus decay/max offset tuning) for clearer movement impact and stronger moment-to-moment game feel
 
 ## License
 
