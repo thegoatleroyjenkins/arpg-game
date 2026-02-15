@@ -163,3 +163,27 @@ Right now the project has strong movement feel but no durable combat/world contr
 
 ### Why this order
 The repo is still prototype-heavy; locking a reusable combat contract first unlocks AI, progression, loot scaling, and streamed open-world systems with minimal rework.
+
+## Focused Planning Pass — 2026-02-15 08:48 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Build the first combat-capable 3D vertical slice (highest leverage now)**
+   - Add `res://systems/combat/damage_resolver.gd` and `combat_actor_3d.gd`.
+   - Route all damage through a single request/apply path.
+   - Validate one loop in `prototype3d/main_3d.tscn`: player hit -> enemy HP loss -> death event.
+
+2. **Introduce one NavMesh enemy that uses the same combat contract**
+   - Create `EnemyActor3D` + `EnemyBrain3D` (Idle/Chase/Attack/Leash) with `NavigationAgent3D`.
+   - Move tuning values into a resource (speed/range/cooldowns) for data-driven scaling.
+   - Ensure enemy attacks call the resolver (no direct HP writes).
+
+3. **Harden open-world scaffolding already started under `systems/world/`**
+   - Expand `WorldSector`, `WorldStreamer`, and `SpawnDirector` from stubs into runnable contracts.
+   - Add activation/unload hysteresis, spawn budgets, and sector lifecycle signals.
+   - Define `.tres` sector config format so content can scale without scene rewrites.
+
+### Immediate Next Implementation Task
+**Implement now:** create `res://systems/combat/damage_resolver.gd` + `res://systems/combat/combat_actor_3d.gd`, then wire `prototype3d/player_3d.gd` to issue a basic light-attack `request_damage()` event.
+
+### Why this order
+The project already has movement feel and initial world-streaming stubs; a real combat contract is the blocking dependency for enemy AI, progression balancing, and open-world encounter scalability.
