@@ -30,6 +30,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dynamic Camera FOV (3D prototype)** — Data-driven FOV kick scales with movement speed and dash state, adding stronger sensation of momentum without hardcoding camera behavior
 - **Sprint Ramp Smoothing (3D prototype)** — Data-driven sprint ramp-up/ramp-down blends acceleration into and out of sprint for weightier, cleaner movement transitions
 - **Velocity Look-Ahead Camera (3D prototype)** — Data-driven camera look-ahead shifts focus toward movement direction based on speed, improving forward readability during traversal and combat repositioning
+- **Dash Charges (3D prototype)** — Data-driven multi-charge dash model (max charges + recharge time) adds tactical mobility pacing without hardcoding ability logic
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases
@@ -178,6 +179,7 @@ arpg-game/
 - ✅ Switched 3D sprint to a dedicated input action and added gamepad bindings for sprint (LB) + dash (B) to improve controller support and input modularity
 - ✅ Added a dedicated 3D jump input action (`jump`) with Space + gamepad A bindings and fallback support for cleaner, modular controls
 - ✅ Added data-driven 3D air jump support (tunable max extra jumps) for better vertical combat/traversal expression without hardcoding movement rules
+- ✅ Added data-driven 3D dash charge system (tunable max charges + recharge time) and HUD charge readout for clearer mobility resource planning
 
 ## License
 

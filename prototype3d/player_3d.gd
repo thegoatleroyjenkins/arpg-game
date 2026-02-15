@@ -9,12 +9,15 @@ const ACTION_JUMP := "jump"
 
 signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
+signal dash_charges_changed(current: int, max_value: int)
 
 var look_target: Vector3
 var target_camera_distance: float = 0.0
 var dash_direction: Vector3 = Vector3.ZERO
 var dash_time_left: float = 0.0
 var dash_cooldown_left: float = 0.0
+var dash_charge_recharge_left: float = 0.0
+var dash_charges: int = 0
 var dash_buffer_left: float = 0.0
 var buffered_dash_direction: Vector3 = Vector3.ZERO
 var stamina: float = 0.0
@@ -29,9 +32,11 @@ func _ready() -> void:
 	look_target = global_position
 	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
 	stamina = tuning.max_stamina
+	dash_charges = max(1, tuning.dash_max_charges)
 	air_jumps_left = max(0, tuning.max_air_jumps)
 	camera.fov = tuning.camera_base_fov
 	_emit_stamina_changed()
+	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
@@ -88,22 +93,36 @@ func _physics_process(delta: float) -> void:
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 
+	var dash_state_changed := false
 	if dash_cooldown_left > 0.0:
 		dash_cooldown_left = max(0.0, dash_cooldown_left - delta)
-		_emit_dash_cooldown_changed()
+		dash_state_changed = true
+
+	if dash_charge_recharge_left > 0.0:
+		dash_charge_recharge_left = max(0.0, dash_charge_recharge_left - delta)
+		dash_state_changed = true
+		if dash_charge_recharge_left <= 0.0 and dash_charges < max(1, tuning.dash_max_charges):
+			dash_charges += 1
+			_emit_dash_charges_changed()
+			if dash_charges < max(1, tuning.dash_max_charges):
+				dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
+				dash_state_changed = true
 
 	if dash_buffer_left > 0.0:
 		dash_buffer_left = max(0.0, dash_buffer_left - delta)
 
+	if dash_state_changed:
+		_emit_dash_cooldown_changed()
+
 	if Input.is_action_just_pressed("dash"):
-		if dash_cooldown_left <= 0.0 and _can_pay_stamina(tuning.dash_stamina_cost):
+		if _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 			_use_stamina(tuning.dash_stamina_cost)
 			_start_dash(move_dir)
-		elif dash_cooldown_left <= tuning.dash_input_buffer_time:
+		elif _dash_ready_within(tuning.dash_input_buffer_time):
 			dash_buffer_left = tuning.dash_input_buffer_time
 			buffered_dash_direction = move_dir
 
-	if dash_buffer_left > 0.0 and dash_cooldown_left <= 0.0 and dash_time_left <= 0.0 and _can_pay_stamina(tuning.dash_stamina_cost):
+	if dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
 		_use_stamina(tuning.dash_stamina_cost)
 		_start_dash(buffered_dash_direction)
 		dash_buffer_left = 0.0
@@ -176,8 +195,12 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_direction = dash_direction.normalized()
 	dash_time_left = tuning.dash_duration
 	dash_cooldown_left = tuning.dash_cooldown
+	dash_charges = max(0, dash_charges - 1)
+	if dash_charges < max(1, tuning.dash_max_charges) and dash_charge_recharge_left <= 0.0:
+		dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
 	dash_buffer_left = 0.0
 	buffered_dash_direction = Vector3.ZERO
+	_emit_dash_charges_changed()
 	_emit_dash_cooldown_changed()
 
 func _update_camera_fov(delta: float) -> void:
@@ -207,6 +230,25 @@ func _adjust_camera_zoom(amount: float) -> void:
 		tuning.camera_max_distance
 	)
 
+func _can_start_dash() -> bool:
+	return dash_time_left <= 0.0 and dash_cooldown_left <= 0.0 and dash_charges > 0
+
+func _dash_ready_within(window: float) -> bool:
+	if window <= 0.0:
+		return false
+	var remaining := _next_dash_ready_remaining()
+	return remaining > 0.0 and remaining <= window
+
+func _next_dash_ready_remaining() -> float:
+	if dash_charges > 0:
+		return dash_cooldown_left
+	return max(dash_cooldown_left, dash_charge_recharge_left)
+
+func _next_dash_ready_max() -> float:
+	if dash_charges > 0:
+		return max(0.01, tuning.dash_cooldown)
+	return max(0.01, max(tuning.dash_cooldown, tuning.dash_charge_recovery_time))
+
 func _can_pay_stamina(cost: float) -> bool:
 	return stamina >= max(0.0, cost)
 
@@ -232,5 +274,8 @@ func _regen_stamina(delta: float, is_moving: bool) -> void:
 func _emit_stamina_changed() -> void:
 	stamina_changed.emit(stamina, tuning.max_stamina)
 
+func _emit_dash_charges_changed() -> void:
+	dash_charges_changed.emit(dash_charges, max(1, tuning.dash_max_charges))
+
 func _emit_dash_cooldown_changed() -> void:
-	dash_cooldown_changed.emit(dash_cooldown_left, tuning.dash_cooldown)
+	dash_cooldown_changed.emit(_next_dash_ready_remaining(), _next_dash_ready_max())

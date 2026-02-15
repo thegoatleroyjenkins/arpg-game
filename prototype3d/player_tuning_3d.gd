@@ -37,6 +37,8 @@ class_name PlayerTuning3D
 @export var dash_speed: float = 18.0
 @export var dash_duration: float = 0.18
 @export var dash_cooldown: float = 0.65
+@export var dash_max_charges: int = 1
+@export var dash_charge_recovery_time: float = 1.25
 @export var dash_input_buffer_time: float = 0.15
 
 @export_group("Camera")
