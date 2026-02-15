@@ -5,6 +5,8 @@ class_name StarterLevelController
 @export var spawn_markers_root: NodePath = NodePath("../SpawnMarkers")
 
 var level_layout: Dictionary = {}
+var _zone_data_by_id: Dictionary = {}
+var _zone_markers_by_id: Dictionary = {}
 
 func _ready() -> void:
 	level_layout = _load_layout(layout_json_path)
@@ -14,8 +16,8 @@ func _ready() -> void:
 	var level_name: String = str(level_layout.get("display_name", "Unknown Level"))
 	print("StarterLevelController loaded: %s" % level_name)
 
-	# Validation pass: ensure marker prefixes map to at least one marker node.
-	_validate_zone_markers()
+	# Validation + cache pass so gameplay systems can query zone marker groups.
+	_rebuild_zone_caches()
 
 func _load_layout(path: String) -> Dictionary:
 	if path.is_empty() or not FileAccess.file_exists(path):
@@ -29,7 +31,10 @@ func _load_layout(path: String) -> Dictionary:
 		return {}
 	return parsed
 
-func _validate_zone_markers() -> void:
+func _rebuild_zone_caches() -> void:
+	_zone_data_by_id.clear()
+	_zone_markers_by_id.clear()
+
 	var markers_root := get_node_or_null(spawn_markers_root)
 	if markers_root == null:
 		push_warning("StarterLevelController: SpawnMarkers root missing at %s" % spawn_markers_root)
@@ -39,12 +44,53 @@ func _validate_zone_markers() -> void:
 	for zone_data in zones:
 		if typeof(zone_data) != TYPE_DICTIONARY:
 			continue
-		var prefix: String = str(zone_data.get("scene_marker_prefix", ""))
-		if prefix.is_empty():
+		var zone_id: String = str(zone_data.get("id", "")).strip_edges()
+		if zone_id.is_empty():
+			push_warning("StarterLevelController: Zone entry missing id")
 			continue
-		var found: int = 0
-		for child in markers_root.get_children():
-			if child is Node3D and child.name.begins_with(prefix):
-				found += 1
-		if found == 0:
-			push_warning("StarterLevelController: No markers found for prefix '%s'" % prefix)
+
+		_zone_data_by_id[zone_id] = zone_data
+		var prefix: String = str(zone_data.get("scene_marker_prefix", ""))
+		var marker_nodes: Array[Node3D] = _find_markers_by_prefix(markers_root, prefix)
+		_zone_markers_by_id[zone_id] = marker_nodes
+		if marker_nodes.is_empty():
+			push_warning("StarterLevelController: No markers found for zone '%s' prefix '%s'" % [zone_id, prefix])
+
+func _find_markers_by_prefix(markers_root: Node, prefix: String) -> Array[Node3D]:
+	var nodes: Array[Node3D] = []
+	if prefix.is_empty():
+		return nodes
+
+	for child in markers_root.get_children():
+		if child is Node3D and child.name.begins_with(prefix):
+			nodes.append(child as Node3D)
+	return nodes
+
+func get_zone_data(zone_id: String) -> Dictionary:
+	var normalized_id := zone_id.strip_edges()
+	if normalized_id.is_empty():
+		return {}
+	if not _zone_data_by_id.has(normalized_id):
+		return {}
+	return _zone_data_by_id[normalized_id]
+
+func get_zone_marker_nodes(zone_id: String) -> Array[Node3D]:
+	var normalized_id := zone_id.strip_edges()
+	if normalized_id.is_empty():
+		return []
+	if not _zone_markers_by_id.has(normalized_id):
+		return []
+	return (_zone_markers_by_id[normalized_id] as Array[Node3D]).duplicate()
+
+func get_random_zone_marker(zone_id: String, rng: RandomNumberGenerator = null) -> Node3D:
+	var markers := get_zone_marker_nodes(zone_id)
+	if markers.is_empty():
+		return null
+
+	var local_rng := rng
+	if local_rng == null:
+		local_rng = RandomNumberGenerator.new()
+		local_rng.randomize()
+
+	var index := local_rng.randi_range(0, markers.size() - 1)
+	return markers[index]

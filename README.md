@@ -108,6 +108,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Procedural Spawning** — Random enemies and items throughout world
 - **Item Drops** — Health potions and XP orbs
 - **Equipment Drops** — Weapons, armor, and accessories spawn in world
+- **Starter Level Zone Marker Query API (3D scaffold)** — `StarterLevelController` now builds a data-driven cache from JSON zone IDs to in-scene marker nodes, exposing modular lookup helpers for encounter systems (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`)
 
 ## Download
 
@@ -214,6 +215,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added modular starter-level zone marker query helpers to `StarterLevelController` (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`) so encounter systems can consume JSON-authored zone IDs and scene marker nodes through a clean, data-driven API
 - ✅ Added data-driven neutral dash direction fallback tuning (`dash_neutral_uses_camera_forward`) so neutral-input dashes can follow camera forward when no live/recent move input exists, preserving camera-framed reposition intent
 - ✅ Added data-driven stamina pickup profile visual identity tuning (`visual_albedo_color`, `visual_emission_color`, `visual_emission_energy`) so different pickup profile types are readable in-world at a glance without hardcoded scene materials
 - ✅ Updated stamina pickup magnet selection to target the nearest player who currently needs stamina/dash/air-jump recovery, improving multiplayer/co-op readiness while keeping the pickup decision flow modular and data-driven

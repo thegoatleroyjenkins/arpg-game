@@ -67,6 +67,7 @@ References to target:
 - Enemy, encounter, loot, and progression config are DB-driven.
 - Layout authored in JSON with zone metadata.
 - Runtime scene uses marker nodes and IDs that map to JSON zone IDs.
+- `StarterLevelController` owns zone/marker cache construction and exposes query helpers (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`) so spawn/encounter systems stay decoupled from raw scene traversal.
 
 ## Godot Scene Hierarchy (proposed)
 - `res://world/levels/starter_village_3d.tscn`
