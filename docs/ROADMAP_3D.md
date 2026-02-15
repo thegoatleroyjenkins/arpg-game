@@ -307,3 +307,27 @@ This proves the first reusable combat encounter slice, then anchors it to stream
 
 ### Why this order
 Combat already has a resolver contract; the biggest unblocker is proving a real moving encounter loop, then binding it to chunk lifecycle so open-world scaling stays additive instead of rewrite-heavy.
+
+## Focused Planning Pass — 2026-02-15 12:18 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Land a real NavMesh enemy encounter to replace the static dummy**
+   - Implement `prototype3d/enemy_actor_3d.gd` + `prototype3d/enemy_brain_3d.gd` with Idle/Chase/Attack/Leash.
+   - Use `NavigationAgent3D` and route all enemy damage through `DamageResolver.request_damage()`.
+   - Validate loop in `prototype3d/main_3d.tscn`: enemy acquires player, attacks on cooldown, dies cleanly.
+
+2. **Wire world streaming events into encounter spawning (open-world architecture milestone)**
+   - Connect `WorldStreamer.chunk_should_load/unload` to `WorldSector` lifecycle behavior in the 3D scene.
+   - Invoke `SpawnDirector.request_wilderness_wave()` on chunk load with per-chunk active caps.
+   - Ensure despawn/deactivate on unload to keep memory/combat state deterministic at scale.
+
+3. **Lock first progression-facing data contracts used by combat and spawning**
+   - Define minimal resource/data schemas for `EnemyArchetype3D`, `SkillData`, and `AffixData`.
+   - Add adapters so resolver/spawner read data contracts, not scene-level constants.
+   - Add a concise combat breakdown debug line (`base`, `mitigation`, `multiplier`, `final`) for tuning clarity.
+
+### Immediate Next Implementation Task
+**Implement now:** add `prototype3d/enemy_actor_3d.gd` and `prototype3d/enemy_brain_3d.gd`, replace `CombatDummy` in `prototype3d/main_3d.tscn` with a `NavigationAgent3D`-driven enemy, and make its melee attack call `DamageResolver.request_damage()`.
+
+### Why this order
+Combat contracts are now present; the highest-risk gap is a moving enemy encounter tied to future chunk-streamed spawning. Closing that gap unlocks practical open-world scaling without rewrites.
