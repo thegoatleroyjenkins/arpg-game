@@ -12,6 +12,7 @@ signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal air_jumps_changed(current: int, max_value: int)
 signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
+signal landing_recovery_changed(remaining: float, max_value: float)
 
 var look_target: Vector3
 var target_camera_distance: float = 0.0
@@ -48,6 +49,7 @@ func _ready() -> void:
 	_emit_dash_cooldown_changed()
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
+	_emit_landing_recovery_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -103,6 +105,7 @@ func _physics_process(delta: float) -> void:
 
 	if landing_recovery_left > 0.0:
 		landing_recovery_left = max(0.0, landing_recovery_left - delta)
+		_emit_landing_recovery_changed()
 
 	# Movement input
 	var input_vec := Vector2(
@@ -206,6 +209,7 @@ func _physics_process(delta: float) -> void:
 		landing_recovery_left = max(landing_recovery_left, max(0.0, tuning.hard_landing_recovery_time))
 		_use_stamina(max(0.0, tuning.hard_landing_stamina_cost))
 		_add_camera_impulse(Vector3(0.0, -1.0, 0.0), tuning.camera_landing_impulse_strength)
+		_emit_landing_recovery_changed()
 
 	# Face movement direction with data-driven turn speed smoothing.
 	var horizontal_vel := Vector3(velocity.x, 0.0, velocity.z)
@@ -366,3 +370,9 @@ func _emit_sprint_state_changed(force: bool = false) -> void:
 	_last_emitted_sprinting = sprinting_now
 	_last_emitted_sprint_exhausted = sprint_exhausted
 	sprint_state_changed.emit(sprinting_now, sprint_exhausted)
+
+func _landing_recovery_max() -> float:
+	return max(0.01, tuning.hard_landing_recovery_time)
+
+func _emit_landing_recovery_changed() -> void:
+	landing_recovery_changed.emit(landing_recovery_left, _landing_recovery_max())

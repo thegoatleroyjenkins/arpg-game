@@ -89,3 +89,13 @@ text = "Air Jumps 1 / 1"
 [node name="SprintStateLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Sprint READY"
+
+[node name="LandingRecoveryBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 0.18
+value = 0.0
+show_percentage = false
+
+[node name="LandingRecoveryLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Landing Recovery Ready"

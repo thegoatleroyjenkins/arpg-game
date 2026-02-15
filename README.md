@@ -39,6 +39,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Sprint State HUD (3D prototype)** — Modular HUD now surfaces Sprint Ready / Active / Exhausted states for clearer stamina pacing and sprint re-engage timing during combat movement
 - **Hard Landing Recovery (3D prototype)** — Data-driven landing impact tuning adds a brief recovery after high-speed falls, making movement weightier and reducing bunny-hop style chaining
 - **Hard Landing Stamina Penalty (3D prototype)** — Data-driven hard-landing stamina cost makes rough falls a meaningful mobility tradeoff and reinforces cleaner traversal/combat routing
+- **Landing Recovery HUD (3D prototype)** — Modular HUD now tracks hard-landing recovery remaining time (data-driven duration), clarifying when movement lockout ends after heavy falls
 - **Camera Impulse Feedback (3D prototype)** — Data-driven camera impulse kick now reacts to dashes and hard landings (with tunable decay/max offset), improving movement impact without hardcoded camera behavior
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
@@ -196,6 +197,7 @@ arpg-game/
 - ✅ Added modular 3D sprint state HUD readout (Ready / Active / Exhausted) wired to player sprint-state signals for better stamina pacing readability
 - ✅ Added data-driven 3D hard landing recovery tuning (fall-speed threshold + recovery duration) to improve movement weight and curb hyperactive landing chains
 - ✅ Added data-driven 3D hard-landing stamina penalty tuning so heavy falls carry a meaningful stamina tradeoff and cleaner traversal discipline
+- ✅ Added modular 3D landing recovery HUD readout (remaining time + ready state) wired to player landing-recovery signal for clearer post-landing movement lockout timing
 - ✅ Added data-driven 3D camera impulse feedback (dash + hard landing impulse, plus decay/max offset tuning) for clearer movement impact and stronger moment-to-moment game feel
 - ✅ Added data-driven low-stamina HUD warning pulse (threshold ratio + pulse speed tuning) to make critical stamina states more readable during combat movement decisions
 
