@@ -22,12 +22,14 @@ var stamina_regen_delay_left: float = 0.0
 var sprint_blend: float = 0.0
 var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
+var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	look_target = global_position
 	target_camera_distance = clamp(tuning.camera_distance, tuning.camera_min_distance, tuning.camera_max_distance)
 	stamina = tuning.max_stamina
+	air_jumps_left = max(0, tuning.max_air_jumps)
 	camera.fov = tuning.camera_base_fov
 	_emit_stamina_changed()
 	_emit_dash_cooldown_changed()
@@ -56,6 +58,7 @@ func _physics_process(delta: float) -> void:
 	# Gravity + coyote time for forgiving jumps after stepping off ledges.
 	if was_on_floor:
 		coyote_time_left = tuning.coyote_time
+		air_jumps_left = max(0, tuning.max_air_jumps)
 	else:
 		coyote_time_left = max(0.0, coyote_time_left - delta)
 		var gravity_scale := 1.0
@@ -65,11 +68,16 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= tuning.gravity * gravity_scale * delta
 		velocity.y = max(velocity.y, -tuning.max_fall_speed)
 
-	if jump_buffer_left > 0.0 and coyote_time_left > 0.0 and _can_pay_stamina(tuning.jump_stamina_cost):
+	var can_ground_jump := coyote_time_left > 0.0
+	var can_air_jump := not was_on_floor and air_jumps_left > 0
+	if jump_buffer_left > 0.0 and (can_ground_jump or can_air_jump) and _can_pay_stamina(tuning.jump_stamina_cost):
 		_use_stamina(tuning.jump_stamina_cost)
 		velocity.y = tuning.jump_velocity
 		jump_buffer_left = 0.0
-		coyote_time_left = 0.0
+		if can_ground_jump:
+			coyote_time_left = 0.0
+		elif can_air_jump:
+			air_jumps_left -= 1
 
 	# Movement input
 	var input_vec := Vector2(

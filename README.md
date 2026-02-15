@@ -20,6 +20,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Forgiving Jump Timing (3D prototype)** — Data-driven coyote time + jump buffering make jumps more responsive and reliable in moment-to-moment combat movement
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
 - **Variable Jump Height (3D prototype)** — Data-driven jump-release gravity and terminal fall speed improve aerial control and landing readability
+- **Air Jump (3D prototype)** — Data-driven extra mid-air jump count enables cleaner vertical repositioning and more expressive traversal/combat routing
 - **Directional Turn Smoothing (3D prototype)** — Data-driven turn speed + movement threshold smooth facing changes so directional control feels weightier without sacrificing responsiveness
 - **Stamina HUD (3D prototype)** — Modular UI layer now reads player stamina signal and displays live stamina values for clearer sprint/dash decision-making
 - **Dash Cooldown HUD (3D prototype)** — Modular UI now also tracks dash cooldown state (ready vs remaining time) to improve ability timing readability
@@ -93,7 +94,7 @@ Release assets uploaded:
 | Space | Attack |
 | Shift / Gamepad LB (in 3D prototype) | Sprint |
 | Q / Gamepad B (in 3D prototype) | Dash |
-| Space / Gamepad A (in 3D prototype) | Jump |
+| Space / Gamepad A (in 3D prototype) | Jump (press again in air for air jump) |
 | Mouse Wheel (in 3D prototype) | Camera Zoom In/Out |
 | Walk over items | Pick up / Equip |
 
@@ -176,6 +177,7 @@ arpg-game/
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 - ✅ Switched 3D sprint to a dedicated input action and added gamepad bindings for sprint (LB) + dash (B) to improve controller support and input modularity
 - ✅ Added a dedicated 3D jump input action (`jump`) with Space + gamepad A bindings and fallback support for cleaner, modular controls
+- ✅ Added data-driven 3D air jump support (tunable max extra jumps) for better vertical combat/traversal expression without hardcoding movement rules
 
 ## License
 
