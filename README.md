@@ -16,7 +16,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
   - `data/sql/starter_level_seed.sql`
 - **Open-world design spec:** `docs/OPEN_WORLD_SPEC.md`
 - **Open-world data + systems scaffold:**
-  - `data/world/world_map_layout.json`
+  - `data/world/world_map_layout.json` (now includes explicit `chunks[]` grid indexing)
   - `data/sql/open_world_schema.sql`
   - `data/sql/open_world_seed.sql`
   - `systems/world/world_streamer.gd`
@@ -117,6 +117,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Item Drops** — Health potions and XP orbs
 - **Equipment Drops** — Weapons, armor, and accessories spawn in world
 - **Starter Level Zone Marker Query API (3D scaffold)** — `StarterLevelController` now builds a data-driven cache from JSON zone IDs to in-scene marker nodes, exposing modular lookup helpers for encounter systems (`get_zone_data`, `get_zone_marker_nodes`, `get_random_zone_marker`)
+- **World Chunk Grid Index Streaming (3D scaffold)** — `WorldStreamer` now resolves loadable chunk IDs from explicit JSON `chunks[]` grid coordinates (`grid_x`,`grid_y`) instead of relying only on placeholder generated IDs, improving modular world-streaming correctness as layout data scales
 
 ## Download
 

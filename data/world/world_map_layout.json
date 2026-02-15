@@ -39,6 +39,13 @@
       "danger_band": [7, 10]
     }
   ],
+  "chunks": [
+    { "id": "chunk_ashwood_00", "grid_x": 0, "grid_y": 0, "biome": "ashwood_frontier", "danger_level": 1 },
+    { "id": "chunk_ashwood_01", "grid_x": 1, "grid_y": 0, "biome": "ashwood_frontier", "danger_level": 2 },
+    { "id": "chunk_ashwood_10", "grid_x": 0, "grid_y": 1, "biome": "ashwood_frontier", "danger_level": 2 },
+    { "id": "chunk_tundra_20", "grid_x": 2, "grid_y": 0, "biome": "frostbreak_tundra", "danger_level": 3 },
+    { "id": "chunk_mire_02", "grid_x": 0, "grid_y": 2, "biome": "mire_of_glass", "danger_level": 4 }
+  ],
   "landmarks": [
     { "id": "poi_broken_bell_watch", "chunk": "chunk_ashwood_01", "visibility_score": 0.92 },
     { "id": "poi_hollowmere_chapel", "chunk": "chunk_mire_02", "visibility_score": 0.78 },

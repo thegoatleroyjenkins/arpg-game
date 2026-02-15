@@ -14,6 +14,7 @@ signal chunk_should_unload(chunk_id: String)
 var _layout: Dictionary = {}
 var _loaded_chunks: Dictionary = {}
 var _last_seen_seconds: Dictionary = {}
+var _chunk_ids_by_grid: Dictionary = {}
 
 func _ready() -> void:
 	_layout = _load_layout(world_layout_json)
@@ -58,6 +59,7 @@ func _load_layout(path: String) -> Dictionary:
 		unload_hysteresis_seconds = float(stream_data.get("unload_hysteresis_seconds", unload_hysteresis_seconds))
 	if parsed.has("chunk_size_meters"):
 		chunk_size_meters = float(parsed.get("chunk_size_meters", chunk_size_meters))
+	_chunk_ids_by_grid = _build_chunk_lookup(parsed)
 	return parsed
 
 func _world_to_chunk(pos: Vector3) -> Vector2i:
@@ -65,5 +67,29 @@ func _world_to_chunk(pos: Vector3) -> Vector2i:
 	return Vector2i(floori(pos.x / size), floori(pos.z / size))
 
 func _chunk_id_at(grid_x: int, grid_y: int) -> String:
-	# Placeholder lookup. In production, resolve against DB world_chunk table.
+	if not _chunk_ids_by_grid.is_empty():
+		var lookup_key := "%d,%d" % [grid_x, grid_y]
+		if _chunk_ids_by_grid.has(lookup_key):
+			return str(_chunk_ids_by_grid[lookup_key])
+		return ""
+
+	# Fallback lookup when JSON does not provide an explicit chunk index yet.
 	return "chunk_%d_%d" % [grid_x, grid_y]
+
+func _build_chunk_lookup(layout: Dictionary) -> Dictionary:
+	var lookup: Dictionary = {}
+	var chunks_variant: Variant = layout.get("chunks", [])
+	if typeof(chunks_variant) != TYPE_ARRAY:
+		return lookup
+	for chunk_entry in chunks_variant:
+		if typeof(chunk_entry) != TYPE_DICTIONARY:
+			continue
+		var chunk: Dictionary = chunk_entry
+		var chunk_id: String = str(chunk.get("id", "")).strip_edges()
+		var grid_x: int = int(chunk.get("grid_x", 0))
+		var grid_y: int = int(chunk.get("grid_y", 0))
+		if chunk_id.is_empty():
+			continue
+		var lookup_key := "%d,%d" % [grid_x, grid_y]
+		lookup[lookup_key] = chunk_id
+	return lookup
