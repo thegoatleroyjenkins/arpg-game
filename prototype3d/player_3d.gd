@@ -97,6 +97,7 @@ var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 
 var light_attack_cooldown_left: float = 0.0
 var light_attack_lunge_left: float = 0.0
+var light_attack_lunge_duration_active: float = 0.0
 var light_attack_lunge_direction: Vector3 = Vector3.ZERO
 var light_attack_combo_stacks: int = 0
 var light_attack_combo_timer_left: float = 0.0
@@ -568,6 +569,7 @@ func _start_dash(move_dir: Vector3) -> void:
 		landing_recovery_left = 0.0
 		_emit_landing_recovery_changed()
 	light_attack_lunge_left = 0.0
+	light_attack_lunge_duration_active = 0.0
 	dash_direction = _resolve_dash_start_direction(move_dir)
 	if dash_direction.length() <= 0.01:
 		dash_direction = _resolve_neutral_dash_direction()
@@ -1092,7 +1094,7 @@ func _try_light_attack() -> bool:
 
 	var targets: Array[Node3D] = _find_attack_targets(max(1, light_attack_max_targets))
 	if targets.is_empty():
-		return false
+		return _try_light_attack_whiff()
 
 	_auto_face_light_attack_target(targets[0])
 
@@ -1102,7 +1104,7 @@ func _try_light_attack() -> bool:
 
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
 	_emit_light_attack_cooldown_changed()
-	_start_light_attack_lunge(targets[0])
+	_start_light_attack_lunge(targets[0], 1.0)
 	var combo_multiplier: float = _consume_light_attack_combo_multiplier()
 	var cleave_falloff: float = clamp(tuning.light_attack_cleave_falloff_per_target, 0.0, 1.0)
 	var cleave_min_multiplier: float = clamp(tuning.light_attack_cleave_min_multiplier, 0.1, 1.0)
@@ -1127,6 +1129,20 @@ func _try_light_attack() -> bool:
 			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
 			"tags": attack_tags,
 		})
+	return true
+
+func _try_light_attack_whiff() -> bool:
+	if not tuning.light_attack_allow_whiff_swing:
+		return false
+	var whiff_stamina_cost: float = max(0.0, tuning.light_attack_stamina_cost) * clamp(tuning.light_attack_whiff_stamina_multiplier, 0.0, 1.0)
+	if not _try_spend_stamina(whiff_stamina_cost, "Attack"):
+		return false
+	light_attack_cooldown_left = max(0.01, light_attack_cooldown * clamp(tuning.light_attack_whiff_cooldown_multiplier, 0.0, 1.0))
+	_emit_light_attack_cooldown_changed()
+	_start_light_attack_lunge(null, clamp(tuning.light_attack_whiff_lunge_multiplier, 0.0, 1.0))
+	light_attack_combo_stacks = 0
+	light_attack_combo_timer_left = 0.0
+	_emit_light_attack_combo_changed()
 	return true
 
 func _consume_light_attack_combo_multiplier() -> float:
@@ -1270,10 +1286,13 @@ func _has_light_attack_line_of_sight(target: Node3D) -> bool:
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	return hit.is_empty()
 
-func _start_light_attack_lunge(primary_target: Node3D) -> void:
+func _start_light_attack_lunge(primary_target: Node3D, strength_multiplier: float = 1.0) -> void:
 	if not tuning.light_attack_lunge_enabled:
 		return
-	var lunge_duration: float = max(0.0, tuning.light_attack_lunge_duration)
+	var lunge_scale: float = clamp(strength_multiplier, 0.0, 1.0)
+	if lunge_scale <= 0.0:
+		return
+	var lunge_duration: float = max(0.0, tuning.light_attack_lunge_duration) * lunge_scale
 	if lunge_duration <= 0.0:
 		return
 	var lunge_direction: Vector3 = -global_transform.basis.z
@@ -1286,12 +1305,13 @@ func _start_light_attack_lunge(primary_target: Node3D) -> void:
 	if lunge_direction.length() <= 0.01:
 		return
 	light_attack_lunge_direction = lunge_direction.normalized()
+	light_attack_lunge_duration_active = lunge_duration
 	light_attack_lunge_left = lunge_duration
 
 func _current_light_attack_lunge_velocity() -> Vector3:
 	if light_attack_lunge_left <= 0.0:
 		return Vector3.ZERO
-	var duration: float = max(0.01, tuning.light_attack_lunge_duration)
+	var duration: float = max(0.01, light_attack_lunge_duration_active)
 	var lunge_ratio: float = clamp(light_attack_lunge_left / duration, 0.0, 1.0)
 	var lunge_speed: float = max(0.0, tuning.light_attack_lunge_speed) * lunge_ratio
 	if lunge_speed <= 0.0 or light_attack_lunge_direction.length() <= 0.01:
