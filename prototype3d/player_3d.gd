@@ -189,7 +189,16 @@ func _physics_process(delta: float) -> void:
 			sprint_blend = max(0.0, sprint_blend - ramp_down * delta)
 
 		var sprint_multiplier := lerpf(1.0, tuning.sprint_multiplier, sprint_blend)
-		var speed := tuning.move_speed * sprint_multiplier
+		var stamina_ratio: float = 1.0
+		if tuning.max_stamina > 0.01:
+			stamina_ratio = clamp(stamina / tuning.max_stamina, 0.0, 1.0)
+		var low_stamina_threshold: float = clamp(tuning.low_stamina_movement_threshold_ratio, 0.0, 1.0)
+		var low_stamina_min_multiplier: float = clamp(tuning.low_stamina_movement_min_multiplier, 0.1, 1.0)
+		var low_stamina_move_multiplier: float = 1.0
+		if low_stamina_threshold > 0.0 and stamina_ratio < low_stamina_threshold and not is_sprinting:
+			var fatigue_t: float = (low_stamina_threshold - stamina_ratio) / low_stamina_threshold
+			low_stamina_move_multiplier = lerpf(1.0, low_stamina_min_multiplier, clamp(fatigue_t, 0.0, 1.0))
+		var speed := tuning.move_speed * sprint_multiplier * low_stamina_move_multiplier
 		var target_velocity := move_dir * speed
 		var control_scale := 1.0 if is_on_floor() else tuning.air_control
 		var accel := tuning.ground_acceleration * control_scale
