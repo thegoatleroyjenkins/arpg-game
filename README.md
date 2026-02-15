@@ -252,6 +252,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven light-attack hit camera impulse tuning (`light_attack_hit_camera_impulse_strength`, `light_attack_hit_camera_impulse_vertical`) so every successful melee hit now adds a subtle directional camera punch, while crits still stack their existing bonus impulse for weightier combat feedback
 - ✅ Added data-driven 3D camera collision minimum-distance tuning (`camera_collision_min_distance`) so obstruction handling no longer collapses the camera too close to the player in tight spaces, improving combat readability while preserving modular camera collision behavior
 - ✅ Added biome-weighted 3D spawn profile data (`data/world/spawn_profiles.json`) and wired `SpawnDirector` to roll enemy archetypes from profile weights (with fallback/default handling), improving modular wilderness encounter authoring without hardcoded biome branches
 - ✅ Added data-driven light-attack lunge commitment tuning (`light_attack_lunge_enabled`, `light_attack_lunge_duration`, `light_attack_lunge_speed`, `light_attack_lunge_control_multiplier`) so successful melee swings include a short target-aware forward commit for cleaner impact feel without hardcoded scene logic

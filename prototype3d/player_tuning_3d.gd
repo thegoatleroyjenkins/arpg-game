@@ -87,6 +87,8 @@ class_name PlayerTuning3D
 @export var light_attack_backstab_enabled: bool = true
 @export_range(0.0, 1.0, 0.01) var light_attack_backstab_dot_threshold: float = 0.35
 @export_range(1.0, 3.0, 0.01) var light_attack_backstab_damage_multiplier: float = 1.25
+@export var light_attack_hit_camera_impulse_strength: float = 0.045
+@export var light_attack_hit_camera_impulse_vertical: float = 0.07
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0

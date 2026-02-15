@@ -1192,14 +1192,20 @@ func _current_light_attack_lunge_velocity() -> Vector3:
 func _on_damage_applied(result: Dictionary) -> void:
 	if result.get("source", null) != self:
 		return
-	if not bool(result.get("is_critical", false)):
+	if float(result.get("final_damage", 0.0)) <= 0.0:
 		return
-	var crit_impulse_strength: float = max(0.0, light_attack_crit_camera_impulse_strength)
-	if crit_impulse_strength <= 0.0:
+
+	var impulse_strength: float = max(0.0, tuning.light_attack_hit_camera_impulse_strength)
+	var impulse_vertical: float = max(0.0, tuning.light_attack_hit_camera_impulse_vertical)
+	if bool(result.get("is_critical", false)):
+		impulse_strength += max(0.0, light_attack_crit_camera_impulse_strength)
+		impulse_vertical += max(0.0, light_attack_crit_camera_impulse_vertical)
+	if impulse_strength <= 0.0:
 		return
+
 	var direction: Vector3 = -global_transform.basis.z
-	direction.y = light_attack_crit_camera_impulse_vertical
-	_add_camera_impulse(direction, crit_impulse_strength)
+	direction.y = impulse_vertical
+	_add_camera_impulse(direction, impulse_strength)
 
 func _report_stamina_action_failed(reason: String) -> void:
 	if stamina_action_warning_cooldown_left > 0.0:
