@@ -7,6 +7,7 @@ signal died()
 
 @export var max_health: float = 100.0
 @export var armor: float = 0.0
+@export var damage_type_multipliers: Dictionary = {}
 
 var current_health: float = 0.0
 var is_dead: bool = false
@@ -18,6 +19,12 @@ func _ready() -> void:
 
 func get_mitigation_for(_payload: Dictionary) -> float:
 	return max(0.0, armor)
+
+func get_damage_multiplier_for(payload: Dictionary) -> float:
+	var damage_type: String = String(payload.get("damage_type", "physical"))
+	if damage_type_multipliers.has(damage_type):
+		return max(0.0, float(damage_type_multipliers[damage_type]))
+	return 1.0
 
 func apply_damage_result(result: Dictionary) -> Dictionary:
 	if is_dead:

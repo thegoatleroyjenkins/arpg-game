@@ -39,7 +39,12 @@ func request_damage(payload: Dictionary) -> Dictionary:
 	var minimum_damage_ratio: float = clamp(float(payload.get("minimum_damage_ratio", 0.0)), 0.0, 1.0)
 	minimum_damage = max(minimum_damage, requested_damage * minimum_damage_ratio)
 
-	var final_damage: float = max(minimum_damage, requested_damage - effective_mitigation)
+	var damage_multiplier: float = 1.0
+	if target.has_method("get_damage_multiplier_for"):
+		damage_multiplier = max(0.0, float(target.get_damage_multiplier_for(payload)))
+
+	var final_damage_before_multiplier: float = max(minimum_damage, requested_damage - effective_mitigation)
+	var final_damage: float = final_damage_before_multiplier * damage_multiplier
 	var result := {
 		"source": payload.get("source", null),
 		"target": target,
@@ -51,6 +56,8 @@ func request_damage(payload: Dictionary) -> Dictionary:
 		"armor_penetration_flat": armor_penetration_flat,
 		"armor_penetration_ratio": armor_penetration_ratio,
 		"minimum_damage": minimum_damage,
+		"damage_multiplier": damage_multiplier,
+		"final_damage_before_multiplier": final_damage_before_multiplier,
 		"final_damage": final_damage,
 		"is_critical": is_critical,
 		"critical_multiplier": crit_multiplier if is_critical else 1.0,

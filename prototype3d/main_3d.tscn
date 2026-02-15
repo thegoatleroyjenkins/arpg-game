@@ -49,6 +49,9 @@ position = Vector3(0, 1, -5)
 script = ExtResource("8_combat_dummy_script")
 max_health = 120.0
 armor = 4.0
+damage_type_multipliers = {
+"physical": 0.9
+}
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CombatDummy"]
 mesh = SubResource("CylinderMesh_combat_dummy")
