@@ -47,6 +47,11 @@ extends Area3D
 @export_range(0.0, 1.0, 0.01) var respawn_telegraph_max_alpha: float = 0.8
 @export var respawn_telegraph_pulse_speed: float = 8.0
 
+@export_group("Visual")
+@export var visual_albedo_color: Color = Color(0.5, 0.95, 1.0, 1.0)
+@export var visual_emission_color: Color = Color(0.35, 0.8, 1.0, 1.0)
+@export_range(0.0, 4.0, 0.05) var visual_emission_energy: float = 1.15
+
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
 
@@ -328,8 +333,12 @@ func _set_mesh_alpha(alpha: float) -> void:
 		var mat := StandardMaterial3D.new()
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.albedo_color = Color(0.5, 0.95, 1.0, clamped_alpha)
 		mesh.material_override = mat
 	var material := mesh.material_override as StandardMaterial3D
 	if material != null:
-		material.albedo_color.a = clamped_alpha
+		var albedo_color := visual_albedo_color
+		albedo_color.a = clamped_alpha
+		material.albedo_color = albedo_color
+		material.emission_enabled = visual_emission_energy > 0.0
+		material.emission = visual_emission_color
+		material.emission_energy_multiplier = max(0.0, visual_emission_energy)

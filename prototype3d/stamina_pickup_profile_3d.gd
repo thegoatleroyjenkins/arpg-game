@@ -48,3 +48,8 @@ class_name StaminaPickupProfile3D
 @export_range(0.0, 1.0, 0.01) var respawn_telegraph_min_alpha: float = 0.2
 @export_range(0.0, 1.0, 0.01) var respawn_telegraph_max_alpha: float = 0.8
 @export var respawn_telegraph_pulse_speed: float = 8.0
+
+@export_group("Visual")
+@export var visual_albedo_color: Color = Color(0.5, 0.95, 1.0, 1.0)
+@export var visual_emission_color: Color = Color(0.35, 0.8, 1.0, 1.0)
+@export_range(0.0, 4.0, 0.05) var visual_emission_energy: float = 1.15

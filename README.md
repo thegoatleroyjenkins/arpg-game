@@ -50,6 +50,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Nearest-Need Pickup Magnet Targeting (3D prototype)** — Stamina orb magnet targeting now chooses the nearest player who currently needs stamina/dash/air-jump recovery (instead of first-in-group), improving co-op readiness while keeping pickup logic modular and threshold-driven
 - **Stamina Orb Regen Surge Buff (3D prototype)** — Data-driven stamina pickups can now apply a temporary stamina regeneration multiplier (duration + multiplier tuning) with HUD readout, enabling cleaner sustain windows after resource pickups
 - **Pickup Profile Resources (3D prototype)** — Stamina orb tuning can now be authored as reusable `StaminaPickupProfile3D` resources and assigned per node, keeping pickup behavior modular/data-driven while reducing scene-level stat duplication
+- **Pickup Profile Visual Identity (3D prototype)** — Data-driven pickup profile visual tuning now controls orb albedo/emission color and glow strength, making different pickup profiles readable at a glance without hardcoded per-node materials
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -206,6 +207,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven stamina pickup profile visual identity tuning (`visual_albedo_color`, `visual_emission_color`, `visual_emission_energy`) so different pickup profile types are readable in-world at a glance without hardcoded scene materials
 - ✅ Updated stamina pickup magnet selection to target the nearest player who currently needs stamina/dash/air-jump recovery, improving multiplayer/co-op readiness while keeping the pickup decision flow modular and data-driven
 - ✅ Added data-driven stamina pickup regen-surge tuning (`regen_boost_duration`, `regen_boost_multiplier`) plus modular `apply_stamina_regen_boost()` player API and HUD timer/multiplier readout, so pickup routing can create brief high-recovery sustain windows without hardcoded logic
 - ✅ Added data-driven 3D camera follow-assist tuning (enable toggle, assist yaw speed, min movement speed, and mouse-look lockout duration) so camera orbit naturally recenters while moving without fighting manual orbit input
