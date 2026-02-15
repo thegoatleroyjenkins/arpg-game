@@ -309,6 +309,16 @@ func _target_needs_air_jump_recovery(player: Node3D, threshold_ratio: float) -> 
 	var missing_ratio: float = float(max_air_jumps - current_air_jumps) / float(max_air_jumps)
 	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
 
+func _target_needs_sprint_efficiency_boost(player: Node3D) -> bool:
+	if sprint_efficiency_boost_duration <= 0.0 or sprint_efficiency_boost_multiplier <= 1.0:
+		return false
+	if not player.has_method("apply_sprint_efficiency_boost"):
+		return false
+	if not player.has_method("get"):
+		return true
+	var remaining: float = float(player.get("sprint_efficiency_boost_left"))
+	return remaining <= 0.01
+
 func _get_target_missing_stamina_ratio(player: Node3D) -> float:
 	var current_stamina: float = float(player.get("stamina"))
 	var tuning: Resource = player.get("tuning")
