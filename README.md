@@ -62,6 +62,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Wall-Collision Cancel (3D prototype)** — Data-driven wall-impact detection now ends dash travel when colliding head-on with level geometry, preventing awkward wall-grind movement and improving close-quarters control readability
 - **Dash Trail Afterimage VFX (3D prototype)** — Data-driven dash trail toggles/timing/alpha now spawn short-lived afterimages during dashes, improving burst readability and movement impact without hardcoded scene effects
 - **Dash Invulnerability Window (3D prototype)** — Data-driven dash i-frame duration now grants a short post-activation safety window, setting up cleaner combat integration without hardcoded timings
+- **Dash I-Frame Character Flash (3D prototype)** — Data-driven dash readability tuning now adds a pulsing character flash during active i-frames, making defensive timing windows visible in-world (not just on HUD)
 - **Air Jump HUD Readout (3D prototype)** — Modular HUD now shows remaining air jumps in real time, improving vertical mobility clarity during combat and traversal
 - **Sprint State HUD (3D prototype)** — Modular HUD now surfaces Sprint Ready / Active / Exhausted states for clearer stamina pacing and sprint re-engage timing during combat movement
 - **Hard Landing Recovery (3D prototype)** — Data-driven landing impact tuning adds a brief recovery after high-speed falls, making movement weightier and reducing bunny-hop style chaining

@@ -92,6 +92,13 @@ class_name PlayerTuning3D
 @export_group("Dash Defense")
 @export var dash_invulnerability_duration: float = 0.12
 
+@export_group("Dash Readability")
+@export var dash_invulnerability_flash_enabled: bool = true
+@export var dash_invulnerability_flash_color: Color = Color(0.45, 0.85, 1.0, 1.0)
+@export_range(0.0, 8.0, 0.1) var dash_invulnerability_flash_emission_energy: float = 1.5
+@export var dash_invulnerability_flash_pulse_speed: float = 18.0
+@export var dash_invulnerability_flash_blend_speed: float = 14.0
+
 @export_group("Camera")
 @export var camera_smooth: float = 8.0
 @export var camera_height: float = 7.0

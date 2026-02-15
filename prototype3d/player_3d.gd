@@ -51,6 +51,9 @@ var camera_orbit_yaw: float = 0.0
 var camera_orbit_pitch: float = 0.0
 var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
+var _body_visual_blend: float = 0.0
+var _body_material: StandardMaterial3D = null
+var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 
 func _ready() -> void:
 	add_to_group("player_3d")
@@ -63,6 +66,7 @@ func _ready() -> void:
 	dash_charges = max(1, tuning.dash_max_charges)
 	air_jumps_left = max(0, tuning.max_air_jumps)
 	camera.fov = tuning.camera_base_fov
+	_ensure_body_material()
 	_emit_stamina_changed()
 	_emit_dash_charges_changed()
 	_emit_dash_charge_recharge_changed()
@@ -98,6 +102,7 @@ func _physics_process(delta: float) -> void:
 	if dash_invulnerability_left > 0.0:
 		dash_invulnerability_left = max(0.0, dash_invulnerability_left - delta)
 		_emit_dash_invulnerability_changed()
+	_update_dash_invulnerability_visual(delta)
 
 	_handle_fall_reset_if_needed()
 
@@ -549,7 +554,7 @@ func _recenter_camera_orbit(delta: float) -> void:
 	var recenter_step: float = deg_to_rad(max(0.0, tuning.camera_recenter_speed_degrees_per_second)) * max(0.0, delta)
 	if recenter_step <= 0.0:
 		return
-	camera_orbit_yaw = move_toward_angle(camera_orbit_yaw, desired_yaw, recenter_step)
+	camera_orbit_yaw += clamp(difference, -recenter_step, recenter_step)
 
 func _adjust_camera_zoom(amount: float) -> void:
 	target_camera_distance = clamp(
@@ -649,6 +654,54 @@ func _regen_stamina(delta: float, is_moving: bool) -> void:
 		regen_rate = tuning.stamina_regen_moving_per_second
 	stamina = min(tuning.max_stamina, stamina + regen_rate * delta)
 	_emit_stamina_changed()
+
+func _ensure_body_material() -> void:
+	if not is_instance_valid(body_mesh) or body_mesh.mesh == null:
+		return
+	var source_material: Material = body_mesh.get_active_material(0)
+	if source_material is StandardMaterial3D:
+		_body_material = (source_material as StandardMaterial3D).duplicate()
+	else:
+		_body_material = StandardMaterial3D.new()
+		_body_material.albedo_color = Color(0.8, 0.8, 0.9, 1.0)
+	_body_material.resource_local_to_scene = true
+	_body_material.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+	body_mesh.material_override = _body_material
+	_body_base_albedo = _body_material.albedo_color
+
+func _update_dash_invulnerability_visual(delta: float) -> void:
+	if not tuning.dash_invulnerability_flash_enabled:
+		_reset_dash_invulnerability_visual(delta)
+		return
+	if _body_material == null:
+		_ensure_body_material()
+		if _body_material == null:
+			return
+	var max_duration: float = max(0.001, tuning.dash_invulnerability_duration)
+	var active_ratio: float = clamp(dash_invulnerability_left / max_duration, 0.0, 1.0)
+	var target_blend: float = active_ratio
+	var blend_speed: float = max(0.01, tuning.dash_invulnerability_flash_blend_speed)
+	_body_visual_blend = move_toward(_body_visual_blend, target_blend, blend_speed * delta)
+	if _body_visual_blend <= 0.001:
+		_reset_dash_invulnerability_visual(delta)
+		return
+	var pulse := 0.5 + (0.5 * sin(Time.get_ticks_msec() * 0.001 * max(0.01, tuning.dash_invulnerability_flash_pulse_speed)))
+	var flash_weight: float = clamp(_body_visual_blend * pulse, 0.0, 1.0)
+	var flash_color: Color = _body_base_albedo.lerp(tuning.dash_invulnerability_flash_color, flash_weight)
+	_body_material.albedo_color = flash_color
+	_body_material.emission_enabled = true
+	_body_material.emission = tuning.dash_invulnerability_flash_color
+	_body_material.emission_energy_multiplier = tuning.dash_invulnerability_flash_emission_energy * flash_weight
+
+func _reset_dash_invulnerability_visual(delta: float) -> void:
+	if _body_material == null:
+		return
+	if _body_visual_blend > 0.0:
+		var blend_speed: float = max(0.01, tuning.dash_invulnerability_flash_blend_speed)
+		_body_visual_blend = max(0.0, _body_visual_blend - blend_speed * delta)
+	_body_material.albedo_color = _body_base_albedo
+	_body_material.emission_enabled = false
+	_body_material.emission_energy_multiplier = 0.0
 
 func _emit_stamina_changed() -> void:
 	stamina_changed.emit(stamina, tuning.max_stamina)

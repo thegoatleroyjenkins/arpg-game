@@ -191,18 +191,18 @@ func _get_target_missing_stamina_ratio(player: Node3D) -> float:
 	return clamp((max_stamina - current_stamina) / max_stamina, 0.0, 1.0)
 
 func _has_line_of_sight_to_target(player: Node3D) -> bool:
-	var world := get_world_3d()
+	var world: World3D = get_world_3d()
 	if world == null:
 		return true
-	var offset := Vector3.UP * max(0.0, magnet_line_of_sight_height_offset)
-	var from := global_position + offset
-	var to := player.global_position + offset
-	var query := PhysicsRayQueryParameters3D.create(from, to)
+	var height_offset: Vector3 = Vector3.UP * max(0.0, magnet_line_of_sight_height_offset)
+	var from_position: Vector3 = global_position + height_offset
+	var to_position: Vector3 = player.global_position + height_offset
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from_position, to_position)
 	query.exclude = [self, player]
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
 	query.collision_mask = max(1, magnet_line_of_sight_collision_mask)
-	var hit := world.direct_space_state.intersect_ray(query)
+	var hit: Dictionary = world.direct_space_state.intersect_ray(query)
 	return hit.is_empty()
 
 func _set_mesh_alpha(alpha: float) -> void:
