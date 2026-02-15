@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
+[ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 radius = 0.35
@@ -48,3 +49,25 @@ position = Vector3(0, 6, 8)
 
 [node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
 current = true
+
+[node name="StaminaHud" type="CanvasLayer" parent="."]
+script = ExtResource("2_stamina_hud_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="StaminaHud"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 296.0
+offset_bottom = 96.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StaminaHud/MarginContainer"]
+layout_mode = 2
+
+[node name="StaminaBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="StaminaLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Stamina 100 / 100"
