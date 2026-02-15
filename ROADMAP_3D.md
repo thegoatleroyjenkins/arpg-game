@@ -43,3 +43,27 @@ A stable combat contract first prevents expensive rewrites when enemy scaling, a
 - No fake complexity.
 - Prefer clear contracts over temporary hacks.
 - Keep systems modular and data-driven.
+
+## Focused Planning Pass — 2026-02-15 03:32 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Stand up a reusable 3D combat core now**
+   - Add `res://systems/combat/damage_resolver.gd` and `res://systems/combat/combat_actor_3d.gd`.
+   - Define one request path (`request_damage`) and one application path (`apply_damage_result`) for both player and enemies.
+   - Keep payload fields future-proof (`damage_type`, `base_damage`, `crit`, `tags`, `poise_damage`, `source_id`).
+
+2. **Add one NavMesh-driven enemy in the 3D slice**
+   - Create `EnemyActor3D` + `EnemyBrain3D` (Idle/Chase/Attack/Leash) in `res://prototype3d/` or `res://systems/ai/`.
+   - Use `NavigationAgent3D` movement and trigger attacks through `DamageResolver` only.
+   - Keep behavior data-driven via a tunable resource for speed/ranges/cooldowns.
+
+3. **Define open-world-ready world streaming interfaces before content scale-up**
+   - Add lightweight contracts for `WorldSector`, `WorldStreamer`, and `SpawnDirector` under `res://systems/world/`.
+   - Start with sector activation radius + spawn budget caps (no full procedural generation yet).
+   - Store sector and spawn settings in resources so biome/endgame layering stays modular.
+
+### Immediate Next Implementation Task
+**Implement first:** create `res://systems/combat/damage_resolver.gd` with a minimal request→resolve→apply pipeline, then hook one player light attack call in `player_3d.gd` to that resolver.
+
+### Why this order
+A stable combat contract first avoids churn across AI, loot scaling, and streamed world systems as the project expands toward open-world scope.
