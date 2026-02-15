@@ -16,6 +16,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Sprint (3D prototype)** — Hold Shift for burst movement speed in the 3D scene
 - **Dash (3D prototype)** — Tap Q for a short directional dash with cooldown (data-driven tuning)
 - **Stamina (3D prototype)** — Sprint and dash now consume stamina with configurable regen/delay for better combat pacing
+- **Forgiving Jump Timing (3D prototype)** — Data-driven coyote time + jump buffering make jumps more responsive and reliable in moment-to-moment combat movement
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases
@@ -143,6 +144,7 @@ arpg-game/
 - ✅ Added data-driven 3D player tuning resource + Shift sprint in prototype
 - ✅ Added data-driven 3D dash (Q) with duration/cooldown tuning
 - ✅ Added data-driven 3D stamina system (sprint + dash costs, regen delay/rate)
+- ✅ Added data-driven 3D jump feel tuning (coyote time + jump buffering)
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
 
 ## License

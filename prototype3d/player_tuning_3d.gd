@@ -5,6 +5,8 @@ class_name PlayerTuning3D
 @export var sprint_multiplier: float = 1.6
 @export var jump_velocity: float = 4.5
 @export var gravity: float = 12.0
+@export var coyote_time: float = 0.12
+@export var jump_buffer_time: float = 0.12
 
 @export_group("Stamina")
 @export var max_stamina: float = 100.0

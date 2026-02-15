@@ -13,6 +13,8 @@ var dash_time_left: float = 0.0
 var dash_cooldown_left: float = 0.0
 var stamina: float = 0.0
 var stamina_regen_delay_left: float = 0.0
+var coyote_time_left: float = 0.0
+var jump_buffer_left: float = 0.0
 
 func _ready() -> void:
 	look_target = global_position
@@ -27,13 +29,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _physics_process(delta: float) -> void:
-	# Gravity
-	if not is_on_floor():
+	var was_on_floor := is_on_floor()
+
+	# Jump buffering gives more forgiving timing before landing.
+	if Input.is_action_just_pressed("ui_accept"):
+		jump_buffer_left = tuning.jump_buffer_time
+	else:
+		jump_buffer_left = max(0.0, jump_buffer_left - delta)
+
+	# Gravity + coyote time for forgiving jumps after stepping off ledges.
+	if was_on_floor:
+		coyote_time_left = tuning.coyote_time
+	else:
+		coyote_time_left = max(0.0, coyote_time_left - delta)
 		velocity.y -= tuning.gravity * delta
 
-	# Jump
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if jump_buffer_left > 0.0 and coyote_time_left > 0.0:
 		velocity.y = tuning.jump_velocity
+		jump_buffer_left = 0.0
+		coyote_time_left = 0.0
 
 	# Movement input
 	var input_vec := Vector2(
