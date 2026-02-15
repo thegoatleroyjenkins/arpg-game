@@ -139,3 +139,27 @@ The repo is currently movement-heavy; a real combat contract is the highest-leve
 
 ### Why this order
 Right now the project has strong movement feel but no durable combat/world contracts. Locking combat + Nav-ready AI + sector interfaces in this order gives the fastest path to a full 3D ARPG while staying open-world-ready.
+
+## Focused Planning Pass — 2026-02-15 07:34 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Implement the combat foundation as an engine-level contract (highest leverage)**
+   - Create `res://systems/combat/damage_resolver.gd` and `res://systems/combat/combat_actor_3d.gd`.
+   - Enforce one damage entry point (`request_damage`) and one apply path (no direct health mutation in gameplay scripts).
+   - Define a minimal `AttackEvent3D` payload now (`source`, `target`, `base_damage`, `damage_type`, `tags`, `poise_damage`) to keep loot/skills extensible.
+
+2. **Deliver one complete 3D combat encounter slice using NavMesh-ready AI**
+   - Add a prototype `EnemyActor3D` + `EnemyBrain3D` with `NavigationAgent3D` states: Idle/Chase/Attack/Leash.
+   - Route enemy attacks through the same resolver to guarantee player/enemy combat parity.
+   - Validate the full loop in `prototype3d/main_3d.tscn`: engage, exchange hits, death signal, respawn/retry.
+
+3. **Add world-streaming scaffolding before open-world content expansion**
+   - Define `WorldSector`, `WorldStreamer`, and `SpawnDirector` interfaces under `res://systems/world/`.
+   - Start with sector activation radius, unload hysteresis, and per-sector spawn budgets.
+   - Keep sector/spawn configs resource-driven (`.tres`) so biome and endgame layering is data-only.
+
+### Immediate Next Implementation Task
+**Implement now:** scaffold `res://systems/combat/` with `damage_resolver.gd` and `combat_actor_3d.gd`, then wire one light melee action in `prototype3d/player_3d.gd` to call `request_damage()` instead of directly mutating target health.
+
+### Why this order
+The repo is still prototype-heavy; locking a reusable combat contract first unlocks AI, progression, loot scaling, and streamed open-world systems with minimal rework.
