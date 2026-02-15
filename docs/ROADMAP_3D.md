@@ -331,3 +331,27 @@ Combat already has a resolver contract; the biggest unblocker is proving a real 
 
 ### Why this order
 Combat contracts are now present; the highest-risk gap is a moving enemy encounter tied to future chunk-streamed spawning. Closing that gap unlocks practical open-world scaling without rewrites.
+
+## Focused Planning Pass — 2026-02-15 12:31 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Replace `CombatDummy` with one reusable enemy prefab slice (highest leverage now)**
+   - Create `prototype3d/enemy_actor_3d.gd` + `prototype3d/enemy_brain_3d.gd` with clear states (Idle/Chase/Attack/Leash).
+   - Add a `NavigationAgent3D` pathing loop so enemy movement already matches open-world/navmesh expectations.
+   - Keep all outgoing enemy damage on `DamageResolver.request_damage()` to preserve one combat contract.
+
+2. **Turn world-streaming stubs into scene-wired behavior**
+   - Instantiate `WorldStreamer`, `WorldSector`, and `SpawnDirector` in `prototype3d/main_3d.tscn`.
+   - Wire `chunk_should_load/unload` to sector activate/deactivate and spawn/despawn callbacks.
+   - Enforce per-chunk active encounter caps so streaming remains deterministic as map size grows.
+
+3. **Lock first data contracts for scalable content authoring**
+   - Add initial resource schemas for `EnemyArchetype3D`, `SkillData`, and `AffixData` with only required core fields.
+   - Move enemy/combat tuning reads behind adapter functions so gameplay logic stops depending on scene constants.
+   - Add one compact combat breakdown debug output (`base -> mitigation -> multipliers -> final`) for balancing clarity.
+
+### Immediate Next Implementation Task
+**Implement now:** add `prototype3d/enemy_actor_3d.gd` and `prototype3d/enemy_brain_3d.gd`, then replace `CombatDummy` in `prototype3d/main_3d.tscn` with a `NavigationAgent3D`-driven enemy that chases player and performs one resolver-based melee attack.
+
+### Why this order
+The biggest open gap between current prototype and open-world-ready architecture is a real moving encounter unit. Once that exists and is wired to the resolver, streaming and progression contracts can scale without redoing combat fundamentals.
