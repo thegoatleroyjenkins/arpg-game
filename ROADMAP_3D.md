@@ -67,3 +67,27 @@ A stable combat contract first prevents expensive rewrites when enemy scaling, a
 
 ### Why this order
 A stable combat contract first avoids churn across AI, loot scaling, and streamed world systems as the project expands toward open-world scope.
+
+## Focused Planning Pass — 2026-02-15 04:32 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Build a reusable 3D combat encounter slice (player + one enemy + resolver)**
+   - Finish `res://systems/combat/damage_resolver.gd` and `combat_actor_3d.gd` as the only damage path.
+   - Add `EnemyActor3D` wired into the same resolver (no direct HP mutation in actor scripts).
+   - Validate one full loop: player light attack, enemy attack, hit reactions, death event.
+
+2. **Create open-world-safe world partition contracts before adding more content**
+   - Add `WorldSector`, `WorldStreamer`, and `SpawnDirector` stubs under `res://systems/world/`.
+   - Support sector load/unload callbacks and per-sector spawn budgets.
+   - Keep settings resource-driven (`.tres`) so biome and endgame modifiers can plug in later.
+
+3. **Stabilize data boundaries for progression systems (skills/loot/enemy scaling)**
+   - Define minimal schemas for `SkillData`, `AffixData`, and `EnemyArchetypeData` resources.
+   - Ensure combat reads these through adapters, not hardcoded constants.
+   - Add a simple debug overlay readout for final damage contributors to protect combat clarity.
+
+### Immediate Next Implementation Task
+**Implement now:** create `res://systems/combat/damage_resolver.gd` + `res://systems/combat/combat_actor_3d.gd`, then wire one player light attack and one prototype enemy attack through `request_damage()`.
+
+### Why this order
+A single combat contract + early world streaming interfaces prevents architecture churn and keeps the project aligned with a full 3D, open-world-ready ARPG trajectory.
