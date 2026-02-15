@@ -598,7 +598,10 @@ func _update_camera_follow_assist(horizontal_speed: float, delta: float) -> void
 	var min_speed: float = max(0.0, tuning.camera_follow_assist_min_move_speed)
 	if horizontal_speed < min_speed:
 		return
-	var assist_speed_rad: float = deg_to_rad(max(0.0, tuning.camera_follow_assist_speed_degrees_per_second))
+	var assist_speed_degrees: float = max(0.0, tuning.camera_follow_assist_speed_degrees_per_second)
+	if dash_time_left > 0.0:
+		assist_speed_degrees *= max(0.5, tuning.camera_follow_assist_dash_multiplier)
+	var assist_speed_rad: float = deg_to_rad(assist_speed_degrees)
 	if assist_speed_rad <= 0.0:
 		return
 	var yaw_difference: float = wrapf(rotation.y - camera_orbit_yaw, -PI, PI)

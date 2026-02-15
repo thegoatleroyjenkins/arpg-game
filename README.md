@@ -72,6 +72,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Mouse Orbit Camera (3D prototype)** — Data-driven camera orbit yaw/pitch (sensitivity, pitch clamp, invert-Y toggle) now lets players rotate the combat camera while keeping movement camera-relative and modular
 - **Hold-to-Recenter Camera (3D prototype)** — Data-driven camera recenter action (R by default) smoothly aligns orbit yaw behind player facing, reducing camera drift after heavy orbit usage while keeping controls modular
 - **Camera Follow Assist (3D prototype)** — Data-driven follow-assist yaw gently realigns orbit behind movement direction while traversing, with tunable speed/min-move threshold and a post-mouse-look lockout window to preserve manual camera control
+- **Dash-Aware Camera Follow Assist (3D prototype)** — Data-driven dash follow-assist multiplier now temporarily boosts follow-assist yaw speed during active dashes, improving burst-mobility framing and short-window camera readability without hardcoded behavior
 - **Dynamic Camera FOV (3D prototype)** — Data-driven FOV kick scales with movement speed and dash state, adding stronger sensation of momentum without hardcoding camera behavior
 - **Sprint Ramp Smoothing (3D prototype)** — Data-driven sprint ramp-up/ramp-down blends acceleration into and out of sprint for weightier, cleaner movement transitions
 - **Sprint Exhaustion Gate (3D prototype)** — Data-driven stamina thresholds now gate sprint re-engage after exhaustion, preventing rapid on/off sprint jitter at near-zero stamina
@@ -224,6 +225,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven dash-aware camera follow-assist tuning (`camera_follow_assist_dash_multiplier`) so orbit yaw realigns faster during active dashes for clearer burst-mobility framing without hardcoded camera logic
 - ✅ Added a Phase-1 offline procedural asset pipeline (`tools/procedural_asset_generator.gd`) that auto-generates modular weapons, props, and pickup scenes into `res://generated_assets/`; usage is documented in `docs/PROCEDURAL_ASSET_PIPELINE.md`
 - ✅ Added data-driven 3D dash trail visual identity tuning (`dash_trail_color`, `dash_trail_emission_energy`) so afterimage trail readability/style can be authored per tuning resource without hardcoded material values
 - ✅ Polished the 2D HUD for readability: split stats and controls into dedicated translucent panels, upgraded the stat readout to BBCode-rich color-coded text, and added an explicit objective line (`Defeat N enemies`) for clearer moment-to-moment UX

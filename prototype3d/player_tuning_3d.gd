@@ -137,6 +137,7 @@ class_name PlayerTuning3D
 @export var camera_follow_assist_enabled: bool = true
 @export var camera_follow_assist_speed_degrees_per_second: float = 95.0
 @export var camera_follow_assist_min_move_speed: float = 1.5
+@export_range(0.5, 4.0, 0.05) var camera_follow_assist_dash_multiplier: float = 1.5
 @export var camera_follow_assist_input_lock_time: float = 0.8
 
 @export_group("Camera Collision")
