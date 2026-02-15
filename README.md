@@ -1,6 +1,12 @@
 # ARPG Game
 
-A Godot 4 action RPG with equipment system, advanced enemy AI, and progression mechanics.
+A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D gameplay target (Project Emberfall).
+
+## Current Direction
+
+- **Target:** Full 3D ARPG experience
+- **Status:** Existing 2D systems remain playable while 3D foundations are being built in parallel.
+- **Prototype Scene:** `res://prototype3d/main_3d.tscn`
 
 ## Current Features
 
@@ -63,6 +69,11 @@ Built with **Godot 4.2**
 ### Run from source:
 ```bash
 godot --path .
+```
+
+### Run the 3D prototype scene directly:
+```bash
+godot --path . --scene res://prototype3d/main_3d.tscn
 ```
 
 ### Export builds:
