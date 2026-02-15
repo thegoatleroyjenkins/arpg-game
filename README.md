@@ -39,7 +39,29 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 
 Get the latest **Windows build** from [Releases](../../releases).
 
-- Every push to `master` now auto-builds and publishes a GitHub Release artifact (`arpg-windows.zip`).
+## Publish a Release (command-driven)
+
+This repo includes a manual GitHub Actions workflow that builds and publishes release assets to the GitHub Releases page.
+
+Run from your terminal (with `gh` authenticated):
+
+```bash
+gh workflow run "Build + Release ARPG" \
+  --ref master \
+  -f tag=v0.1.0 \
+  -f name="ARPG v0.1.0" \
+  -f prerelease=true
+```
+
+Optional: watch the run live
+
+```bash
+gh run watch
+```
+
+Release assets uploaded:
+- `arpg-windows.zip`
+- `arpg-linux.zip`
 
 ## Controls
 

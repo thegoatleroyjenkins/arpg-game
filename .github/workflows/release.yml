@@ -1,0 +1,57 @@
+name: Build + Release ARPG
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (example: v0.1.0)"
+        required: true
+        type: string
+      name:
+        description: "Release title"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark as pre-release"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.2.1
+          use-dotnet: false
+
+      - name: Build Windows
+        run: |
+          mkdir -p build/windows
+          godot --headless --path . --export-release "Windows Desktop" build/windows/ARPG.exe
+          cd build/windows && zip -r ../arpg-windows.zip .
+
+      - name: Build Linux
+        run: |
+          mkdir -p build/linux
+          godot --headless --path . --export-release "Linux" build/linux/ARPG.x86_64
+          cd build/linux && zip -r ../arpg-linux.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          name: ${{ inputs.name }}
+          prerelease: ${{ inputs.prerelease }}
+          generate_release_notes: true
+          files: |
+            build/arpg-windows.zip
+            build/arpg-linux.zip
