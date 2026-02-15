@@ -69,6 +69,14 @@ extends Area3D
 @export var visual_emission_color: Color = Color(0.35, 0.8, 1.0, 1.0)
 @export_range(0.0, 4.0, 0.05) var visual_emission_energy: float = 1.15
 
+@export_group("Contextual Visuals")
+@export var contextual_visual_feedback_enabled: bool = true
+@export var contextual_stamina_tint: Color = Color(0.5, 0.95, 1.0, 1.0)
+@export var contextual_dash_tint: Color = Color(1.0, 0.78, 0.36, 1.0)
+@export var contextual_air_jump_tint: Color = Color(0.86, 0.66, 1.0, 1.0)
+@export var contextual_mixed_tint: Color = Color(0.68, 0.92, 0.74, 1.0)
+@export_range(0.0, 1.0, 0.01) var contextual_tint_blend: float = 0.7
+
 @onready var mesh: MeshInstance3D = $MeshInstance3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
 
@@ -77,6 +85,8 @@ var _base_y: float = 0.0
 var _time: float = 0.0
 var _spawn_origin: Vector3 = Vector3.ZERO
 var _respawn_remaining: float = 0.0
+var _runtime_albedo_tint: Color = Color(1.0, 1.0, 1.0, 1.0)
+var _runtime_emission_tint: Color = Color(1.0, 1.0, 1.0, 1.0)
 
 func _ready() -> void:
 	_apply_profile_overrides()
@@ -114,6 +124,7 @@ func _process(delta: float) -> void:
 		if is_instance_valid(mesh):
 			mesh.rotation_degrees.y += spin_speed_degrees * delta
 			mesh.position.y = sin(_time * bob_speed) * bob_height
+			_update_contextual_visual_tint()
 			_set_mesh_alpha(1.0)
 		_update_magnet_motion(delta)
 		return
@@ -298,6 +309,33 @@ func _target_needs_any_recovery(player: Node3D, stamina_threshold: float, dash_t
 		or _target_needs_move_speed_boost(player) \
 		or _target_needs_dash_invulnerability_boost(player)
 
+func _update_contextual_visual_tint() -> void:
+	_runtime_albedo_tint = Color(1.0, 1.0, 1.0, 1.0)
+	_runtime_emission_tint = Color(1.0, 1.0, 1.0, 1.0)
+	if not contextual_visual_feedback_enabled:
+		return
+	var player := _get_magnet_target()
+	if player == null:
+		return
+	var needs_stamina: bool = _target_needs_stamina_with_threshold(player, min_collect_missing_stamina_ratio)
+	var needs_dash: bool = _target_needs_dash_recovery(player, min_collect_missing_dash_ratio) \
+		or _target_needs_dash_charge_recovery(player, min_collect_missing_dash_charge_ratio)
+	var needs_air_jump: bool = _target_needs_air_jump_recovery(player, min_collect_missing_air_jump_ratio)
+	var active_modes: int = int(needs_stamina) + int(needs_dash) + int(needs_air_jump)
+	if active_modes <= 0:
+		return
+	var target_tint: Color = contextual_mixed_tint
+	if active_modes == 1:
+		if needs_dash:
+			target_tint = contextual_dash_tint
+		elif needs_air_jump:
+			target_tint = contextual_air_jump_tint
+		else:
+			target_tint = contextual_stamina_tint
+	var blend: float = clamp(contextual_tint_blend, 0.0, 1.0)
+	_runtime_albedo_tint = Color(1.0, 1.0, 1.0, 1.0).lerp(target_tint, blend)
+	_runtime_emission_tint = Color(1.0, 1.0, 1.0, 1.0).lerp(target_tint, blend)
+
 func _target_needs_stamina(player: Node3D) -> bool:
 	return _target_needs_stamina_with_threshold(player, magnet_missing_stamina_ratio)
 
@@ -420,9 +458,9 @@ func _set_mesh_alpha(alpha: float) -> void:
 		mesh.material_override = mat
 	var material := mesh.material_override as StandardMaterial3D
 	if material != null:
-		var albedo_color := visual_albedo_color
+		var albedo_color := visual_albedo_color * _runtime_albedo_tint
 		albedo_color.a = clamped_alpha
 		material.albedo_color = albedo_color
 		material.emission_enabled = visual_emission_energy > 0.0
-		material.emission = visual_emission_color
+		material.emission = visual_emission_color * _runtime_emission_tint
 		material.emission_energy_multiplier = max(0.0, visual_emission_energy)

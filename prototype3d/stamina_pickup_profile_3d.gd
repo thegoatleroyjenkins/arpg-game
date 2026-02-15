@@ -70,3 +70,11 @@ class_name StaminaPickupProfile3D
 @export var visual_albedo_color: Color = Color(0.5, 0.95, 1.0, 1.0)
 @export var visual_emission_color: Color = Color(0.35, 0.8, 1.0, 1.0)
 @export_range(0.0, 4.0, 0.05) var visual_emission_energy: float = 1.15
+
+@export_group("Contextual Visuals")
+@export var contextual_visual_feedback_enabled: bool = true
+@export var contextual_stamina_tint: Color = Color(0.5, 0.95, 1.0, 1.0)
+@export var contextual_dash_tint: Color = Color(1.0, 0.78, 0.36, 1.0)
+@export var contextual_air_jump_tint: Color = Color(0.86, 0.66, 1.0, 1.0)
+@export var contextual_mixed_tint: Color = Color(0.68, 0.92, 0.74, 1.0)
+@export_range(0.0, 1.0, 0.01) var contextual_tint_blend: float = 0.7
