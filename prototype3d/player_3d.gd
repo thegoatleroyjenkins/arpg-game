@@ -143,17 +143,18 @@ func _physics_process(delta: float) -> void:
 	if dash_state_changed:
 		_emit_dash_cooldown_changed()
 
+	var dash_stamina_cost := _current_dash_stamina_cost()
 	if _can_dash_now() and Input.is_action_just_pressed("dash"):
-		if _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
-			_use_stamina(tuning.dash_stamina_cost)
+		if _can_start_dash() and _can_pay_stamina(dash_stamina_cost):
+			_use_stamina(dash_stamina_cost)
 			_start_dash(move_dir)
 		elif _dash_ready_within(tuning.dash_input_buffer_time):
 			dash_buffer_left = tuning.dash_input_buffer_time
 			buffered_dash_direction = move_dir
 			_emit_dash_buffer_changed()
 
-	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(tuning.dash_stamina_cost):
-		_use_stamina(tuning.dash_stamina_cost)
+	if _can_dash_now() and dash_buffer_left > 0.0 and _can_start_dash() and _can_pay_stamina(dash_stamina_cost):
+		_use_stamina(dash_stamina_cost)
 		_start_dash(buffered_dash_direction)
 		dash_buffer_left = 0.0
 		buffered_dash_direction = Vector3.ZERO
@@ -380,6 +381,12 @@ func _next_dash_ready_max() -> float:
 			return max(0.01, tuning.dash_charge_recovery_time)
 		return max(0.01, tuning.dash_cooldown)
 	return max(0.01, max(tuning.dash_cooldown, tuning.dash_charge_recovery_time))
+
+func _current_dash_stamina_cost() -> float:
+	var base_cost: float = max(0.0, tuning.dash_stamina_cost)
+	if is_on_floor():
+		return base_cost
+	return base_cost * max(1.0, tuning.dash_airborne_stamina_multiplier)
 
 func _can_pay_stamina(cost: float) -> bool:
 	return stamina >= max(0.0, cost)

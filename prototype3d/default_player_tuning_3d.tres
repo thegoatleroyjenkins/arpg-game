@@ -24,6 +24,7 @@ hard_landing_dash_cancel_window = 0.07
 max_stamina = 100.0
 sprint_stamina_per_second = 28.0
 dash_stamina_cost = 35.0
+dash_airborne_stamina_multiplier = 1.2
 jump_stamina_cost = 12.0
 low_stamina_movement_threshold_ratio = 0.2
 low_stamina_movement_min_multiplier = 0.82

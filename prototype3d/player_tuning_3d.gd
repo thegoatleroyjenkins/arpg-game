@@ -40,6 +40,7 @@ class_name PlayerTuning3D
 @export var max_stamina: float = 100.0
 @export var sprint_stamina_per_second: float = 28.0
 @export var dash_stamina_cost: float = 35.0
+@export_range(1.0, 3.0, 0.01) var dash_airborne_stamina_multiplier: float = 1.2
 @export var jump_stamina_cost: float = 12.0
 @export_range(0.0, 1.0, 0.01) var low_stamina_movement_threshold_ratio: float = 0.2
 @export_range(0.1, 1.0, 0.01) var low_stamina_movement_min_multiplier: float = 0.82
