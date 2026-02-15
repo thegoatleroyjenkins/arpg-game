@@ -38,6 +38,34 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Resolve Godot binary
+        id: godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          GODOT_BIN="$(command -v godot || command -v godot4 || true)"
+          if [ -z "$GODOT_BIN" ]; then
+            echo "No godot binary found on PATH"
+            exit 1
+          fi
+          echo "bin=$GODOT_BIN" >> "$GITHUB_OUTPUT"
+          "$GODOT_BIN" --version
+
+      - name: Validate export presets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f export_presets.cfg
+          grep -q 'name="Windows Desktop"' export_presets.cfg
+          grep -q 'name="Linux"' export_presets.cfg
+          echo "Export presets look good."
+
+      - name: Engine smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          "${{ steps.godot.outputs.bin }}" --headless --path . --quit-after 1
+
       - name: Resolve release tag + title
         id: version
         shell: bash
@@ -51,11 +79,9 @@ jobs:
             LATEST_TAG="$(git tag --list 'v*' --sort=-v:refname | head -n1 || true)"
 
             if [[ -z "$LATEST_TAG" ]]; then
-              # Requested baseline behavior from user: after 0.0.0.1, next should be 0.0.02
               NEXT=2
               TAG=$(printf 'v0.0.%02d' "$NEXT")
             elif [[ "$LATEST_TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-              # Legacy 4-part format, e.g. v0.0.0.1 -> v0.0.02
               MAJOR="${BASH_REMATCH[1]}"
               MINOR="${BASH_REMATCH[2]}"
               LAST="${BASH_REMATCH[4]}"
@@ -84,16 +110,30 @@ jobs:
           echo "Resolved release: $TAG ($NAME)"
 
       - name: Build Windows
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p build/windows
-          godot --headless --path . --export-release "Windows Desktop" build/windows/ARPG.exe
+          "${{ steps.godot.outputs.bin }}" --headless --path . --export-release "Windows Desktop" build/windows/ARPG.exe
           cd build/windows && zip -r ../arpg-windows.zip .
 
       - name: Build Linux
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p build/linux
-          godot --headless --path . --export-release "Linux" build/linux/ARPG.x86_64
+          "${{ steps.godot.outputs.bin }}" --headless --path . --export-release "Linux" build/linux/ARPG.x86_64
           cd build/linux && zip -r ../arpg-linux.zip .
+
+      - name: Upload build artifacts (debug)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arpg-build-bundles
+          path: |
+            build/arpg-windows.zip
+            build/arpg-linux.zip
+          if-no-files-found: warn
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
