@@ -607,7 +607,7 @@ func _adjust_camera_orbit(relative_motion: Vector2) -> void:
 	if sensitivity <= 0.0:
 		return
 	camera_follow_assist_lock_left = max(camera_follow_assist_lock_left, max(0.0, tuning.camera_follow_assist_input_lock_time))
-	camera_orbit_yaw -= relative_motion.x * sensitivity * 0.01
+	camera_orbit_yaw += relative_motion.x * sensitivity * 0.01
 	var pitch_input: float = -relative_motion.y
 	if tuning.camera_orbit_invert_y:
 		pitch_input = -pitch_input
