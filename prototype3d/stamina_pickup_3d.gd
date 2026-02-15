@@ -14,6 +14,13 @@ extends Area3D
 @export_range(0.0, 1.0, 0.01) var magnet_missing_stamina_ratio: float = 0.2
 @export_group("Collection")
 @export_range(0.0, 1.0, 0.01) var min_collect_missing_stamina_ratio: float = 0.05
+
+@export_group("Dash Recovery")
+@export var dash_recovery_bonus_seconds: float = 0.35
+@export_range(0.0, 1.0, 0.01) var min_collect_missing_dash_ratio: float = 0.1
+@export_range(0.0, 1.0, 0.01) var magnet_missing_dash_ratio: float = 0.2
+
+@export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1
 @export var magnet_line_of_sight_height_offset: float = 0.5
@@ -63,12 +70,23 @@ func _try_collect(body: Node) -> void:
 		return
 	if not body.has_method("restore_stamina"):
 		return
-	if body is Node3D:
-		var missing_ratio: float = _get_target_missing_stamina_ratio(body)
-		if missing_ratio < clamp(min_collect_missing_stamina_ratio, 0.0, 1.0):
-			return
-	var restored: float = float(body.call("restore_stamina", stamina_restore))
-	if restored <= 0.0:
+	if not (body is Node3D):
+		return
+	var target: Node3D = body as Node3D
+	var wants_stamina: bool = _target_needs_stamina_for_collection(target)
+	var wants_dash_recovery: bool = _target_needs_dash_recovery(target, min_collect_missing_dash_ratio)
+	if not wants_stamina and not wants_dash_recovery:
+		return
+
+	var restored: float = 0.0
+	if wants_stamina:
+		restored = float(target.call("restore_stamina", stamina_restore))
+
+	var dash_recovered: float = 0.0
+	if dash_recovery_bonus_seconds > 0.0 and target.has_method("refund_dash_recovery") and wants_dash_recovery:
+		dash_recovered = float(target.call("refund_dash_recovery", dash_recovery_bonus_seconds))
+
+	if restored <= 0.0 and dash_recovered <= 0.0:
 		return
 	_deactivate()
 
@@ -138,7 +156,7 @@ func _update_magnet_motion(delta: float) -> void:
 	if distance <= 0.01 or distance > magnet_radius:
 		_move_toward_spawn(delta)
 		return
-	if not _target_needs_stamina(player):
+	if not _target_needs_stamina(player) and not _target_needs_dash_recovery(player, magnet_missing_dash_ratio):
 		_move_toward_spawn(delta)
 		return
 	if magnet_requires_line_of_sight and not _has_line_of_sight_to_target(player):
@@ -179,6 +197,28 @@ func _target_needs_stamina(player: Node3D) -> bool:
 		return false
 	var missing_ratio: float = _get_target_missing_stamina_ratio(player)
 	return missing_ratio >= clamp(magnet_missing_stamina_ratio, 0.0, 1.0)
+
+func _target_needs_stamina_for_collection(player: Node3D) -> bool:
+	if not player.has_method("restore_stamina"):
+		return false
+	var missing_ratio: float = _get_target_missing_stamina_ratio(player)
+	return missing_ratio >= clamp(min_collect_missing_stamina_ratio, 0.0, 1.0)
+
+func _target_needs_dash_recovery(player: Node3D, threshold_ratio: float) -> bool:
+	if dash_recovery_bonus_seconds <= 0.0:
+		return false
+	if not player.has_method("refund_dash_recovery"):
+		return false
+	if not player.has_method("_next_dash_ready_remaining"):
+		return false
+	var remaining: float = max(0.0, float(player.call("_next_dash_ready_remaining")))
+	if remaining <= 0.0:
+		return false
+	if not player.has_method("_next_dash_ready_max"):
+		return true
+	var max_value: float = max(0.01, float(player.call("_next_dash_ready_max")))
+	var missing_ratio: float = clamp(remaining / max_value, 0.0, 1.0)
+	return missing_ratio >= clamp(threshold_ratio, 0.0, 1.0)
 
 func _get_target_missing_stamina_ratio(player: Node3D) -> float:
 	var current_stamina: float = float(player.get("stamina"))

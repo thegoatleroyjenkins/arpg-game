@@ -745,6 +745,24 @@ func restore_stamina(amount: float) -> float:
 		return stamina - previous_stamina
 	return 0.0
 
+func refund_dash_recovery(seconds: float) -> float:
+	var reduction: float = max(0.0, seconds)
+	if reduction <= 0.0:
+		return 0.0
+	var applied: float = 0.0
+	if dash_cooldown_left > 0.0:
+		var cooldown_reduction: float = min(dash_cooldown_left, reduction)
+		dash_cooldown_left -= cooldown_reduction
+		applied += cooldown_reduction
+	if dash_charge_recharge_left > 0.0:
+		var charge_reduction: float = min(dash_charge_recharge_left, reduction)
+		dash_charge_recharge_left -= charge_reduction
+		applied += charge_reduction
+	if applied > 0.0:
+		_emit_dash_cooldown_changed()
+		_emit_dash_charge_recharge_changed()
+	return applied
+
 func _report_stamina_action_failed(reason: String) -> void:
 	if stamina_action_warning_cooldown_left > 0.0:
 		return
