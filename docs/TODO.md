@@ -20,3 +20,9 @@
   - [ ] Create city scene + district layout (market, quest square, crafting quarter).
   - [ ] Set fast-travel/entry routing from early frontier zones.
   - [ ] Place NPC Gnome as a permanent resident and city guide/quest giver.
+
+- [ ] Build out a full open-world map system.
+  - [ ] World map UI with pan/zoom and biome overlays.
+  - [ ] Discovery fog + reveal state per chunk/POI.
+  - [ ] Player/NPC/quest markers with filtering.
+  - [ ] Fast-travel node integration and unlock states.
