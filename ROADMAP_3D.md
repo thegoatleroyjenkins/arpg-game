@@ -115,3 +115,27 @@ A single combat contract + early world streaming interfaces prevents architectur
 
 ### Why this order
 The repo is currently movement-heavy; a real combat contract is the highest-leverage step to unlock AI, loot, progression, and open-world scaling without rework.
+
+## Focused Planning Pass — 2026-02-15 06:34 (America/Chicago)
+
+### Top 3 Priorities (ordered)
+1. **Convert prototype combat into a reusable 3D encounter slice (done once, reused everywhere)**
+   - Add `res://systems/combat/damage_resolver.gd` + `combat_actor_3d.gd` as the only HP mutation path.
+   - Create a tiny `AttackEvent3D` payload contract (`source`, `target`, `base_damage`, `damage_type`, `tags`, `poise_damage`) so player/enemy/skills all speak one format.
+   - Wire one player melee and one enemy melee through resolver events to validate parity.
+
+2. **Stand up open-world-safe AI movement contracts before adding more enemies**
+   - Build `EnemyBrain3D` around `NavigationAgent3D` with explicit states (Idle/Chase/Attack/Leash).
+   - Keep behavior knobs in resource data (`EnemyArchetype3D.tres`) so biome variants and elites are data-only additions.
+   - Add leash + home-anchor rules now to prevent future streaming/sector edge bugs.
+
+3. **Lay first world-streaming rails with strict boundaries**
+   - Define `WorldSector`, `WorldStreamer`, and `SpawnDirector` interfaces under `res://systems/world/`.
+   - Implement minimal load/unload radius + hysteresis and per-sector spawn budget caps.
+   - Keep sector definitions in `.tres` resources so the open world can scale without scene rewrites.
+
+### Immediate Next Implementation Task
+**Implement now:** create `res://systems/combat/damage_resolver.gd` and `res://systems/combat/combat_actor_3d.gd`, then route one player light attack in `prototype3d/player_3d.gd` through `request_damage()` (no direct health writes).
+
+### Why this order
+Right now the project has strong movement feel but no durable combat/world contracts. Locking combat + Nav-ready AI + sector interfaces in this order gives the fastest path to a full 3D ARPG while staying open-world-ready.
