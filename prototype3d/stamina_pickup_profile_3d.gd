@@ -33,6 +33,10 @@ class_name StaminaPickupProfile3D
 @export var regen_boost_duration: float = 1.6
 @export_range(1.0, 4.0, 0.05) var regen_boost_multiplier: float = 1.35
 
+@export_group("Sprint Efficiency")
+@export var sprint_efficiency_boost_duration: float = 2.4
+@export_range(1.0, 4.0, 0.05) var sprint_efficiency_boost_multiplier: float = 1.5
+
 @export_group("Line of Sight")
 @export var magnet_requires_line_of_sight: bool = true
 @export_flags_3d_physics var magnet_line_of_sight_collision_mask: int = 1

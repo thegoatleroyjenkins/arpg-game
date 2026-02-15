@@ -63,6 +63,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Stamina Orbs Grant Dash Recovery (3D prototype)** — Data-driven stamina pickups can now shave configurable time off dash readiness when dash resources are missing, allowing intentional sustain-or-routing plays even when stamina is near full
 - **Stamina Orbs Grant Air Jump Recovery (3D prototype)** — Data-driven stamina pickups can now restore configurable air-jump charges when missing-jump thresholds are met, improving vertical recovery routing without hardcoded pickup behavior
 - **Stamina Orbs Grant Sprint Efficiency Burst (3D prototype)** — Data-driven pickups can now grant a temporary sprint efficiency buff (reduced sprint stamina drain) with modular HUD timing/multiplier feedback, enabling short reposition windows without hardcoded stamina discounts
+- **Pickup Profile Sprint-Efficiency Authoring (3D prototype)** — `StaminaPickupProfile3D` now exposes sprint-efficiency duration/multiplier fields, so reusable pickup profiles can tune mobility-burst behavior without falling back to per-node defaults
 - **Nearest-Need Pickup Magnet Targeting (3D prototype)** — Stamina orb magnet targeting now chooses the nearest player who currently needs stamina/dash/air-jump recovery (instead of first-in-group), improving co-op readiness while keeping pickup logic modular and threshold-driven
 - **Stamina Orb Regen Surge Buff (3D prototype)** — Data-driven stamina pickups can now apply a temporary stamina regeneration multiplier (duration + multiplier tuning) with HUD readout, enabling cleaner sustain windows after resource pickups
 - **Pickup Profile Resources (3D prototype)** — Stamina orb tuning can now be authored as reusable `StaminaPickupProfile3D` resources and assigned per node, keeping pickup behavior modular/data-driven while reducing scene-level stat duplication
@@ -226,6 +227,7 @@ arpg-game/
 
 ## Recent Updates
 
+- ✅ Added data-driven sprint-efficiency pickup profile tuning (`sprint_efficiency_boost_duration`, `sprint_efficiency_boost_multiplier`) to `StaminaPickupProfile3D`, so reusable orb profile resources can author mobility-burst behavior without scene-level hardcoding
 - ✅ Added data-driven dash-aware camera follow-assist tuning (`camera_follow_assist_dash_multiplier`) so orbit yaw realigns faster during active dashes for clearer burst-mobility framing without hardcoded camera logic
 - ✅ Promoted a new default playable open-world scene (`res://world/levels/open_world_3d.tscn`) with chunk-based terrain generation from `data/world/world_map_layout.json`, streaming hooks (`WorldStreamer`), and procedural prop population per chunk for immediate large-world traversal
 - ✅ Extended the Phase-1 procedural asset pipeline with an auto-generated player placeholder mesh (`generated_assets/characters/player_knight.tscn`) so character blocking/readability can iterate without manual modeling
