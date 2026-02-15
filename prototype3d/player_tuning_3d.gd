@@ -89,6 +89,9 @@ class_name PlayerTuning3D
 @export_range(1.0, 3.0, 0.01) var light_attack_backstab_damage_multiplier: float = 1.25
 @export var light_attack_hit_camera_impulse_strength: float = 0.045
 @export var light_attack_hit_camera_impulse_vertical: float = 0.07
+@export var light_attack_require_line_of_sight: bool = true
+@export_flags_3d_physics var light_attack_line_of_sight_mask: int = 1
+@export var light_attack_line_of_sight_height: float = 1.0
 
 @export_group("Dash")
 @export var dash_speed: float = 18.0

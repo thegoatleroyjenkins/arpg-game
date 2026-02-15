@@ -1145,6 +1145,8 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 			continue
 		if forward.dot(direction) < light_attack_arc_dot:
 			continue
+		if not _has_light_attack_line_of_sight(target):
+			continue
 		candidates.append({
 			"target": target,
 			"distance_sq": distance_sq,
@@ -1160,6 +1162,22 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 		if results.size() >= max_targets:
 			break
 	return results
+
+func _has_light_attack_line_of_sight(target: Node3D) -> bool:
+	if not tuning.light_attack_require_line_of_sight:
+		return true
+	if not is_instance_valid(target):
+		return false
+	var eye_height: float = max(0.0, tuning.light_attack_line_of_sight_height)
+	var from_point: Vector3 = global_position + Vector3(0.0, eye_height, 0.0)
+	var to_point: Vector3 = target.global_position + Vector3(0.0, eye_height, 0.0)
+	var query := PhysicsRayQueryParameters3D.create(from_point, to_point)
+	query.exclude = [self, target]
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.collision_mask = max(1, tuning.light_attack_line_of_sight_mask)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	return hit.is_empty()
 
 func _start_light_attack_lunge(primary_target: Node3D) -> void:
 	if not tuning.light_attack_lunge_enabled:

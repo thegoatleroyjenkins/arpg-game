@@ -35,6 +35,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Chain Fatigue (3D prototype)** — Data-driven dash-chain stamina scaling now increases dash cost when chaining dashes inside a short window, adding cleaner mobility tradeoffs without hardcoded limits
 - **Stamina (3D prototype)** — Sprint, dash, and jump now consume stamina with configurable regen/delay for better combat pacing
 - **Attack Stamina Gating (3D prototype)** — Light attacks now consume a data-driven stamina cost (`light_attack_stamina_cost`), reinforcing resource tradeoffs between mobility and offense while reusing existing low-stamina feedback
+- **Light Attack Line-of-Sight Filtering (3D prototype)** — Data-driven attack target selection now supports occlusion checks (`light_attack_require_line_of_sight`, `light_attack_line_of_sight_mask`, `light_attack_line_of_sight_height`) so melee swings no longer snap to enemies through blocking world geometry
 - **Damage-Type Multipliers (3D prototype)** — `CombatActor3D` now exposes per-type `damage_type_multipliers` (for resist/weakness tuning), and the modular damage resolver applies them data-driven after mitigation so enemies can express archetype identity without hardcoded branches
 - **Forgiving Jump Timing (3D prototype)** — Data-driven coyote time + jump buffering make jumps more responsive and reliable in moment-to-moment combat movement
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
