@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var sensitivity_slider: HSlider = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SensitivityRow/SensitivitySlider
 @onready var sensitivity_value_label: Label = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SensitivityRow/SensitivityValue
 @onready var fullscreen_toggle: CheckButton = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FullscreenToggle
+@onready var invert_y_toggle: CheckButton = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/InvertYToggle
 @onready var hud_toggle: CheckButton = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HudToggle
 @onready var mouse_capture_toggle: CheckButton = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MouseCaptureToggle
 @onready var resume_button: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonRow/ResumeButton
@@ -26,6 +27,7 @@ func _ready() -> void:
 	quit_button.pressed.connect(_on_quit_pressed)
 	sensitivity_slider.value_changed.connect(_on_sensitivity_changed)
 	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
+	invert_y_toggle.toggled.connect(_on_invert_y_toggled)
 	hud_toggle.toggled.connect(_on_hud_toggled)
 	mouse_capture_toggle.toggled.connect(_on_mouse_capture_toggled)
 
@@ -59,6 +61,7 @@ func _sync_from_state() -> void:
 			var sensitivity: float = float(tuning.get("camera_orbit_sensitivity"))
 			sensitivity_slider.value = clamp(sensitivity, sensitivity_slider.min_value, sensitivity_slider.max_value)
 			_update_sensitivity_label(sensitivity_slider.value)
+			invert_y_toggle.button_pressed = bool(tuning.get("camera_orbit_invert_y"))
 	else:
 		_update_sensitivity_label(sensitivity_slider.value)
 
@@ -86,6 +89,13 @@ func _update_sensitivity_label(value: float) -> void:
 
 func _on_fullscreen_toggled(enabled: bool) -> void:
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if enabled else DisplayServer.WINDOW_MODE_WINDOWED)
+
+func _on_invert_y_toggled(enabled: bool) -> void:
+	if _player == null:
+		return
+	var tuning: Resource = _player.get("tuning")
+	if tuning != null:
+		tuning.set("camera_orbit_invert_y", enabled)
 
 func _on_hud_toggled(enabled: bool) -> void:
 	if _hud != null:

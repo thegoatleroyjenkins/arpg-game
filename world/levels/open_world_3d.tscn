@@ -217,6 +217,10 @@ text = "0.10"
 layout_mode = 2
 text = "Fullscreen"
 
+[node name="InvertYToggle" type="CheckButton" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Invert camera Y"
+
 [node name="HudToggle" type="CheckButton" parent="PauseMenu/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Show HUD"

@@ -78,6 +78,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
 - **Mouse Orbit Camera (3D prototype)** — Data-driven camera orbit yaw/pitch (sensitivity, pitch clamp, invert-Y toggle) now lets players rotate the combat camera while keeping movement camera-relative and modular
+- **Pause Menu Invert-Y Toggle (3D prototype)** — Pause settings now expose a live invert-Y camera option wired directly into player tuning, improving camera comfort/accessibility without hardcoded input branches
 - **Hold-to-Recenter Camera (3D prototype)** — Data-driven camera recenter action (R by default) smoothly aligns orbit yaw behind player facing, reducing camera drift after heavy orbit usage while keeping controls modular
 - **Camera Follow Assist (3D prototype)** — Data-driven follow-assist yaw gently realigns orbit behind movement direction while traversing, with tunable speed/min-move threshold and a post-mouse-look lockout window to preserve manual camera control
 - **Dash-Aware Camera Follow Assist (3D prototype)** — Data-driven dash follow-assist multiplier now temporarily boosts follow-assist yaw speed during active dashes, improving burst-mobility framing and short-window camera readability without hardcoded behavior
@@ -177,6 +178,7 @@ Release assets uploaded:
 | Mouse Move (captured, in 3D prototype) | Orbit Camera |
 | Mouse Wheel (in 3D prototype) | Camera Zoom In/Out |
 | R (hold, in 3D prototype) | Recenter camera behind player facing |
+| Esc (in 3D prototype) | Pause menu (camera sensitivity, invert-Y, HUD/mouse settings) |
 | Walk over items | Pick up / Equip |
 
 ## Equipment
