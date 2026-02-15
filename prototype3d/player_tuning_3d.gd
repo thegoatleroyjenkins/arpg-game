@@ -76,6 +76,9 @@ class_name PlayerTuning3D
 @export var low_stamina_action_warning_time: float = 0.65
 @export var low_stamina_action_warning_cooldown: float = 0.25
 
+@export_group("Attack Feel")
+@export var light_attack_input_buffer_time: float = 0.14
+
 @export_group("Dash")
 @export var dash_speed: float = 18.0
 @export var dash_duration: float = 0.18

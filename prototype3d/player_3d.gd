@@ -15,6 +15,7 @@ signal stamina_changed(current: float, max_value: float)
 signal dash_cooldown_changed(remaining: float, max_value: float)
 signal dash_buffer_changed(remaining: float, max_value: float)
 signal jump_buffer_changed(remaining: float, max_value: float)
+signal attack_buffer_changed(remaining: float, max_value: float)
 signal dash_charges_changed(current: int, max_value: int)
 signal dash_charge_recharge_changed(remaining: float, max_value: float)
 signal air_jumps_changed(current: int, max_value: int)
@@ -47,6 +48,7 @@ var sprint_blend: float = 0.0
 var sprint_exhausted: bool = false
 var coyote_time_left: float = 0.0
 var jump_buffer_left: float = 0.0
+var light_attack_buffer_left: float = 0.0
 var air_jumps_left: int = 0
 var camera_look_ahead: Vector3 = Vector3.ZERO
 var camera_impulse_offset: Vector3 = Vector3.ZERO
@@ -111,6 +113,7 @@ func _ready() -> void:
 	_emit_dash_cooldown_changed()
 	_emit_dash_buffer_changed()
 	_emit_jump_buffer_changed()
+	_emit_attack_buffer_changed()
 	_emit_air_jumps_changed()
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
@@ -140,11 +143,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(ACTION_CAMERA_RECENTER):
 		_recenter_camera_orbit(1.0)
 	if event.is_action_pressed(ACTION_ATTACK):
-		_try_light_attack()
+		if light_attack_cooldown_left <= 0.0:
+			if _try_light_attack() and light_attack_buffer_left > 0.0:
+				light_attack_buffer_left = 0.0
+				_emit_attack_buffer_changed()
+		else:
+			light_attack_buffer_left = max(light_attack_buffer_left, max(0.0, tuning.light_attack_input_buffer_time))
+			_emit_attack_buffer_changed()
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
 	light_attack_cooldown_left = max(0.0, light_attack_cooldown_left - delta)
+	if light_attack_buffer_left > 0.0:
+		light_attack_buffer_left = max(0.0, light_attack_buffer_left - delta)
+		_emit_attack_buffer_changed()
 	if stamina_action_warning_cooldown_left > 0.0:
 		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
 	if camera_follow_assist_lock_left > 0.0:
@@ -279,6 +291,11 @@ func _physics_process(delta: float) -> void:
 
 	if dash_state_changed:
 		_emit_dash_cooldown_changed()
+
+	if light_attack_buffer_left > 0.0 and light_attack_cooldown_left <= 0.0:
+		if _try_light_attack():
+			light_attack_buffer_left = 0.0
+			_emit_attack_buffer_changed()
 
 	var dash_stamina_cost := _current_dash_stamina_cost()
 	if Input.is_action_just_pressed("dash"):
@@ -1033,21 +1050,21 @@ func refund_dash_recovery(seconds: float) -> float:
 		_emit_dash_charge_recharge_changed()
 	return applied
 
-func _try_light_attack() -> void:
+func _try_light_attack() -> bool:
 	if light_attack_cooldown_left > 0.0:
-		return
+		return false
 	if damage_resolver == null:
 		damage_resolver = get_tree().get_first_node_in_group("damage_resolver")
 		if damage_resolver == null:
-			return
+			return false
 
 	var targets: Array[Node3D] = _find_attack_targets(max(1, light_attack_max_targets))
 	if targets.is_empty():
-		return
+		return false
 
 	var attack_stamina_cost: float = max(0.0, tuning.light_attack_stamina_cost)
 	if not _try_spend_stamina(attack_stamina_cost, "Attack"):
-		return
+		return false
 
 	light_attack_cooldown_left = max(0.01, light_attack_cooldown)
 	for target in targets:
@@ -1060,6 +1077,7 @@ func _try_light_attack() -> void:
 			"crit_multiplier": max(1.0, light_attack_crit_multiplier),
 			"tags": PackedStringArray(["player", "light_attack"]),
 		})
+	return true
 
 func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 	var candidates: Array[Dictionary] = []
@@ -1134,6 +1152,12 @@ func _jump_buffer_max() -> float:
 
 func _emit_jump_buffer_changed() -> void:
 	jump_buffer_changed.emit(jump_buffer_left, _jump_buffer_max())
+
+func _attack_buffer_max() -> float:
+	return max(0.01, max(0.0, tuning.light_attack_input_buffer_time))
+
+func _emit_attack_buffer_changed() -> void:
+	attack_buffer_changed.emit(light_attack_buffer_left, _attack_buffer_max())
 
 func _emit_air_jumps_changed() -> void:
 	air_jumps_changed.emit(air_jumps_left, max(0, tuning.max_air_jumps))
