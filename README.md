@@ -13,8 +13,8 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 
 ### Player Systems
 - **Movement** — WASD/Arrow key movement with directional facing
-- **Sprint (3D prototype)** — Hold Shift for burst movement speed in the 3D scene
-- **Dash (3D prototype)** — Tap Q for a short directional dash with cooldown (data-driven tuning)
+- **Sprint (3D prototype)** — Sprint now uses an input action (Shift / gamepad LB) for modular remapping and burst movement speed
+- **Dash (3D prototype)** — Tap Q (or gamepad B) for a short directional dash with cooldown (data-driven tuning)
 - **Stamina (3D prototype)** — Sprint, dash, and jump now consume stamina with configurable regen/delay for better combat pacing
 - **Forgiving Jump Timing (3D prototype)** — Data-driven coyote time + jump buffering make jumps more responsive and reliable in moment-to-moment combat movement
 - **Weighted Movement Feel (3D prototype)** — Data-driven acceleration/deceleration + air control make movement feel less twitchy and more intentional
@@ -85,8 +85,8 @@ Release assets uploaded:
 |-----|--------|
 | WASD / Arrows | Move |
 | Space | Attack |
-| Shift (in 3D prototype) | Sprint |
-| Q (in 3D prototype) | Dash |
+| Shift / Gamepad LB (in 3D prototype) | Sprint |
+| Q / Gamepad B (in 3D prototype) | Dash |
 | Mouse Wheel (in 3D prototype) | Camera Zoom In/Out |
 | Walk over items | Pick up / Equip |
 
@@ -162,6 +162,7 @@ arpg-game/
 - ✅ Added data-driven 3D camera zoom controls (mouse wheel) with min/max/step tuning for better combat readability and scene awareness
 - ✅ Added data-driven 3D jump stamina cost to curb spam-jumping and strengthen stamina tradeoff decisions
 - ✅ Added two new enemy archetypes: Bruiser (heavy pressure) and Assassin (high-speed threat)
+- ✅ Switched 3D sprint to a dedicated input action and added gamepad bindings for sprint (LB) + dash (B) to improve controller support and input modularity
 
 ## License
 

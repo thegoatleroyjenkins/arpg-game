@@ -87,7 +87,7 @@ func _physics_process(delta: float) -> void:
 		velocity.z = dash_direction.z * tuning.dash_speed
 	else:
 		var speed := tuning.move_speed
-		var is_trying_to_sprint := Input.is_key_pressed(KEY_SHIFT) and move_dir.length() > 0.01
+		var is_trying_to_sprint := Input.is_action_pressed("sprint") and move_dir.length() > 0.01
 		if is_trying_to_sprint and _can_pay_stamina(tuning.sprint_stamina_per_second * delta):
 			speed *= tuning.sprint_multiplier
 			_use_stamina(tuning.sprint_stamina_per_second * delta)
