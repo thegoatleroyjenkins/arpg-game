@@ -7,11 +7,13 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Target:** Full 3D ARPG experience
 - **Status:** Existing 2D systems remain playable while 3D foundations are being built in parallel.
 - **Prototype Scene:** `res://prototype3d/main_3d.tscn`
+- **Data-driven 3D tuning:** `res://prototype3d/default_player_tuning_3d.tres`
 
 ## Current Features
 
 ### Player Systems
 - **Movement** — WASD/Arrow key movement with directional facing
+- **Sprint (3D prototype)** — Hold Shift for burst movement speed in the 3D scene
 - **Combat** — Real-time melee attacks with cooldowns and hit feedback
 - **Health System** — Health bar with damage flash effects
 - **Leveling** — XP gain, level-ups with stat increases
@@ -45,6 +47,7 @@ Get the latest **Windows build** from [Releases](../../releases).
 |-----|--------|
 | WASD / Arrows | Move |
 | Space | Attack |
+| Shift (in 3D prototype) | Sprint |
 | Walk over items | Pick up / Equip |
 
 ## Equipment
@@ -107,6 +110,7 @@ arpg-game/
 - ✅ Implemented enemy AI state machine
 - ✅ Added enemy variety (Grunt, Fast, Tank, Ranged types)
 - ✅ Auto-build releases for Windows
+- ✅ Added data-driven 3D player tuning resource + Shift sprint in prototype
 
 ## License
 

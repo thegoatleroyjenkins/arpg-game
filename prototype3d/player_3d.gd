@@ -1,9 +1,6 @@
 extends CharacterBody3D
 
-const MOVE_SPEED := 6.5
-const JUMP_VELOCITY := 4.5
-const GRAVITY := 12.0
-const CAMERA_SMOOTH := 8.0
+@export var tuning: PlayerTuning3D = preload("res://prototype3d/default_player_tuning_3d.tres")
 
 @onready var pivot: Node3D = $CameraPivot
 @onready var camera: Camera3D = $CameraPivot/Camera3D
@@ -23,11 +20,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	# Gravity
 	if not is_on_floor():
-		velocity.y -= GRAVITY * delta
+		velocity.y -= tuning.gravity * delta
 
 	# Jump
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+		velocity.y = tuning.jump_velocity
 
 	# Movement input
 	var input_vec := Vector2(
@@ -38,8 +35,12 @@ func _physics_process(delta: float) -> void:
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 
-	velocity.x = move_dir.x * MOVE_SPEED
-	velocity.z = move_dir.z * MOVE_SPEED
+	var speed := tuning.move_speed
+	if Input.is_key_pressed(KEY_SHIFT):
+		speed *= tuning.sprint_multiplier
+
+	velocity.x = move_dir.x * speed
+	velocity.z = move_dir.z * speed
 
 	move_and_slide()
 
@@ -50,6 +51,6 @@ func _physics_process(delta: float) -> void:
 		look_at(look_target, Vector3.UP)
 
 	# Follow camera smoothly
-	var target_cam_pos := global_position + Vector3(0.0, 7.0, 8.5)
-	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * CAMERA_SMOOTH)
+	var target_cam_pos := global_position + Vector3(0.0, tuning.camera_height, tuning.camera_distance)
+	pivot.global_position = pivot.global_position.lerp(target_cam_pos, delta * tuning.camera_smooth)
 	camera.look_at(global_position + Vector3(0, 1.0, 0), Vector3.UP)
