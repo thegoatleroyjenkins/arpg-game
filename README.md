@@ -32,6 +32,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Queue HUD Feedback (3D prototype)** — Modular HUD now surfaces buffered dash queue state and remaining queue time, improving readability for clutch mobility timing
 - **Contextual Stamina Regen (3D prototype)** — Stamina regeneration is now data-driven with separate idle vs moving rates, improving combat pacing and recovery decision-making
 - **Stamina Regen Delay HUD (3D prototype)** — Modular HUD now surfaces stamina regen lockout remaining time and active state via player signals, improving readability of post-action resource recovery windows
+- **Dash I-Frame HUD Readout (3D prototype)** — Modular HUD now tracks remaining dash invulnerability time via player signals, making defensive timing windows readable during high-pressure movement chains
 - **Airborne Stamina Regen Tuning (3D prototype)** — Data-driven airborne stamina regen rate now decouples in-air recovery from grounded movement, making jump/dash chains a clearer resource tradeoff
 - **Low-Stamina Movement Drag (3D prototype)** — Data-driven low-stamina movement threshold + minimum speed multiplier now add gentle fatigue drag when stamina is critically low, reinforcing resource pacing without hardcoded movement penalties
 - **Camera Zoom (3D prototype)** — Mouse wheel zoom is now data-driven (min/max/step in tuning resource) so players can quickly adjust combat readability and spatial awareness
@@ -42,6 +43,7 @@ A Godot 4 action RPG currently transitioning from 2D prototype systems to a 3D g
 - **Dash Charges (3D prototype)** — Data-driven multi-charge dash model (max charges + recharge time) adds tactical mobility pacing without hardcoding ability logic
 - **Charge-Bypass Dash Chaining (3D prototype)** — Data-driven toggle now allows available dash charges to bypass cooldown gating, enabling cleaner back-to-back reposition bursts while depleted charges still recover on timer
 - **Dash Steering Control (3D prototype)** — Data-driven in-dash steering (control + responsiveness tuning) allows limited course correction for more skill-expressive repositioning
+- **Dash Invulnerability Window (3D prototype)** — Data-driven dash i-frame duration now grants a short post-activation safety window, setting up cleaner combat integration without hardcoded timings
 - **Air Jump HUD Readout (3D prototype)** — Modular HUD now shows remaining air jumps in real time, improving vertical mobility clarity during combat and traversal
 - **Sprint State HUD (3D prototype)** — Modular HUD now surfaces Sprint Ready / Active / Exhausted states for clearer stamina pacing and sprint re-engage timing during combat movement
 - **Hard Landing Recovery (3D prototype)** — Data-driven landing impact tuning adds a brief recovery after high-speed falls, making movement weightier and reducing bunny-hop style chaining
@@ -221,6 +223,7 @@ arpg-game/
 - ✅ Added data-driven sprint-jump momentum carry tuning (momentum multiplier + speed cap) so jumping out of sprint preserves cleaner forward flow without hardcoded movement boosts
 - ✅ Added data-driven airborne dash stamina scaling (tunable airborne multiplier) so in-air dash chains carry a clearer stamina tradeoff than grounded repositioning
 - ✅ Added data-driven impact-scaled hard-landing penalties (max penalty speed + min penalty multiplier) so recovery lockout, stamina cost, and landing camera impulse scale by fall severity instead of using a binary full-penalty landing model
+- ✅ Added data-driven 3D dash invulnerability duration tuning plus modular HUD i-frame readout wired to a new player dash-invulnerability signal, improving defensive timing clarity and combat-system integration readiness
 
 ## License
 

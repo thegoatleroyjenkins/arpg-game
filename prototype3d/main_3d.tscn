@@ -114,6 +114,16 @@ show_percentage = false
 layout_mode = 2
 text = "Regen Active"
 
+[node name="DashInvulnerabilityBar" type="ProgressBar" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 0.12
+value = 0.0
+show_percentage = false
+
+[node name="DashInvulnerabilityLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Dash I-Frames Ready"
+
 [node name="StaminaWarningLabel" type="Label" parent="StaminaHud/MarginContainer/VBoxContainer"]
 visible = false
 layout_mode = 2

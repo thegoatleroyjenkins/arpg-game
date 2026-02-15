@@ -16,6 +16,7 @@ signal sprint_state_changed(is_sprinting: bool, is_exhausted: bool)
 signal landing_recovery_changed(remaining: float, max_value: float)
 signal stamina_regen_delay_changed(remaining: float, max_value: float)
 signal stamina_action_failed(reason: String, remaining: float)
+signal dash_invulnerability_changed(remaining: float, max_value: float)
 
 var look_target: Vector3
 var target_camera_distance: float = 0.0
@@ -37,6 +38,7 @@ var camera_look_ahead: Vector3 = Vector3.ZERO
 var camera_impulse_offset: Vector3 = Vector3.ZERO
 var landing_recovery_left: float = 0.0
 var stamina_action_warning_cooldown_left: float = 0.0
+var dash_invulnerability_left: float = 0.0
 var sprinting_now: bool = false
 var _last_emitted_sprinting: bool = false
 var _last_emitted_sprint_exhausted: bool = false
@@ -56,6 +58,7 @@ func _ready() -> void:
 	_emit_sprint_state_changed(true)
 	_emit_landing_recovery_changed()
 	_emit_stamina_regen_delay_changed()
+	_emit_dash_invulnerability_changed()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -73,6 +76,10 @@ func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()
 	if stamina_action_warning_cooldown_left > 0.0:
 		stamina_action_warning_cooldown_left = max(0.0, stamina_action_warning_cooldown_left - delta)
+
+	if dash_invulnerability_left > 0.0:
+		dash_invulnerability_left = max(0.0, dash_invulnerability_left - delta)
+		_emit_dash_invulnerability_changed()
 
 	# Jump buffering gives more forgiving timing before landing.
 	if _is_jump_just_pressed():
@@ -225,12 +232,12 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	if not was_on_floor and is_on_floor() and pre_move_vertical_velocity <= -absf(tuning.hard_landing_speed_threshold):
-		var landing_speed := absf(pre_move_vertical_velocity)
-		var threshold_speed := absf(tuning.hard_landing_speed_threshold)
-		var max_penalty_speed := max(threshold_speed + 0.01, absf(tuning.hard_landing_max_penalty_speed))
-		var landing_impact_t := clamp((landing_speed - threshold_speed) / (max_penalty_speed - threshold_speed), 0.0, 1.0)
-		var min_penalty_multiplier := clamp(tuning.hard_landing_min_penalty_multiplier, 0.1, 1.0)
-		var landing_penalty_multiplier := lerpf(min_penalty_multiplier, 1.0, landing_impact_t)
+		var landing_speed: float = absf(pre_move_vertical_velocity)
+		var threshold_speed: float = absf(tuning.hard_landing_speed_threshold)
+		var max_penalty_speed: float = max(threshold_speed + 0.01, absf(tuning.hard_landing_max_penalty_speed))
+		var landing_impact_t: float = clamp((landing_speed - threshold_speed) / (max_penalty_speed - threshold_speed), 0.0, 1.0)
+		var min_penalty_multiplier: float = clamp(tuning.hard_landing_min_penalty_multiplier, 0.1, 1.0)
+		var landing_penalty_multiplier: float = lerpf(min_penalty_multiplier, 1.0, landing_impact_t)
 		landing_recovery_left = max(
 			landing_recovery_left,
 			max(0.0, tuning.hard_landing_recovery_time) * landing_penalty_multiplier
@@ -274,9 +281,9 @@ func _apply_sprint_jump_momentum_boost() -> void:
 	var horizontal_speed := horizontal_velocity.length()
 	if horizontal_speed <= 0.01:
 		return
-	var speed_cap := tuning.move_speed * max(1.0, tuning.sprint_multiplier) * max(1.0, tuning.sprint_jump_speed_cap_multiplier)
-	var boosted_speed := min(horizontal_speed * boost_multiplier, speed_cap)
-	var boosted_velocity := horizontal_velocity.normalized() * boosted_speed
+	var speed_cap: float = tuning.move_speed * max(1.0, tuning.sprint_multiplier) * max(1.0, tuning.sprint_jump_speed_cap_multiplier)
+	var boosted_speed: float = min(horizontal_speed * boost_multiplier, speed_cap)
+	var boosted_velocity: Vector3 = horizontal_velocity.normalized() * boosted_speed
 	velocity.x = boosted_velocity.x
 	velocity.z = boosted_velocity.z
 
@@ -291,6 +298,8 @@ func _start_dash(move_dir: Vector3) -> void:
 	dash_direction = dash_direction.normalized()
 	dash_time_left = tuning.dash_duration
 	dash_cooldown_left = tuning.dash_cooldown
+	dash_invulnerability_left = max(dash_invulnerability_left, max(0.0, tuning.dash_invulnerability_duration))
+	_emit_dash_invulnerability_changed()
 	dash_charges = max(0, dash_charges - 1)
 	if dash_charges < max(1, tuning.dash_max_charges) and dash_charge_recharge_left <= 0.0:
 		dash_charge_recharge_left = max(0.01, tuning.dash_charge_recovery_time)
@@ -475,3 +484,12 @@ func _emit_stamina_regen_delay_changed() -> void:
 
 func _emit_landing_recovery_changed() -> void:
 	landing_recovery_changed.emit(landing_recovery_left, _landing_recovery_max())
+
+func _dash_invulnerability_max() -> float:
+	return max(0.01, tuning.dash_invulnerability_duration)
+
+func has_dash_invulnerability() -> bool:
+	return dash_invulnerability_left > 0.0
+
+func _emit_dash_invulnerability_changed() -> void:
+	dash_invulnerability_changed.emit(dash_invulnerability_left, _dash_invulnerability_max())

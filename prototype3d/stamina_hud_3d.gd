@@ -13,6 +13,8 @@ extends CanvasLayer
 @onready var landing_recovery_label: Label = $MarginContainer/VBoxContainer/LandingRecoveryLabel
 @onready var stamina_regen_delay_bar: ProgressBar = $MarginContainer/VBoxContainer/StaminaRegenDelayBar
 @onready var stamina_regen_delay_label: Label = $MarginContainer/VBoxContainer/StaminaRegenDelayLabel
+@onready var dash_invulnerability_bar: ProgressBar = $MarginContainer/VBoxContainer/DashInvulnerabilityBar
+@onready var dash_invulnerability_label: Label = $MarginContainer/VBoxContainer/DashInvulnerabilityLabel
 @onready var stamina_warning_label: Label = $MarginContainer/VBoxContainer/StaminaWarningLabel
 
 var dash_charges_current: int = 0
@@ -57,6 +59,9 @@ func _ready() -> void:
 	if not player.has_signal("stamina_action_failed"):
 		push_warning("StaminaHud3D target does not expose stamina_action_failed signal")
 		return
+	if not player.has_signal("dash_invulnerability_changed"):
+		push_warning("StaminaHud3D target does not expose dash_invulnerability_changed signal")
+		return
 
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.dash_cooldown_changed.connect(_on_dash_cooldown_changed)
@@ -67,6 +72,7 @@ func _ready() -> void:
 	player.landing_recovery_changed.connect(_on_landing_recovery_changed)
 	player.stamina_regen_delay_changed.connect(_on_stamina_regen_delay_changed)
 	player.stamina_action_failed.connect(_on_stamina_action_failed)
+	player.dash_invulnerability_changed.connect(_on_dash_invulnerability_changed)
 	var current_stamina := float(player.get("stamina"))
 	var current_dash_cooldown := float(player.call("_next_dash_ready_remaining"))
 	var current_dash_buffer := float(player.get("dash_buffer_left"))
@@ -74,6 +80,7 @@ func _ready() -> void:
 	var current_air_jumps := int(player.get("air_jumps_left"))
 	var current_landing_recovery := float(player.get("landing_recovery_left"))
 	var current_stamina_regen_delay := float(player.get("stamina_regen_delay_left"))
+	var current_dash_invulnerability := float(player.get("dash_invulnerability_left"))
 	var tuning_resource: Resource = player.get("tuning")
 	var max_stamina := 100.0
 	var max_dash_cooldown := 1.0
@@ -82,6 +89,7 @@ func _ready() -> void:
 	var max_air_jumps := 0
 	var max_landing_recovery := 0.18
 	var max_stamina_regen_delay := 0.7
+	var max_dash_invulnerability := 0.12
 	if tuning_resource != null:
 		max_stamina = float(tuning_resource.get("max_stamina"))
 		max_dash_cooldown = max(0.01, float(player.call("_next_dash_ready_max")))
@@ -90,6 +98,7 @@ func _ready() -> void:
 		max_air_jumps = max(0, int(tuning_resource.get("max_air_jumps")))
 		max_landing_recovery = max(0.01, float(tuning_resource.get("hard_landing_recovery_time")))
 		max_stamina_regen_delay = max(0.01, float(tuning_resource.get("stamina_regen_delay")))
+		max_dash_invulnerability = max(0.01, float(tuning_resource.get("dash_invulnerability_duration")))
 		if tuning_resource.has_method("get"):
 			low_stamina_warning_ratio = clamp(float(tuning_resource.get("low_stamina_warning_ratio")), 0.0, 1.0)
 			low_stamina_pulse_speed = max(0.01, float(tuning_resource.get("low_stamina_pulse_speed")))
@@ -105,6 +114,7 @@ func _ready() -> void:
 	_on_sprint_state_changed(bool(player.get("sprinting_now")), bool(player.get("sprint_exhausted")))
 	_on_landing_recovery_changed(current_landing_recovery, max_landing_recovery)
 	_on_stamina_regen_delay_changed(current_stamina_regen_delay, max_stamina_regen_delay)
+	_on_dash_invulnerability_changed(current_dash_invulnerability, max_dash_invulnerability)
 
 func _process(delta: float) -> void:
 	if low_stamina_active:
@@ -142,8 +152,8 @@ func _on_dash_cooldown_changed(remaining: float, max_value: float) -> void:
 		dash_cooldown_label.text = "Dash %.2fs (%d/%d)" % [remaining, dash_charges_current, dash_charges_max]
 
 func _on_dash_buffer_changed(remaining: float, max_value: float) -> void:
-	var clamped_max := max(0.01, max_value)
-	var clamped_remaining := clamp(remaining, 0.0, clamped_max)
+	var clamped_max: float = max(0.01, max_value)
+	var clamped_remaining: float = clamp(remaining, 0.0, clamped_max)
 	if clamped_remaining > 0.0:
 		dash_buffer_label.text = "Dash Queue %.2fs" % clamped_remaining
 		dash_buffer_label.modulate = Color(0.95, 0.9, 0.5)
@@ -198,3 +208,13 @@ func _on_stamina_action_failed(reason: String, duration: float) -> void:
 		return
 	stamina_warning_label.text = "%s failed: low stamina" % reason
 	stamina_warning_label.visible = true
+
+func _on_dash_invulnerability_changed(remaining: float, max_value: float) -> void:
+	dash_invulnerability_bar.max_value = max(0.01, max_value)
+	dash_invulnerability_bar.value = clamp(remaining, 0.0, dash_invulnerability_bar.max_value)
+	if remaining > 0.01:
+		dash_invulnerability_label.text = "Dash I-Frames %.2fs" % remaining
+		dash_invulnerability_label.modulate = Color(0.72, 0.95, 1.0)
+	else:
+		dash_invulnerability_label.text = "Dash I-Frames Ready"
+		dash_invulnerability_label.modulate = Color(0.78, 0.86, 0.98)

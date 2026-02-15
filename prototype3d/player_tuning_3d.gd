@@ -68,6 +68,9 @@ class_name PlayerTuning3D
 @export_range(0.0, 1.0, 0.01) var dash_steer_control: float = 0.35
 @export var dash_steer_responsiveness: float = 14.0
 
+@export_group("Dash Defense")
+@export var dash_invulnerability_duration: float = 0.12
+
 @export_group("Camera")
 @export var camera_smooth: float = 8.0
 @export var camera_height: float = 7.0
