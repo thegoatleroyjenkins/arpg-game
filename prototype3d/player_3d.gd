@@ -92,8 +92,7 @@ var _body_base_albedo: Color = Color(1.0, 1.0, 1.0, 1.0)
 @export_range(1, 8, 1) var light_attack_max_targets: int = 1
 @export_range(0.0, 1.0, 0.01) var light_attack_crit_chance: float = 0.18
 @export_range(1.0, 5.0, 0.05) var light_attack_crit_multiplier: float = 1.75
-@export var light_attack_crit_camera_impulse_strength: float = 0.12
-@export var light_attack_crit_camera_impulse_vertical: float = 0.15
+# Critical hit camera impulse bonuses are tuned via PlayerTuning3D.
 
 var light_attack_cooldown_left: float = 0.0
 var light_attack_lunge_left: float = 0.0
@@ -1327,8 +1326,8 @@ func _on_damage_applied(result: Dictionary) -> void:
 	var impulse_strength: float = max(0.0, tuning.light_attack_hit_camera_impulse_strength)
 	var impulse_vertical: float = max(0.0, tuning.light_attack_hit_camera_impulse_vertical)
 	if bool(result.get("is_critical", false)):
-		impulse_strength += max(0.0, light_attack_crit_camera_impulse_strength)
-		impulse_vertical += max(0.0, light_attack_crit_camera_impulse_vertical)
+		impulse_strength += max(0.0, tuning.light_attack_crit_camera_impulse_strength_bonus)
+		impulse_vertical += max(0.0, tuning.light_attack_crit_camera_impulse_vertical_bonus)
 	if impulse_strength <= 0.0:
 		return
 
