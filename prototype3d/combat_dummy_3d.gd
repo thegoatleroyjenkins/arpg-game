@@ -20,6 +20,8 @@ extends "res://systems/combat/combat_actor_3d.gd"
 @export var damage_popup_height: float = 1.2
 @export var damage_popup_rise_distance: float = 0.45
 @export var damage_popup_duration: float = 0.5
+@export var damage_popup_spread_radius: float = 0.22
+@export var damage_popup_vertical_stagger: float = 0.05
 @export var damage_popup_pixel_size: float = 0.006
 @export var damage_popup_text_size: int = 30
 @export var damage_popup_color: Color = Color(1.0, 0.52, 0.3, 1.0)
@@ -40,9 +42,11 @@ var _health_label: Label3D = null
 var _damage_popups: Array[Dictionary] = []
 var _pending_popup_is_critical: bool = false
 var _pending_popup_damage_multiplier: float = 1.0
+var _popup_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
 	super._ready()
+	_popup_rng.randomize()
 	if mesh != null:
 		_base_scale = mesh.scale
 	_create_health_label()
@@ -155,7 +159,14 @@ func _spawn_damage_popup(amount: float, is_critical: bool = false, damage_multip
 		if not resist_suffix.is_empty():
 			prefix_parts.append(resist_suffix)
 	popup.text = "%s %s" % [" ".join(prefix_parts), amount_text] if not prefix_parts.is_empty() else amount_text
-	popup.position = Vector3(0.0, damage_popup_height, 0.0)
+	var spread_radius: float = max(0.0, damage_popup_spread_radius)
+	var spread_offset := Vector3.ZERO
+	if spread_radius > 0.0:
+		var angle := _popup_rng.randf_range(0.0, TAU)
+		var radius := _popup_rng.randf_range(0.0, spread_radius)
+		spread_offset = Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
+	var stack_stagger := max(0.0, damage_popup_vertical_stagger) * float(_damage_popups.size())
+	popup.position = Vector3(0.0, damage_popup_height + stack_stagger, 0.0) + spread_offset
 	popup.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	popup.font_size = max(12, damage_popup_text_size)
 	if is_critical:
@@ -168,7 +179,7 @@ func _spawn_damage_popup(amount: float, is_critical: bool = false, damage_multip
 	_damage_popups.append({
 		"node": popup,
 		"time_left": damage_popup_duration,
-		"start_y": popup.position.y,
+		"start_position": popup.position,
 		"is_critical": is_critical,
 		"state": popup_state,
 	})
@@ -202,8 +213,8 @@ func _update_damage_popups(delta: float) -> void:
 		var normalized: float = 1.0
 		if damage_popup_duration > 0.0:
 			normalized = clamp(1.0 - (time_left / damage_popup_duration), 0.0, 1.0)
-		var start_y: float = float(entry.get("start_y", damage_popup_height))
-		popup.position.y = start_y + (damage_popup_rise_distance * normalized)
+		var start_position: Vector3 = entry.get("start_position", Vector3(0.0, damage_popup_height, 0.0))
+		popup.position = start_position + Vector3.UP * (damage_popup_rise_distance * normalized)
 		var alpha: float = 1.0 - normalized
 		var is_critical: bool = bool(entry.get("is_critical", false))
 		var popup_state: String = String(entry.get("state", "normal"))
