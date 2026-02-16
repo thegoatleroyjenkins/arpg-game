@@ -1216,6 +1216,25 @@ func _get_light_attack_execute_multiplier(target: Node3D) -> float:
 		return 1.0
 	return max(1.0, tuning.light_attack_execute_damage_multiplier)
 
+func _get_light_attack_execute_target_priority(target: Node3D) -> float:
+	if not tuning.light_attack_execute_enabled:
+		return 0.0
+	if not is_instance_valid(target):
+		return 0.0
+	if not target.has_method("apply_damage_result"):
+		return 0.0
+	var target_max_health: float = float(target.get("max_health"))
+	if target_max_health <= 0.0:
+		return 0.0
+	var target_current_health: float = float(target.get("current_health"))
+	var health_ratio: float = clamp(target_current_health / target_max_health, 0.0, 1.0)
+	var threshold: float = clamp(tuning.light_attack_execute_health_ratio_threshold, 0.0, 1.0)
+	if threshold <= 0.0:
+		return 0.0
+	if health_ratio > threshold:
+		return 0.0
+	return clamp((threshold - health_ratio) / threshold, 0.0, 1.0)
+
 func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 	var candidates: Array[Dictionary] = []
 	var max_distance_sq: float = light_attack_range * light_attack_range
@@ -1223,6 +1242,7 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 	var forward: Vector3 = -global_transform.basis.z
 	var distance_weight: float = max(0.0, tuning.light_attack_targeting_distance_weight)
 	var alignment_weight: float = max(0.0, tuning.light_attack_targeting_alignment_weight)
+	var execute_bias_weight: float = max(0.0, tuning.light_attack_targeting_execute_bias_weight)
 	for candidate in get_tree().get_nodes_in_group("combat_actor_3d"):
 		if candidate == self or not (candidate is Node3D):
 			continue
@@ -1242,7 +1262,8 @@ func _find_attack_targets(max_targets: int) -> Array[Node3D]:
 			continue
 		var normalized_distance: float = clamp(sqrt(distance_sq) / max_distance, 0.0, 1.0)
 		var alignment_penalty: float = clamp((1.0 - alignment) * 0.5, 0.0, 1.0)
-		var targeting_score: float = (normalized_distance * distance_weight) + (alignment_penalty * alignment_weight)
+		var execute_priority: float = _get_light_attack_execute_target_priority(target)
+		var targeting_score: float = (normalized_distance * distance_weight) + (alignment_penalty * alignment_weight) - (execute_priority * execute_bias_weight)
 		candidates.append({
 			"target": target,
 			"distance_sq": distance_sq,
