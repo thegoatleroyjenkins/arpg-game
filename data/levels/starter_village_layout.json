@@ -52,5 +52,15 @@
     "arena_marker": "Boss_ArenaCenter",
     "enrage_hp_ratio": 0.3,
     "guaranteed_rewards": ["RareItem", "PassivePoint"]
-  }
+  },
+  "travel_connections": [
+    {
+      "id": "gate_to_garden",
+      "label": "The Garden",
+      "target_level": "the_garden",
+      "target_marker": "PlayerArrivalSpawn",
+      "scene_marker": "TravelGate_ToGarden",
+      "unlock_condition": null
+    }
+  ]
 }

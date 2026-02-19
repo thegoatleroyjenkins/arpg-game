@@ -1,0 +1,64 @@
+{
+  "level_id": "the_garden",
+  "display_name": "The Garden",
+  "theme": "living_city_hub",
+  "biome": "ashwood_frontier",
+  "type": "city_hub",
+  "safe_zone": true,
+  "estimated_minutes": null,
+  "description": "A verdant city carved from the living forest — the oldest settlement in the Emberfall Marches. The NPC known as Gnome holds court here, trading secrets for favors.",
+  "districts": [
+    {
+      "id": "market_square",
+      "label": "Market Square",
+      "scene_marker_prefix": "Market_",
+      "type": "hub",
+      "npcs": ["gnome"],
+      "services": ["shop", "quest_board"]
+    },
+    {
+      "id": "crafting_quarter",
+      "label": "Crafting Quarter",
+      "scene_marker_prefix": "Craft_",
+      "type": "crafting",
+      "npcs": [],
+      "services": ["forge", "alchemy"]
+    },
+    {
+      "id": "quest_plaza",
+      "label": "Quest Plaza",
+      "scene_marker_prefix": "Quest_",
+      "type": "quest",
+      "npcs": [],
+      "services": ["quest_board", "noticeboard"]
+    },
+    {
+      "id": "travel_gate",
+      "label": "Travel Gate",
+      "scene_marker_prefix": "Gate_",
+      "type": "travel",
+      "npcs": [],
+      "services": ["fast_travel"]
+    }
+  ],
+  "npcs": [
+    {
+      "id": "gnome",
+      "display_name": "Gnome",
+      "description": "An enigmatic keeper of The Garden. Speaks in riddles, trades in truth.",
+      "district": "market_square",
+      "scene_marker": "Market_GnomeSpawn",
+      "quest_tags": ["garden_welcome", "first_contact"],
+      "dialogue_tree": "res://data/dialogue/gnome_default.json"
+    }
+  ],
+  "travel_connections": [
+    {
+      "id": "gate_to_ashfall",
+      "label": "Gate to Ashfall Outskirts",
+      "target_level": "ashfall_outskirts",
+      "target_marker": "TravelGate_FromGarden",
+      "scene_marker": "Gate_ToAshfall"
+    }
+  ]
+}

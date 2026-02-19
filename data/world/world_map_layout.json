@@ -44,7 +44,8 @@
     { "id": "chunk_ashwood_01", "grid_x": 1, "grid_y": 0, "biome": "ashwood_frontier", "danger_level": 2 },
     { "id": "chunk_ashwood_10", "grid_x": 0, "grid_y": 1, "biome": "ashwood_frontier", "danger_level": 2 },
     { "id": "chunk_tundra_20", "grid_x": 2, "grid_y": 0, "biome": "frostbreak_tundra", "danger_level": 3 },
-    { "id": "chunk_mire_02", "grid_x": 0, "grid_y": 2, "biome": "mire_of_glass", "danger_level": 4 }
+    { "id": "chunk_mire_02", "grid_x": 0, "grid_y": 2, "biome": "mire_of_glass", "danger_level": 4 },
+    { "id": "chunk_garden_neg1_0", "grid_x": -1, "grid_y": 0, "biome": "ashwood_frontier", "danger_level": 0, "type": "city_hub", "city": "the_garden" }
   ],
   "landmarks": [
     { "id": "poi_broken_bell_watch", "chunk": "chunk_ashwood_01", "visibility_score": 0.92 },
@@ -52,7 +53,27 @@
     { "id": "poi_rimegate_pass_camp", "chunk": "chunk_tundra_20", "visibility_score": 0.66 },
     { "id": "poi_charred_mill_hamlet", "chunk": "chunk_ashwood_00", "visibility_score": 0.88 },
     { "id": "poi_vault_of_thorns", "chunk": "chunk_ashwood_10", "visibility_score": 0.95 },
-    { "id": "poi_the_garden", "chunk": "chunk_ashwood_00", "visibility_score": 0.99 }
+    { "id": "poi_the_garden", "chunk": "chunk_garden_neg1_0", "visibility_score": 0.99, "type": "city_hub", "scene": "res://world/levels/the_garden_3d.tscn", "safe_zone": true }
   ],
-  "notes": "MVP map intentionally compact; scale by adding chunk records and biome spawn rows."
+  "travel_gates": [
+    {
+      "id": "gate_ashfall_to_garden",
+      "from_level": "ashfall_outskirts",
+      "from_marker": "TravelGate_ToGarden",
+      "to_level": "the_garden",
+      "to_marker": "PlayerArrivalSpawn",
+      "label": "The Garden",
+      "unlock_condition": null
+    },
+    {
+      "id": "gate_garden_to_ashfall",
+      "from_level": "the_garden",
+      "from_marker": "Gate_ToAshfall",
+      "to_level": "ashfall_outskirts",
+      "to_marker": "TravelGate_FromGarden",
+      "label": "Ashfall Outskirts",
+      "unlock_condition": null
+    }
+  ],
+  "notes": "MVP map intentionally compact; scale by adding chunk records and biome spawn rows. The Garden city hub sits west of the starter chunk (grid -1,0)."
 }

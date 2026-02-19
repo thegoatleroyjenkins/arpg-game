@@ -1,0 +1,156 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://world/levels/the_garden_level_controller.gd" id="1_controller"]
+
+[sub_resource type="BoxShape3D" id="1_ground_shape"]
+size = Vector3(96, 1, 96)
+
+[sub_resource type="BoxMesh" id="2_ground_mesh"]
+size = Vector3(96, 1, 96)
+
+[sub_resource type="BoxShape3D" id="3_platform_shape"]
+size = Vector3(16, 0.5, 16)
+
+[sub_resource type="BoxMesh" id="4_platform_mesh"]
+size = Vector3(16, 0.5, 16)
+
+[sub_resource type="CylinderMesh" id="5_gate_pillar_mesh"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 4.0
+
+; ----------------------------------------------------------------
+; The Garden — city hub scene
+; Districts: Market Square (centre), Crafting Quarter (west),
+;             Quest Plaza (east), Travel Gate (north)
+; ----------------------------------------------------------------
+
+[node name="TheGarden3D" type="Node3D"]
+
+; -------------------- Environment --------------------
+[node name="EnvironmentRoot" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="EnvironmentRoot"]
+position = Vector3(0, 20, 0)
+rotation = Vector3(-0.75, 0.4, 0)
+light_energy = 1.4
+light_color = Color(1, 0.97, 0.88, 1)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="EnvironmentRoot"]
+
+; -------------------- Ground / Terrain --------------------
+[node name="TerrainRoot" type="Node3D" parent="."]
+
+[node name="MainGround" type="StaticBody3D" parent="TerrainRoot"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TerrainRoot/MainGround"]
+shape = SubResource("1_ground_shape")
+position = Vector3(0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TerrainRoot/MainGround"]
+mesh = SubResource("2_ground_mesh")
+position = Vector3(0, -0.5, 0)
+
+; Raised market square platform
+[node name="MarketPlatform" type="StaticBody3D" parent="TerrainRoot"]
+position = Vector3(0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TerrainRoot/MarketPlatform"]
+shape = SubResource("3_platform_shape")
+position = Vector3(0, 0.25, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TerrainRoot/MarketPlatform"]
+mesh = SubResource("4_platform_mesh")
+position = Vector3(0, 0.25, 0)
+
+; -------------------- Districts --------------------
+[node name="Districts" type="Node3D" parent="."]
+
+; Market Square — centre, Gnome NPC hub
+[node name="MarketSquare" type="Node3D" parent="Districts"]
+position = Vector3(0, 0, 0)
+
+; Crafting Quarter — west wing
+[node name="CraftingQuarter" type="Node3D" parent="Districts"]
+position = Vector3(-28, 0, 0)
+
+; Quest Plaza — east wing
+[node name="QuestPlaza" type="Node3D" parent="Districts"]
+position = Vector3(28, 0, 0)
+
+; Travel Gate — north archway
+[node name="TravelGate" type="Node3D" parent="Districts"]
+position = Vector3(0, 0, -34)
+
+; Gate left pillar
+[node name="PillarLeft" type="MeshInstance3D" parent="Districts/TravelGate"]
+position = Vector3(-2.5, 2, 0)
+mesh = SubResource("5_gate_pillar_mesh")
+
+; Gate right pillar
+[node name="PillarRight" type="MeshInstance3D" parent="Districts/TravelGate"]
+position = Vector3(2.5, 2, 0)
+mesh = SubResource("5_gate_pillar_mesh")
+
+; -------------------- Spawn Markers --------------------
+; Used by TheGardenLevelController to place NPCs and waypoints.
+[node name="SpawnMarkers" type="Node3D" parent="."]
+
+; Market Square — Gnome's spot, centre-north of the platform
+[node name="Market_GnomeSpawn" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0.5, -4)
+
+; Market Square — general visitor spawn points
+[node name="Market_VisitorA" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-4, 0.5, 0)
+
+[node name="Market_VisitorB" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(4, 0.5, 0)
+
+[node name="Market_VisitorC" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0.5, 4)
+
+; Crafting Quarter markers
+[node name="Craft_WorkbenchA" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-26, 0.5, -4)
+
+[node name="Craft_WorkbenchB" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-30, 0.5, 4)
+
+; Quest Plaza markers
+[node name="Quest_BoardMain" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(28, 1, 0)
+
+[node name="Quest_NoticeA" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(24, 0.5, -6)
+
+; Travel gate marker — player stands here to activate
+[node name="Gate_ToAshfall" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0.5, -34)
+
+; Player arrival spawn (coming from travel gate)
+[node name="PlayerArrivalSpawn" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(0, 0.5, -28)
+
+; -------------------- Interactables --------------------
+[node name="Interactables" type="Node3D" parent="."]
+
+; Quest board placeholder
+[node name="QuestBoardMarker" type="Marker3D" parent="Interactables"]
+position = Vector3(28, 1, 0)
+
+; Travel gate interaction zone centre
+[node name="TravelGateInteraction" type="Marker3D" parent="Interactables"]
+position = Vector3(0, 0.5, -34)
+
+; -------------------- NPCs --------------------
+; Populated at runtime by TheGardenLevelController._spawn_npcs().
+[node name="NPCs" type="Node3D" parent="."]
+
+; -------------------- Level Controller --------------------
+[node name="LevelController" type="Node" parent="."]
+script = ExtResource("1_controller")
+layout_json_path = "res://data/levels/the_garden_layout.json"
+npc_root_path = NodePath("../NPCs")
+interactables_root_path = NodePath("../Interactables")

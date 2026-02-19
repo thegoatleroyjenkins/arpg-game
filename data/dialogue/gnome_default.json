@@ -1,0 +1,52 @@
+{
+  "npc_id": "gnome",
+  "version": 1,
+  "trees": [
+    {
+      "id": "garden_welcome",
+      "trigger": "first_visit",
+      "nodes": [
+        {
+          "id": "start",
+          "speaker": "Gnome",
+          "text": "You've found The Garden. Few do by accident.",
+          "next": "offer_help"
+        },
+        {
+          "id": "offer_help",
+          "speaker": "Gnome",
+          "text": "These lands are old. The things that grow here... not all of them are plants. What brings you west of the Outskirts?",
+          "choices": [
+            { "label": "Looking for work.", "next": "give_quests" },
+            { "label": "Just passing through.", "next": "farewell" }
+          ]
+        },
+        {
+          "id": "give_quests",
+          "speaker": "Gnome",
+          "text": "Good. The Garden has need of someone willing to get their hands dirty. Check the Quest Plaza — the board has fresh notices.",
+          "effects": ["unlock_quest_board"],
+          "next": "farewell"
+        },
+        {
+          "id": "farewell",
+          "speaker": "Gnome",
+          "text": "The Marches remember those who act. And those who hesitate.",
+          "next": null
+        }
+      ]
+    },
+    {
+      "id": "first_contact",
+      "trigger": "repeat_visit",
+      "nodes": [
+        {
+          "id": "start",
+          "speaker": "Gnome",
+          "text": "Back again. The Garden grows on people.",
+          "next": null
+        }
+      ]
+    }
+  ]
+}

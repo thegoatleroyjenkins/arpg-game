@@ -67,6 +67,14 @@ position = Vector3(-2, 0.5, 21)
 [node name="Optional_Chest" type="Marker3D" parent="SpawnMarkers"]
 position = Vector3(14, 0.5, 8)
 
+; Travel gate to The Garden — placed on the west edge of the map.
+[node name="TravelGate_ToGarden" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-24, 0.5, 0)
+
+; Return arrival point when coming back from The Garden.
+[node name="TravelGate_FromGarden" type="Marker3D" parent="SpawnMarkers"]
+position = Vector3(-22, 0.5, 0)
+
 [node name="Interactables" type="Node3D" parent="."]
 
 [node name="HiddenChestMarker" type="Marker3D" parent="Interactables"]
@@ -74,6 +82,10 @@ position = Vector3(14, 0.5, 8)
 
 [node name="BreakableWallMarker" type="Marker3D" parent="Interactables"]
 position = Vector3(12, 0.5, 7)
+
+; Travel gate interaction marker — player stands here to travel to The Garden.
+[node name="TravelGateToGardenInteract" type="Marker3D" parent="Interactables"]
+position = Vector3(-24, 0.5, 0)
 
 [node name="TutorialAnchors" type="Node3D" parent="."]
 
