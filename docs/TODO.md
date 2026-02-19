@@ -9,12 +9,14 @@
   - [ ] Reward pipeline (XP, gold, items, reputation).
   - [ ] Data-driven quest definitions (JSON/SQL) with versioning.
 
-- [ ] Build out a full inventory system.
-  - [ ] Inventory data model (stacking rules, slot types, capacity).
-  - [ ] Pickup-to-inventory flow with overflow handling.
-  - [ ] Inventory UI grid + drag/drop + equip/unequip integration.
-  - [ ] Item tooltip/stat comparison panel.
-  - [ ] Save/load persistence and schema versioning for inventory data.
+- [x] Build out a full inventory system.
+  - [x] Inventory data model (stacking rules, slot types, capacity) — `systems/inventory/inventory_data.gd` + `inventory_item.gd`
+  - [x] Pickup-to-inventory flow with overflow handling — `systems/inventory/pickup_3d.gd/.tscn`
+  - [x] Inventory UI grid + drag/drop + equip/unequip integration — `systems/inventory/inventory_ui.gd/.tscn`, `item_slot_ui.gd/.tscn`
+  - [x] Item tooltip/stat comparison panel — `systems/inventory/item_tooltip_ui.gd/.tscn`
+  - [x] Save/load persistence and schema versioning for inventory data — JSON at `user://inventory.json`
+  - [x] Item definitions JSON + LootTable helper — `data/items/item_definitions.json`, `systems/inventory/loot_table.gd`
+  - [x] Wired into `open_world_3d.tscn` — `I` key opens, sample pickup spawned near player start
 
 - [ ] Build **The Garden** as a major city hub players can travel to.
   - [ ] Create city scene + district layout (market, quest square, crafting quarter).

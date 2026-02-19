@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://item_tooltip_ui"]
+
+[ext_resource type="Script" path="res://systems/inventory/item_tooltip_ui.gd" id="1_tooltip_script"]
+
+[node name="ItemTooltip" type="PanelContainer"]
+custom_minimum_size = Vector2(200, 80)
+script = ExtResource("1_tooltip_script")
+z_index = 100
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ItemName" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Item Name"
+
+[node name="Rarity" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "[Common]"
+
+[node name="ItemType" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+add_theme_color_override/font_color = Color(0.7, 0.8, 1.0)
+text = "Consumable"
+
+[node name="Description" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+add_theme_color_override/font_color = Color(0.75, 0.75, 0.75)
+autowrap_mode = 3
+text = ""
+
+[node name="Stats" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+add_theme_color_override/font_color = Color(0.9, 0.95, 1.0)
+text = ""
+
+[node name="Compare" type="RichTextLabel" parent="VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+fit_content = true
+use_bbcode = true
+bbcode_enabled = true
+add_theme_color_override/font_color = Color(0.8, 0.8, 0.8)
+theme_override_font_sizes/font_size = 11
+text = ""

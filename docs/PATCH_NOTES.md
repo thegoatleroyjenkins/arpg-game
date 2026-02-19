@@ -1,5 +1,21 @@
 # Patch Notes
 
+## v0.1.2 (unreleased)
+
+### Inventory System
+- **Full inventory system** added — 24-slot grid, 3 equipment slots (weapon/armor/accessory), drag/drop, right-click use/equip.
+- `InventoryItem` Resource class with type, rarity, stacking rules, and stat bonuses.
+- `InventoryData` Godot autoload (`/root/Inventory`) — singleton holding grid + equipment state with JSON save/load to `user://inventory.json`.
+- `InventoryUI` panel (press **I** to open/close) with tooltip + stat comparison vs. currently equipped item.
+- `ItemSlotUI` cells with rarity-coloured icons, quantity labels, hover highlight.
+- `ItemTooltipUI` — shows name, rarity, type, description, stats, and green/red comparison delta vs. equipped piece.
+- `Pickup3D` — world orb that walks into Inventory; overflow handled with "Bag full!" indicator.
+- `LootTable` — loads `data/items/item_definitions.json` and provides `random_item()` / `weighted_random_drop()` helpers for loot drops.
+- 11 item definitions seeded (potions, weapons, armors, accessories across all rarities).
+- Sample pickup spawned near player start in `open_world_3d.tscn`.
+- `inventory_open` input action registered (key: **I**).
+- `receive_healing()` stub added to `player_3d.gd` — maps consumable heal → stamina restore (extends to HP once CombatActor3D gains full HP tracking).
+
 ## v0.1.1 (unreleased)
 
 ### UI / UX

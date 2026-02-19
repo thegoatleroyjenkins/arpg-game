@@ -1,6 +1,8 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://prototype3d/player_3d.gd" id="1_player_script"]
+[ext_resource type="PackedScene" path="res://systems/inventory/inventory_ui.tscn" id="18_inv_ui"]
+[ext_resource type="PackedScene" path="res://systems/inventory/pickup_3d.tscn"   id="19_pickup"]
 [ext_resource type="Script" path="res://prototype3d/stamina_hud_3d.gd" id="2_stamina_hud_script"]
 [ext_resource type="Script" path="res://prototype3d/pause_menu_3d.gd" id="3_pause_menu_script"]
 [ext_resource type="Script" path="res://systems/world/world_streamer.gd" id="4_world_streamer"]
@@ -223,6 +225,14 @@ text = "Dash I-Frames Ready"
 visible = false
 layout_mode = 2
 text = "Dash failed: low stamina"
+
+[node name="InventoryLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="InventoryUI" parent="InventoryLayer" instance=ExtResource("18_inv_ui")]
+
+[node name="SamplePickup" parent="." instance=ExtResource("19_pickup")]
+position = Vector3(27, 2, 24)
 
 [node name="PauseMenu" type="CanvasLayer" parent="."]
 process_mode = 3

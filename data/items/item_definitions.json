@@ -1,0 +1,133 @@
+{
+  "comment": "Item definitions used by Pickup3D and loot tables. item_type: 0=consumable 1=weapon 2=armor 3=accessory. rarity: 0=common 1=uncommon 2=rare 3=epic 4=legendary.",
+  "items": [
+    {
+      "item_id": "health_potion_small",
+      "item_name": "Small Health Potion",
+      "description": "A crude vial of red liquid. Restores a modest amount of health.",
+      "item_type": 0,
+      "rarity": 0,
+      "quantity": 1,
+      "max_stack": 10,
+      "heal_amount": 30
+    },
+    {
+      "item_id": "health_potion_large",
+      "item_name": "Large Health Potion",
+      "description": "A full flask of concentrated restorative brew.",
+      "item_type": 0,
+      "rarity": 1,
+      "quantity": 1,
+      "max_stack": 5,
+      "heal_amount": 80
+    },
+    {
+      "item_id": "rusty_sword",
+      "item_name": "Rusty Sword",
+      "description": "Worn edges but still cuts.",
+      "item_type": 1,
+      "rarity": 0,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 5,
+      "defense_bonus": 0,
+      "health_bonus": 0
+    },
+    {
+      "item_id": "iron_sword",
+      "item_name": "Iron Sword",
+      "description": "Standard issue. Reliable.",
+      "item_type": 1,
+      "rarity": 1,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 12,
+      "defense_bonus": 0,
+      "health_bonus": 0
+    },
+    {
+      "item_id": "flame_sword",
+      "item_name": "Flame Sword",
+      "description": "Crackling with fire essence. Burns what it touches.",
+      "item_type": 1,
+      "rarity": 2,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 30,
+      "defense_bonus": 0,
+      "health_bonus": 10
+    },
+    {
+      "item_id": "leather_armor",
+      "item_name": "Leather Armor",
+      "description": "Light but serviceable protection.",
+      "item_type": 2,
+      "rarity": 0,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 0,
+      "defense_bonus": 8,
+      "health_bonus": 15
+    },
+    {
+      "item_id": "chain_mail",
+      "item_name": "Chain Mail",
+      "description": "Interlocking rings offering solid coverage.",
+      "item_type": 2,
+      "rarity": 1,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 0,
+      "defense_bonus": 20,
+      "health_bonus": 25
+    },
+    {
+      "item_id": "dragon_plate",
+      "item_name": "Dragon Plate",
+      "description": "Forged from drake scales. Unyielding.",
+      "item_type": 2,
+      "rarity": 2,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 5,
+      "defense_bonus": 45,
+      "health_bonus": 50
+    },
+    {
+      "item_id": "wooden_ring",
+      "item_name": "Wooden Ring",
+      "description": "Carved from the heartwood of an old oak.",
+      "item_type": 3,
+      "rarity": 0,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 0,
+      "defense_bonus": 2,
+      "health_bonus": 10
+    },
+    {
+      "item_id": "ring_of_health",
+      "item_name": "Ring of Health",
+      "description": "A constant warmth pulses from within.",
+      "item_type": 3,
+      "rarity": 1,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 0,
+      "defense_bonus": 5,
+      "health_bonus": 40
+    },
+    {
+      "item_id": "ring_of_the_gods",
+      "item_name": "Ring of the Gods",
+      "description": "Radiates ancient power. Even holding it feels dangerous.",
+      "item_type": 3,
+      "rarity": 3,
+      "quantity": 1,
+      "max_stack": 1,
+      "damage_bonus": 25,
+      "defense_bonus": 15,
+      "health_bonus": 30
+    }
+  ]
+}

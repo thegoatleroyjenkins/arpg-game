@@ -1455,3 +1455,20 @@ func _emit_dash_invulnerability_boost_changed() -> void:
 
 func _emit_dash_charge_recovery_boost_changed() -> void:
 	dash_charge_recovery_boost_changed.emit(dash_charge_recovery_boost_left, max(0.01, dash_charge_recovery_boost_max), max(1.0, dash_charge_recovery_boost_multiplier))
+
+## ── Inventory hooks ──────────────────────────────────────────────────────────
+
+## Called by InventoryUI when a health consumable is used.
+func receive_healing(amount: float) -> void:
+	var resolved := get_node_or_null("/root/Inventory")
+	# healing is handled generically via stamina restore for now;
+	# extend with a health system when CombatActor3D gains HP tracking.
+	restore_stamina(amount * 0.5)   # temporary: map heal → stamina until HP system is live
+
+## Called by the combat system (future) to apply equipment stat changes.
+func refresh_equipment_stats() -> void:
+	var inv := get_node_or_null("/root/Inventory")
+	if inv == null:
+		return
+	# Stub: push bonuses into damage resolver or player stats when ready.
+	# inv.total_damage_bonus() / total_defense_bonus() / total_health_bonus()
